@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>物件ウォッチ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --bg2: #161616;
+    --bg3: #1e1e1e;
+    --border: #2a2a2a;
+    --border2: #333;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #555;
+    --accent: #c8f55a;
+    --accent2: #7fff9a;
+    --red: #ff5a5a;
+    --orange: #ffaa44;
+    --blue: #5ab4ff;
+    --purple: #b088ff;
+    --radius: 10px;
+    --radius2: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15,15,15,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    flex: 1;
+  }
+  .header-title span {
+    color: var(--accent);
+  }
+  .view-toggle {
+    display: flex;
+    background: var(--bg3);
+    border-radius: var(--radius2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .view-btn {
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .view-btn.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+  }
+  .add-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: var(--radius2);
+    padding: 7px 14px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* ===== FILTER BAR ===== */
+  .filter-bar {
+    padding: 10px 16px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    scrollbar-width: none;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    white-space: nowrap;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .filter-chip.active {
+    border-color: var(--accent);
+    background: rgba(200,245,90,0.12);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .filter-divider {
+    width: 1px;
+    background: var(--border2);
+    margin: 3px 4px;
+    flex-shrink: 0;
+  }
+
+  /* ===== STATS BAR ===== */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-item {
+    background: var(--bg2);
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ===== LIST VIEW ===== */
+  #list-view {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .property-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .property-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--border2);
+    transition: background 0.2s;
+  }
+  .property-card.changed::before { background: var(--orange); }
+  .property-card.withdrawn::before { background: var(--red); }
+  .property-card.new::before { background: var(--accent2); }
+  .property-card:active { opacity: 0.8; }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .source-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .badge-suumo { background: #1a3a1a; color: #6fcf6f; }
+  .badge-athome { background: #1a2a3a; color: #6aaff0; }
+  .badge-homes { background: #2a1a3a; color: #b088ff; }
+  .badge-kenbi { background: #3a1a1a; color: #f08080; }
+  .badge-rakumachi { background: #2a2a1a; color: #f0c060; }
+
+  .card-name {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    flex: 1;
+  }
+  .change-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .change-badge.price-down { background: rgba(255,90,90,0.2); color: var(--red); }
+  .change-badge.price-up { background: rgba(255,170,68,0.2); color: var(--orange); }
+  .change-badge.new-badge { background: rgba(127,255,154,0.15); color: var(--accent2); }
+  .change-badge.withdrawn-badge { background: rgba(255,90,90,0.15); color: var(--red); }
+  .change-badge.campaign { background: rgba(90,180,255,0.15); color: var(--blue); }
+
+  .card-price {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .card-price .unit { font-size: 12px; color: var(--text2); font-weight: 400; }
+  .card-price .prev {
+    font-size: 12px;
+    color: var(--red);
+    text-decoration: line-through;
+    margin-left: 8px;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .meta-tag {
+    font-size: 11px;
+    color: var(--text2);
+    background: var(--bg3);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-region {
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .card-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  /* ===== MAP VIEW ===== */
+  #map-view {
+    display: none;
+    height: calc(100vh - 140px);
+    position: relative;
+    background: var(--bg3);
+  }
+  .map-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: var(--text2);
+  }
+  .map-placeholder .map-icon {
+    font-size: 48px;
+    opacity: 0.3;
+  }
+  .map-info-cards {
+    position: absolute;
+    bottom: 16px;
+    left: 0; right: 0;
+    padding: 0 12px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .map-info-cards::-webkit-scrollbar { display: none; }
+  .map-mini-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    min-width: 180px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .map-pin {
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 4px;
+  }
+  .map-mini-name {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .map-mini-price {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--accent);
+  }
+
+  /* ===== DETAIL MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: block; }
+
+  .modal {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg2);
+    border-radius: 16px 16px 0 0;
+    border-top: 1px solid var(--border2);
+    z-index: 201;
+    max-height: 92vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+  }
+  .modal.open { transform: translateY(0); }
+
+  .modal-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border2);
+    border-radius: 2px;
+    margin: 10px auto 0;
+  }
+  .modal-header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-source-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .modal-price {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--accent);
+    margin: 8px 0 4px;
+  }
+  .modal-price .unit { font-size: 14px; color: var(--text2); }
+  .modal-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-section-title {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .detail-item {
+    background: var(--bg3);
+    border-radius: var(--radius2);
+    padding: 8px 10px;
+  }
+  .detail-label {
+    font-size: 10px;
+    color: var(--text3);
+    margin-bottom: 2px;
+  }
+  .detail-value {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* タブ */
+  .modal-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .modal-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* 変更履歴 */
+  .history-list {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .history-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .history-dot-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    padding-top: 3px;
+  }
+  .history-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border2);
+    flex-shrink: 0;
+  }
+  .history-dot.price { background: var(--red); }
+  .history-dot.campaign { background: var(--blue); }
+  .history-dot.withdrawn { background: var(--text3); }
+  .history-dot.added { background: var(--accent); }
+  .history-line {
+    width: 1px;
+    flex: 1;
+    background: var(--border);
+    margin-top: 4px;
+    min-height: 20px;
+  }
+  .history-body { flex: 1; padding-bottom: 8px; }
+  .history-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 3px;
+  }
+  .history-desc {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .history-diff {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    margin-top: 4px;
+    padding: 4px 8px;
+    background: var(--bg3);
+    border-radius: 4px;
+    color: var(--text2);
+  }
+  .diff-old { color: var(--red); text-decoration: line-through; }
+  .diff-new { color: var(--accent2); }
+
+  /* グラフ */
+  .chart-area {
+    padding: 16px;
+  }
+  .chart-wrap {
+    background: var(--bg3);
+    border-radius: var(--radius);
+    padding: 14px;
+    position: relative;
+    height: 160px;
+  }
+  canvas#priceChart { width: 100% !important; height: 100% !important; }
+
+  /* 外部リンク */
+  .open-link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: calc(100% - 32px);
+    margin: 8px 16px 20px;
+    padding: 13px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  /* ===== ADD MODAL ===== */
+  .add-modal {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--bg2);
+    border-radius: 16px 16px 0 0;
+    border-top: 1px solid var(--border2);
+    z-index: 301;
+    max-height: 92vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+  }
+  .add-modal.open { transform: translateY(0); }
+  .add-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 300;
+  }
+  .add-modal-overlay.open { display: block; }
+
+  .form-group {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-label {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius2);
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    outline: none;
+  }
+  .form-input:focus, .form-select:focus {
+    border-color: var(--accent);
+  }
+  .form-select option { background: var(--bg3); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .form-submit {
+    margin: 14px 16px 24px;
+    width: calc(100% - 32px);
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #000;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text3);
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+  .empty-state p { font-size: 14px; line-height: 1.6; }
+
+  /* ===== BOOKMARKLET PAGE ===== */
+  #bookmarklet-view {
+    display: none;
+    padding: 16px;
+  }
+  .bm-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .bm-site {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text2);
+    margin-bottom: 6px;
+    letter-spacing: 0.05em;
+  }
+  .bm-desc {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .bm-code {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    word-break: break-all;
+    line-height: 1.5;
+    cursor: pointer;
+    position: relative;
+  }
+  .bm-copy-hint {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  /* スナップショット追記ボタン */
+  .snapshot-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border);
+    color: var(--blue);
+    font-size: 13px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(15,15,15,0.97);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    z-index: 150;
+    backdrop-filter: blur(12px);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0 8px;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 10px;
+    gap: 3px;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-icon { font-size: 20px; }
+
+  .main-content {
+    padding-bottom: 70px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">物件<span>ウォッチ</span></div>
+  <div class="view-toggle">
+    <button class="view-btn active" onclick="switchView('list')" id="list-btn">リスト</button>
+    <button class="view-btn" onclick="switchView('map')" id="map-btn">地図</button>
+  </div>
+  <button class="add-btn" onclick="openAddModal()">＋ 追加</button>
+</header>
+
+<div class="filter-bar" id="filter-bar">
+  <div class="filter-chip active" onclick="setFilter('type','all',this)">すべて</div>
+  <div class="filter-chip" onclick="setFilter('type','rent',this)">賃貸</div>
+  <div class="filter-chip" onclick="setFilter('type','sale',this)">売買</div>
+  <div class="filter-divider"></div>
+  <div class="filter-chip active" onclick="setFilter('region','all',this)" id="region-all">全地域</div>
+  <!-- 地域チップはJS生成 -->
+</div>
+
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-item"><div class="stat-num" id="stat-total">0</div><div class="stat-label">総物件数</div></div>
+  <div class="stat-item"><div class="stat-num" id="stat-changed">0</div><div class="stat-label">変更あり</div></div>
+  <div class="stat-item"><div class="stat-num" id="stat-withdrawn">0</div><div class="stat-label">取り下げ</div></div>
+  <div class="stat-item"><div class="stat-num" id="stat-watching">0</div><div class="stat-label">監視中</div></div>
+</div>
+
+<div class="main-content">
+  <div id="list-view"></div>
+  <div id="map-view">
+    <div class="map-placeholder">
+      <div class="map-icon">🗾</div>
+      <div style="font-size:13px;">地図連携にはGoogleマップAPIキーが必要です</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">現在：ブックマークレットで取得した住所情報を一覧表示</div>
+    </div>
+    <div class="map-info-cards" id="map-cards"></div>
+  </div>
+  <div id="bookmarklet-view"></div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-item active" onclick="setPage('watch')" id="nav-watch">
+    <span class="nav-icon">👁</span>ウォッチ
+  </button>
+  <button class="nav-item" onclick="setPage('bookmarklet')" id="nav-bm">
+    <span class="nav-icon">🔖</span>取込設定
+  </button>
+  <button class="nav-item" onclick="setPage('stats')" id="nav-stats">
+    <span class="nav-icon">📊</span>相場分析
+  </button>
+</div>
+
+<!-- 詳細モーダル -->
+<div class="modal-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+<div class="modal" id="detail-modal">
+  <div class="modal-handle"></div>
+  <div id="detail-content"></div>
+</div>
+
+<!-- 追加モーダル -->
+<div class="add-modal-overlay" id="add-overlay" onclick="closeAddModal()"></div>
+<div class="add-modal" id="add-modal">
+  <div class="modal-handle"></div>
+  <div style="padding:14px 16px 10px; border-bottom:1px solid var(--border);">
+    <div style="font-size:16px;font-weight:700;">物件を追加</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:2px;">スクショを貼るかURLと合わせて手動入力</div>
+  </div>
+
+  <!-- スクショ解析エリア -->
+  <div class="form-group">
+    <label class="form-label">📸 物件スクショから自動入力（Gemini AI）</label>
+    <div id="screenshot-drop-area" onclick="document.getElementById('screenshot-input').click()"
+      style="border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--bg3);">
+      <div style="font-size:28px;margin-bottom:6px;">📷</div>
+      <div style="font-size:13px;color:var(--text2);">タップして画像を選択</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">SUUMOなど各サイトのスクショをそのまま貼り付けOK</div>
+    </div>
+    <input type="file" id="screenshot-input" accept="image/*" style="display:none" onchange="handleScreenshot(event)">
+    <div id="screenshot-preview" style="display:none;margin-top:8px;position:relative;">
+      <img id="screenshot-img" style="width:100%;border-radius:8px;border:1px solid var(--border2);">
+      <button onclick="clearScreenshot()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);border:none;color:white;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;">×</button>
+    </div>
+    <button id="analyze-btn" onclick="analyzeScreenshot()" style="display:none;width:100%;margin-top:8px;padding:11px;background:linear-gradient(135deg,#4285f4,#34a853);border:none;border-radius:8px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">
+      ✨ AIで情報を自動入力
+    </button>
+    <div id="analyze-status" style="display:none;text-align:center;padding:10px;font-size:12px;color:var(--text2);"></div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:8px;padding:0 16px 10px;">
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+    <div style="font-size:11px;color:var(--text3);">または手動入力</div>
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">物件URL <span style="color:var(--red)">*必須</span></label>
+    <input class="form-input" id="f-url" placeholder="https://suumo.jp/..." type="url">
+  </div>
+  <div class="form-group">
+    <label class="form-label">物件名</label>
+    <input class="form-input" id="f-name" placeholder="例：グランドメゾン渋谷">
+  </div>
+  <div class="form-group">
+    <div class="form-row">
+      <div>
+        <label class="form-label">種別</label>
+        <select class="form-select" id="f-type">
+          <option value="rent">賃貸</option>
+          <option value="sale">売買</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">情報源</label>
+        <select class="form-select" id="f-source">
+          <option value="suumo">SUUMO</option>
+          <option value="athome">アットホーム</option>
+          <option value="homes">ホームズ</option>
+          <option value="kenbi">健美家</option>
+          <option value="rakumachi">楽待</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="form-row">
+      <div>
+        <label class="form-label">価格（万円）</label>
+        <input class="form-input" id="f-price" type="number" placeholder="例：15.5">
+      </div>
+      <div>
+        <label class="form-label">地域</label>
+        <input class="form-input" id="f-region" placeholder="例：渋谷区">
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="form-row">
+      <div>
+        <label class="form-label">敷金（ヶ月）</label>
+        <input class="form-input" id="f-shikikin" type="number" placeholder="1">
+      </div>
+      <div>
+        <label class="form-label">礼金（ヶ月）</label>
+        <input class="form-input" id="f-reikin" type="number" placeholder="1">
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">間取り</label>
+    <input class="form-input" id="f-layout" placeholder="例：1LDK">
+  </div>
+  <div class="form-group">
+    <label class="form-label">専有面積（㎡）</label>
+    <input class="form-input" id="f-area" type="number" placeholder="例：45.5">
+  </div>
+  <div class="form-group">
+    <label class="form-label">フリーレント・キャンペーン</label>
+    <input class="form-input" id="f-campaign" placeholder="例：フリーレント1ヶ月">
+  </div>
+  <div class="form-group">
+    <label class="form-label">メモ</label>
+    <input class="form-input" id="f-memo" placeholder="気になる点など">
+  </div>
+
+  <button class="form-submit" onclick="saveProperty()">保存する</button>
+</div>
+
+<script>
+// ===== GEMINI API =====
+const GEMINI_KEY_STORAGE = 'fudosan_watch_gemini_key';
+
+function getGeminiKey() {
+  return localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+}
+function saveGeminiKey(key) {
+  localStorage.setItem(GEMINI_KEY_STORAGE, key.trim());
+}
+
+let screenshotBase64 = null;
+let screenshotMime = 'image/jpeg';
+
+function handleScreenshot(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  screenshotMime = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const result = e.target.result;
+    screenshotBase64 = result.split(',')[1];
+    document.getElementById('screenshot-img').src = result;
+    document.getElementById('screenshot-preview').style.display = 'block';
+    document.getElementById('analyze-btn').style.display = 'block';
+    document.getElementById('screenshot-drop-area').style.borderColor = 'var(--accent)';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearScreenshot() {
+  screenshotBase64 = null;
+  document.getElementById('screenshot-preview').style.display = 'none';
+  document.getElementById('analyze-btn').style.display = 'none';
+  document.getElementById('screenshot-drop-area').style.borderColor = 'var(--border2)';
+  document.getElementById('screenshot-input').value = '';
+  document.getElementById('analyze-status').style.display = 'none';
+}
+
+async function analyzeScreenshot() {
+  const key = getGeminiKey();
+  if (!key) {
+    alert('Gemini APIキーが設定されていません。\n「取込設定」タブで設定してください。');
+    closeAddModal();
+    setPage('bookmarklet');
+    return;
+  }
+  if (!screenshotBase64) return;
+
+  const btn = document.getElementById('analyze-btn');
+  const status = document.getElementById('analyze-status');
+  btn.style.display = 'none';
+  status.style.display = 'block';
+  status.innerHTML = '⏳ AI解析中...';
+
+  const prompt = `この画像は日本の不動産サイト（SUUMO、アットホーム、ホームズ、健美家、楽待など）の物件ページのスクリーンショットです。
+以下の情報をJSON形式で抽出してください。見つからない項目はnullにしてください。
+
+{
+  "name": "物件名またはマンション名",
+  "price": 数値（万円。賃貸なら月額、売買なら売値。数字のみ）,
+  "type": "rent" または "sale",
+  "region": "市区町村（例：渋谷区、世田谷区）",
+  "layout": "間取り（例：1LDK）",
+  "area": 数値（専有面積㎡、数字のみ）,
+  "shikikin": 数値（敷金ヶ月数、数字のみ）,
+  "reikin": 数値（礼金ヶ月数、数字のみ）,
+  "campaign": "フリーレントやキャンペーン情報（なければnull）",
+  "source": "suumo" または "athome" または "homes" または "kenbi" または "rakumachi" または "other"
+}
+
+JSONのみ返してください。マークダウンや説明文は不要です。`;
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: screenshotMime, data: screenshotBase64 } }
+          ]
+        }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'API error');
+    }
+
+    const data = await res.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    // フォームに自動入力
+    if (parsed.name) document.getElementById('f-name').value = parsed.name;
+    if (parsed.price) document.getElementById('f-price').value = parsed.price;
+    if (parsed.type) document.getElementById('f-type').value = parsed.type;
+    if (parsed.region) document.getElementById('f-region').value = parsed.region;
+    if (parsed.layout) document.getElementById('f-layout').value = parsed.layout;
+    if (parsed.area) document.getElementById('f-area').value = parsed.area;
+    if (parsed.shikikin != null) document.getElementById('f-shikikin').value = parsed.shikikin;
+    if (parsed.reikin != null) document.getElementById('f-reikin').value = parsed.reikin;
+    if (parsed.campaign) document.getElementById('f-campaign').value = parsed.campaign;
+    if (parsed.source) document.getElementById('f-source').value = parsed.source;
+
+    status.innerHTML = '✅ 入力完了！URLを確認して保存してください';
+    status.style.color = 'var(--accent)';
+
+    // URLフィールドにフォーカス
+    setTimeout(() => document.getElementById('f-url').focus(), 300);
+
+  } catch (e) {
+    console.error(e);
+    status.innerHTML = `❌ エラー：${e.message}`;
+    status.style.color = 'var(--red)';
+    btn.style.display = 'block';
+  }
+}
+
+// ===== DATA =====
+const STORAGE_KEY = 'fudosan_watch_v1';
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { properties: [] }; }
+  catch { return { properties: [] }; }
+}
+function saveData(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+let db = loadData();
+let currentFilters = { type: 'all', region: 'all' };
+let currentPage = 'watch';
+
+// サンプルデータ（初回のみ）
+function initSampleData() {
+  if (db.properties.length > 0) return;
+  const now = Date.now();
+  db.properties = [
+    {
+      id: 'p1', name: 'パークハイツ世田谷', source: 'suumo', type: 'rent',
+      region: '世田谷区', url: 'https://suumo.jp/sample',
+      price: 12.8, layout: '1LDK', area: 42.5,
+      shikikin: 1, reikin: 1, campaign: '',
+      status: 'active', addedAt: now - 86400000*5,
+      snapshots: [
+        { time: now - 86400000*5, price: 13.2, shikikin:1, reikin:1, campaign:'', memo:'初回記録' },
+        { time: now - 86400000*2, price: 12.8, shikikin:1, reikin:1, campaign:'', memo:'値下げ' },
+      ]
+    },
+    {
+      id: 'p2', name: 'レジデンス代々木', source: 'athome', type: 'rent',
+      region: '渋谷区', url: 'https://athome.co.jp/sample',
+      price: 18.5, layout: '2LDK', area: 62.0,
+      shikikin: 2, reikin: 0, campaign: 'フリーレント1ヶ月',
+      status: 'active', addedAt: now - 86400000*3,
+      snapshots: [
+        { time: now - 86400000*3, price: 18.5, shikikin:2, reikin:1, campaign:'', memo:'初回記録' },
+        { time: now - 86400000*1, price: 18.5, shikikin:2, reikin:0, campaign:'フリーレント1ヶ月', memo:'礼金撤廃＋フリーレント追加' },
+      ]
+    },
+    {
+      id: 'p3', name: '中古マンション 目黒区', source: 'homes', type: 'sale',
+      region: '目黒区', url: 'https://homes.co.jp/sample',
+      price: 4980, layout: '3LDK', area: 78.2,
+      shikikin: 0, reikin: 0, campaign: '',
+      status: 'withdrawn', addedAt: now - 86400000*10,
+      withdrawnAt: now - 86400000*1,
+      snapshots: [
+        { time: now - 86400000*10, price: 5200, shikikin:0, reikin:0, campaign:'', memo:'初回記録' },
+        { time: now - 86400000*5, price: 4980, shikikin:0, reikin:0, campaign:'', memo:'値下げ' },
+        { time: now - 86400000*1, price: 4980, shikikin:0, reikin:0, campaign:'', memo:'掲載終了（成約？）', withdrawn: true },
+      ]
+    },
+    {
+      id: 'p4', name: '一棟アパート 板橋区', source: 'rakumachi', type: 'sale',
+      region: '板橋区', url: 'https://rakumachi.jp/sample',
+      price: 8500, layout: '1K×8戸', area: 320,
+      shikikin: 0, reikin: 0, campaign: '',
+      status: 'active', addedAt: now - 86400000*7,
+      snapshots: [
+        { time: now - 86400000*7, price: 8500, shikikin:0, reikin:0, campaign:'', memo:'初回記録' },
+      ]
+    },
+    {
+      id: 'p5', name: 'RC造区分 江東区', source: 'kenbi', type: 'sale',
+      region: '江東区', url: 'https://kenbiya.com/sample',
+      price: 1200, layout: '1K', area: 28.4,
+      shikikin: 0, reikin: 0, campaign: '',
+      status: 'active', addedAt: now - 86400000*2,
+      snapshots: [
+        { time: now - 86400000*2, price: 1200, shikikin:0, reikin:0, campaign:'', memo:'初回記録' },
+      ]
+    },
+  ];
+  saveData(db);
+}
+initSampleData();
+
+// ===== FILTERS =====
+let typeFilter = 'all', regionFilter = 'all';
+
+function getRegions() {
+  return [...new Set(db.properties.map(p => p.region).filter(Boolean))];
+}
+
+function buildRegionChips() {
+  const bar = document.getElementById('filter-bar');
+  // 既存の地域チップを削除
+  bar.querySelectorAll('.region-chip').forEach(e => e.remove());
+  getRegions().forEach(r => {
+    const c = document.createElement('div');
+    c.className = 'filter-chip region-chip';
+    c.textContent = r;
+    c.onclick = () => setFilter('region', r, c);
+    bar.appendChild(c);
+  });
+}
+
+function setFilter(kind, val, el) {
+  if (kind === 'type') {
+    typeFilter = val;
+    document.querySelectorAll('.filter-chip:not(.region-chip)').forEach(c => {
+      const cv = c.textContent === 'すべて' ? 'all' : c.textContent === '賃貸' ? 'rent' : 'sale';
+      c.classList.toggle('active', cv === val);
+    });
+  } else {
+    regionFilter = val;
+    document.querySelectorAll('.filter-chip.region-chip, #region-all').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+  renderList();
+}
+
+function filteredProps() {
+  return db.properties.filter(p => {
+    if (typeFilter !== 'all' && p.type !== typeFilter) return false;
+    if (regionFilter !== 'all' && p.region !== regionFilter) return false;
+    return true;
+  });
+}
+
+// ===== STATS =====
+function updateStats() {
+  const all = db.properties;
+  document.getElementById('stat-total').textContent = all.length;
+  document.getElementById('stat-changed').textContent = all.filter(p => hasRecentChange(p)).length;
+  document.getElementById('stat-withdrawn').textContent = all.filter(p => p.status === 'withdrawn').length;
+  document.getElementById('stat-watching').textContent = all.filter(p => p.status === 'active').length;
+}
+
+function hasRecentChange(p) {
+  if (p.snapshots.length < 2) return false;
+  const last = p.snapshots[p.snapshots.length - 1];
+  const prev = p.snapshots[p.snapshots.length - 2];
+  return last.price !== prev.price || last.shikikin !== prev.shikikin
+    || last.reikin !== prev.reikin || last.campaign !== prev.campaign;
+}
+
+function getChangeBadge(p) {
+  if (p.status === 'withdrawn') return { text: '取り下げ', cls: 'withdrawn-badge' };
+  if (p.snapshots.length < 2) return null;
+  const last = p.snapshots[p.snapshots.length - 1];
+  const prev = p.snapshots[p.snapshots.length - 2];
+  if (last.price < prev.price) return { text: '値下げ▼', cls: 'price-down' };
+  if (last.price > prev.price) return { text: '値上げ▲', cls: 'price-up' };
+  if (last.campaign && !prev.campaign) return { text: 'キャンペーン', cls: 'campaign' };
+  if (last.shikikin !== prev.shikikin || last.reikin !== prev.reikin) return { text: '条件変更', cls: 'campaign' };
+  return null;
+}
+
+// ===== RENDER LIST =====
+function formatPrice(p) {
+  if (p.type === 'sale') return p.price.toLocaleString() + '<span class="unit"> 万円</span>';
+  return p.price.toFixed(1) + '<span class="unit"> 万円/月</span>';
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 3600000) return Math.floor(diff / 60000) + '分前';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + '時間前';
+  if (diff < 86400000 * 7) return Math.floor(diff / 86400000) + '日前';
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
+const SOURCE_INFO = {
+  suumo: { label: 'SUUMO', cls: 'badge-suumo' },
+  athome: { label: 'アットホーム', cls: 'badge-athome' },
+  homes: { label: 'ホームズ', cls: 'badge-homes' },
+  kenbi: { label: '健美家', cls: 'badge-kenbi' },
+  rakumachi: { label: '楽待', cls: 'badge-rakumachi' },
+};
+
+function renderList() {
+  const container = document.getElementById('list-view');
+  const props = filteredProps();
+  updateStats();
+  buildRegionChips();
+
+  if (props.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🏠</div>
+      <p>物件がありません<br>「＋ 追加」から登録するか<br>ブックマークレットを使ってください</p>
+    </div>`;
+    return;
+  }
+
+  // 取り下げは下へ
+  const sorted = [...props].sort((a,b) => {
+    if (a.status === 'withdrawn' && b.status !== 'withdrawn') return 1;
+    if (a.status !== 'withdrawn' && b.status === 'withdrawn') return -1;
+    return b.addedAt - a.addedAt;
+  });
+
+  container.innerHTML = sorted.map(p => {
+    const badge = getChangeBadge(p);
+    const si = SOURCE_INFO[p.source] || { label: p.source, cls: '' };
+    const lastSnap = p.snapshots[p.snapshots.length - 1];
+    const prevSnap = p.snapshots.length > 1 ? p.snapshots[p.snapshots.length - 2] : null;
+    const priceChanged = prevSnap && lastSnap.price !== prevSnap.price;
+    const cardClass = p.status === 'withdrawn' ? 'withdrawn' : badge ? 'changed' : '';
+
+    return `<div class="property-card ${cardClass}" onclick="openDetail('${p.id}')">
+      <div class="card-top">
+        <span class="source-badge ${si.cls}">${si.label}</span>
+        <span class="card-name">${p.name}</span>
+        ${badge ? `<span class="change-badge ${badge.cls}">${badge.text}</span>` : ''}
+      </div>
+      <div class="card-price">
+        ${formatPrice(p)}
+        ${priceChanged ? `<span class="prev">${prevSnap.price}${p.type==='sale'?'万':'万/月'}</span>` : ''}
+      </div>
+      <div class="card-meta">
+        ${p.layout ? `<span class="meta-tag">${p.layout}</span>` : ''}
+        ${p.area ? `<span class="meta-tag">${p.area}㎡</span>` : ''}
+        ${p.type === 'rent' ? `<span class="meta-tag">敷${p.shikikin||0}/礼${p.reikin||0}</span>` : ''}
+        ${p.campaign ? `<span class="meta-tag" style="color:var(--blue)">${p.campaign}</span>` : ''}
+      </div>
+      <div class="card-footer">
+        <span class="card-region">📍 ${p.region || '地域未設定'}</span>
+        <span class="card-time">${formatTime(p.addedAt)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 地図カード
+  renderMapCards(sorted);
+}
+
+function renderMapCards(props) {
+  const container = document.getElementById('map-cards');
+  container.innerHTML = props.filter(p => p.status !== 'withdrawn').map(p => {
+    const si = SOURCE_INFO[p.source] || { label: p.source, cls: '' };
+    return `<div class="map-mini-card" onclick="openDetail('${p.id}')">
+      <div class="map-pin"><span class="source-badge ${si.cls}" style="font-size:9px;">${si.label}</span> ${p.region}</div>
+      <div class="map-mini-name">${p.name}</div>
+      <div class="map-mini-price">${p.type === 'sale' ? p.price.toLocaleString()+'万円' : p.price+'万/月'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== DETAIL =====
+let currentPropId = null;
+let currentTab = 'info';
+
+function openDetail(id) {
+  currentPropId = id;
+  currentTab = 'info';
+  renderDetail();
+  document.getElementById('detail-overlay').classList.add('open');
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-overlay').classList.remove('open');
+  document.getElementById('detail-modal').classList.remove('open');
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+  if (tab === 'chart') drawChart();
+}
+
+function renderDetail() {
+  const p = db.properties.find(x => x.id === currentPropId);
+  if (!p) return;
+  const si = SOURCE_INFO[p.source] || { label: p.source, cls: '' };
+  const badge = getChangeBadge(p);
+
+  const historyHTML = [...p.snapshots].reverse().map((s, i, arr) => {
+    const isLast = i === arr.length - 1;
+    const prev = arr[i + 1];
+    let dotClass = isLast ? 'added' : '';
+    let desc = '', diff = '';
+
+    if (isLast) {
+      desc = '追加・初回記録';
+    } else if (s.withdrawn) {
+      desc = '掲載終了（成約の可能性）'; dotClass = 'withdrawn';
+    } else if (prev) {
+      const changes = [];
+      if (s.price !== prev.price) {
+        changes.push('価格変更');
+        dotClass = 'price';
+        diff = `<div class="history-diff"><span class="diff-old">${prev.price}${p.type==='sale'?'万円':'万/月'}</span> → <span class="diff-new">${s.price}${p.type==='sale'?'万円':'万/月'}</span></div>`;
+      }
+      if (s.shikikin !== prev.shikikin) changes.push(`敷金 ${prev.shikikin}→${s.shikikin}ヶ月`);
+      if (s.reikin !== prev.reikin) changes.push(`礼金 ${prev.reikin}→${s.reikin}ヶ月`);
+      if (s.campaign !== prev.campaign) {
+        changes.push('キャンペーン変更'); dotClass = 'campaign';
+        if (!diff) diff = `<div class="history-diff"><span class="diff-old">${prev.campaign||'なし'}</span> → <span class="diff-new">${s.campaign||'なし'}</span></div>`;
+      }
+      desc = changes.length ? changes.join('・') : (s.memo || 'スナップショット記録');
+    }
+
+    return `<div class="history-item">
+      <div class="history-dot-line">
+        <div class="history-dot ${dotClass}"></div>
+        ${!isLast ? '<div class="history-line"></div>' : ''}
+      </div>
+      <div class="history-body">
+        <div class="history-time">${new Date(s.time).toLocaleDateString('ja-JP')} ${new Date(s.time).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="history-desc">${desc}</div>
+        ${diff}
+        ${s.memo && !isLast ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;">${s.memo}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-source-row">
+        <span class="source-badge ${si.cls}">${si.label}</span>
+        <span style="font-size:11px;color:var(--text2);">${p.type === 'rent' ? '賃貸' : '売買'} · ${p.region}</span>
+        ${badge ? `<span class="change-badge ${badge.cls}" style="margin-left:auto;">${badge.text}</span>` : ''}
+      </div>
+      <div class="modal-title">${p.name}</div>
+      <div class="modal-price">${p.type==='sale' ? p.price.toLocaleString() : p.price}<span class="unit"> ${p.type==='sale'?'万円':'万円/月'}</span></div>
+    </div>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="info" onclick="switchTab('info')">基本情報</button>
+      <button class="modal-tab" data-tab="history" onclick="switchTab('history')">変更履歴 (${p.snapshots.length})</button>
+      <button class="modal-tab" data-tab="chart" onclick="switchTab('chart')">グラフ</button>
+    </div>
+
+    <div id="tab-info" class="tab-content active">
+      <div class="modal-section">
+        <div class="modal-section-title">物件詳細</div>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="detail-label">間取り</div><div class="detail-value">${p.layout||'—'}</div></div>
+          <div class="detail-item"><div class="detail-label">専有面積</div><div class="detail-value">${p.area ? p.area+'㎡' : '—'}</div></div>
+          ${p.type==='rent' ? `
+          <div class="detail-item"><div class="detail-label">敷金</div><div class="detail-value">${p.shikikin||0}ヶ月</div></div>
+          <div class="detail-item"><div class="detail-label">礼金</div><div class="detail-value">${p.reikin||0}ヶ月</div></div>
+          ` : ''}
+          <div class="detail-item" style="grid-column:1/-1;"><div class="detail-label">キャンペーン</div><div class="detail-value">${p.campaign||'なし'}</div></div>
+          <div class="detail-item" style="grid-column:1/-1;"><div class="detail-label">追加日</div><div class="detail-value">${new Date(p.addedAt).toLocaleDateString('ja-JP')}</div></div>
+          ${p.status==='withdrawn' ? `<div class="detail-item" style="grid-column:1/-1;background:rgba(255,90,90,0.1);border:1px solid rgba(255,90,90,0.3)"><div class="detail-label" style="color:var(--red)">掲載終了日</div><div class="detail-value">${new Date(p.withdrawnAt).toLocaleDateString('ja-JP')}</div></div>` : ''}
+        </div>
+      </div>
+      <button class="snapshot-btn" onclick="addSnapshot('${p.id}')">
+        📸 現在の情報をスナップショット記録
+      </button>
+    </div>
+
+    <div id="tab-history" class="tab-content">
+      <div class="history-list">${historyHTML}</div>
+    </div>
+
+    <div id="tab-chart" class="tab-content">
+      <div class="chart-area">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:10px;">価格推移（万円）</div>
+        <div class="chart-wrap">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <a class="open-link-btn" href="${p.url}" target="_blank">
+      🔗 ${si.label}で物件を開く
+    </a>
+    <div style="padding:0 16px 8px; display:flex; gap:8px;">
+      <button onclick="markWithdrawn('${p.id}')" style="flex:1;padding:10px;background:rgba(255,90,90,0.1);border:1px solid rgba(255,90,90,0.3);border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit;">取り下げとして記録</button>
+      <button onclick="deleteProperty('${p.id}')" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:inherit;">削除</button>
+    </div>
+    <div style="height:20px;"></div>
+  `;
+}
+
+function drawChart() {
+  const p = db.properties.find(x => x.id === currentPropId);
+  if (!p || p.snapshots.length < 2) return;
+
+  const canvas = document.getElementById('priceChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = canvas.offsetHeight * 2;
+  ctx.scale(2, 2);
+
+  const W = canvas.offsetWidth / 2;
+  const H = canvas.offsetHeight / 2;
+  const pad = { t: 10, r: 10, b: 30, l: 45 };
+  const cW = W - pad.l - pad.r;
+  const cH = H - pad.t - pad.b;
+
+  const prices = p.snapshots.map(s => s.price);
+  const minP = Math.min(...prices) * 0.98;
+  const maxP = Math.max(...prices) * 1.02;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = 1;
+  [0,.25,.5,.75,1].forEach(t => {
+    const y = pad.t + cH * (1 - t);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cW, y); ctx.stroke();
+    const val = (minP + (maxP - minP) * t).toFixed(1);
+    ctx.fillStyle = '#555';
+    ctx.font = '9px DM Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(val, pad.l - 4, y + 3);
+  });
+
+  // Line
+  const pts = p.snapshots.map((s, i) => ({
+    x: pad.l + (i / (p.snapshots.length - 1)) * cW,
+    y: pad.t + cH * (1 - (s.price - minP) / (maxP - minP))
+  }));
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + cH);
+  grad.addColorStop(0, 'rgba(200,245,90,0.3)');
+  grad.addColorStop(1, 'rgba(200,245,90,0)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pad.t + cH);
+  pts.forEach(pt => ctx.lineTo(pt.x, pt.y));
+  ctx.lineTo(pts[pts.length-1].x, pad.t + cH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#c8f55a';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  pts.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
+  ctx.stroke();
+
+  // Dots
+  pts.forEach((pt, i) => {
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#c8f55a';
+    ctx.fill();
+    // Date labels
+    const d = new Date(p.snapshots[i].time);
+    ctx.fillStyle = '#555';
+    ctx.font = '8px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${d.getMonth()+1}/${d.getDate()}`, pt.x, H - pad.b + 14);
+  });
+}
+
+// ===== SNAPSHOT =====
+function addSnapshot(id) {
+  const p = db.properties.find(x => x.id === id);
+  if (!p) return;
+  const priceStr = prompt(`現在の価格（万円）\n前回: ${p.price}`, p.price);
+  if (priceStr === null) return;
+  const newPrice = parseFloat(priceStr);
+  if (isNaN(newPrice)) return;
+
+  const campaign = prompt('キャンペーン・フリーレント（なければ空欄）', p.campaign || '') || '';
+
+  const snap = {
+    time: Date.now(),
+    price: newPrice,
+    shikikin: p.shikikin,
+    reikin: p.reikin,
+    campaign,
+    memo: ''
+  };
+  p.snapshots.push(snap);
+  p.price = newPrice;
+  p.campaign = campaign;
+  saveData(db);
+  renderDetail();
+  renderList();
+}
+
+function markWithdrawn(id) {
+  if (!confirm('この物件を「取り下げ（成約）」として記録しますか？')) return;
+  const p = db.properties.find(x => x.id === id);
+  if (!p) return;
+  p.status = 'withdrawn';
+  p.withdrawnAt = Date.now();
+  p.snapshots.push({ time: Date.now(), price: p.price, shikikin: p.shikikin, reikin: p.reikin, campaign: p.campaign, memo: '掲載終了（成約）', withdrawn: true });
+  saveData(db);
+  closeDetail();
+  renderList();
+}
+
+function deleteProperty(id) {
+  if (!confirm('この物件を削除しますか？')) return;
+  db.properties = db.properties.filter(x => x.id !== id);
+  saveData(db);
+  closeDetail();
+  renderList();
+}
+
+// ===== ADD MODAL =====
+function saveGeminiKeyFromInput() {
+  const input = document.getElementById('gemini-key-input');
+  const val = input.value.trim();
+  if (!val || val === '••••••••••••••••') {
+    alert('APIキーを入力してください');
+    return;
+  }
+  saveGeminiKey(val);
+  input.value = '••••••••••••••••';
+  renderBookmarkletPage();
+  alert('✅ APIキーを保存しました');
+}
+
+function openAddModal() {
+  document.getElementById('add-overlay').classList.add('open');
+  document.getElementById('add-modal').classList.add('open');
+  // URLパラメータからの自動入力（ブックマークレット連携）
+  const params = new URLSearchParams(location.search);
+  if (params.get('url')) document.getElementById('f-url').value = params.get('url');
+  if (params.get('name')) document.getElementById('f-name').value = params.get('name');
+  if (params.get('price')) document.getElementById('f-price').value = params.get('price');
+  if (params.get('source')) document.getElementById('f-source').value = params.get('source');
+}
+function closeAddModal() {
+  document.getElementById('add-overlay').classList.remove('open');
+  document.getElementById('add-modal').classList.remove('open');
+  clearScreenshot();
+}
+
+function saveProperty() {
+  const name = document.getElementById('f-name').value.trim();
+  const price = parseFloat(document.getElementById('f-price').value);
+  if (!name) { alert('物件名を入力してください'); return; }
+  if (isNaN(price)) { alert('価格を入力してください'); return; }
+
+  const now = Date.now();
+  const p = {
+    id: 'p' + now,
+    name,
+    source: document.getElementById('f-source').value,
+    type: document.getElementById('f-type').value,
+    region: document.getElementById('f-region').value.trim(),
+    url: document.getElementById('f-url').value.trim(),
+    price,
+    layout: document.getElementById('f-layout').value.trim(),
+    area: parseFloat(document.getElementById('f-area').value) || 0,
+    shikikin: parseFloat(document.getElementById('f-shikikin').value) || 0,
+    reikin: parseFloat(document.getElementById('f-reikin').value) || 0,
+    campaign: document.getElementById('f-campaign').value.trim(),
+    status: 'active',
+    addedAt: now,
+    snapshots: [{
+      time: now,
+      price,
+      shikikin: parseFloat(document.getElementById('f-shikikin').value) || 0,
+      reikin: parseFloat(document.getElementById('f-reikin').value) || 0,
+      campaign: document.getElementById('f-campaign').value.trim(),
+      memo: document.getElementById('f-memo').value.trim() || '初回記録'
+    }]
+  };
+
+  db.properties.unshift(p);
+  saveData(db);
+  closeAddModal();
+  renderList();
+  buildRegionChips();
+
+  // フォームリセット
+  ['f-url','f-name','f-price','f-region','f-layout','f-area','f-shikikin','f-reikin','f-campaign','f-memo'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+// ===== VIEW SWITCH =====
+function switchView(v) {
+  document.getElementById('list-view').style.display = v === 'list' ? 'flex' : 'none';
+  document.getElementById('map-view').style.display = v === 'map' ? 'block' : 'none';
+  document.getElementById('list-btn').classList.toggle('active', v === 'list');
+  document.getElementById('map-btn').classList.toggle('active', v === 'map');
+}
+
+// ===== PAGE =====
+function setPage(page) {
+  currentPage = page;
+  ['watch','bookmarklet','stats'].forEach(p => {
+    document.getElementById('nav-' + (p==='watch'?'watch':p==='bookmarklet'?'bm':'stats')).classList.toggle('active', p === page);
+  });
+
+  const mainContent = document.querySelector('.main-content');
+  document.getElementById('list-view').style.display = 'none';
+  document.getElementById('map-view').style.display = 'none';
+  document.getElementById('bookmarklet-view').style.display = 'none';
+
+  if (page === 'watch') {
+    document.querySelector('.filter-bar').style.display = 'flex';
+    document.querySelector('.stats-bar').style.display = 'grid';
+    document.querySelector('header .view-toggle').style.display = 'flex';
+    document.querySelector('header .add-btn').style.display = 'flex';
+    switchView('list');
+  } else if (page === 'bookmarklet') {
+    document.querySelector('.filter-bar').style.display = 'none';
+    document.querySelector('.stats-bar').style.display = 'none';
+    document.querySelector('header .view-toggle').style.display = 'none';
+    document.querySelector('header .add-btn').style.display = 'none';
+    renderBookmarkletPage();
+    document.getElementById('bookmarklet-view').style.display = 'block';
+  } else if (page === 'stats') {
+    document.querySelector('.filter-bar').style.display = 'none';
+    document.querySelector('.stats-bar').style.display = 'none';
+    document.querySelector('header .view-toggle').style.display = 'none';
+    document.querySelector('header .add-btn').style.display = 'none';
+    renderStatsPage();
+    document.getElementById('bookmarklet-view').style.display = 'block';
+  }
+}
+
+// ===== BOOKMARKLET =====
+const APP_URL = location.href.split('?')[0];
+
+const BOOKMARKLETS = [
+  {
+    site: 'SUUMO',
+    cls: 'badge-suumo',
+    desc: 'SUUMOの物件詳細ページで実行してください。物件名・賃料・間取り・住所を自動取得します。',
+    code: `javascript:(function(){var t=document.querySelector('h1.section_h1-header-title')||document.querySelector('.bukkenName')||document.querySelector('h1');var p=document.querySelector('.detailMark .price')||document.querySelector('[class*="price"]');var url=location.href;var name=t?t.innerText.trim():'';var price=p?p.innerText.replace(/[^0-9.]/g,''):'';var w=window.open('${APP_URL}?url='+encodeURIComponent(url)+'&name='+encodeURIComponent(name)+'&price='+encodeURIComponent(price)+'&source=suumo','_blank');})();`
+  },
+  {
+    site: 'アットホーム',
+    cls: 'badge-athome',
+    desc: 'アットホームの物件詳細ページで実行してください。',
+    code: `javascript:(function(){var t=document.querySelector('h1')||document.querySelector('.building-name');var p=document.querySelector('.price-rent')||document.querySelector('[class*="price"]');var url=location.href;var name=t?t.innerText.trim():'';var price=p?p.innerText.replace(/[^0-9.]/g,''):'';window.open('${APP_URL}?url='+encodeURIComponent(url)+'&name='+encodeURIComponent(name)+'&price='+encodeURIComponent(price)+'&source=athome','_blank');})();`
+  },
+  {
+    site: 'ホームズ',
+    cls: 'badge-homes',
+    desc: 'ホームズの物件詳細ページで実行してください。',
+    code: `javascript:(function(){var t=document.querySelector('h1');var p=document.querySelector('[class*="price"]');var url=location.href;var name=t?t.innerText.trim():'';var price=p?p.innerText.replace(/[^0-9.]/g,''):'';window.open('${APP_URL}?url='+encodeURIComponent(url)+'&name='+encodeURIComponent(name)+'&price='+encodeURIComponent(price)+'&source=homes','_blank');})();`
+  },
+  {
+    site: '健美家',
+    cls: 'badge-kenbi',
+    desc: '健美家の物件詳細ページで実行してください。',
+    code: `javascript:(function(){var t=document.querySelector('h1');var p=document.querySelector('.price');var url=location.href;var name=t?t.innerText.trim():'';var price=p?p.innerText.replace(/[^0-9.]/g,''):'';window.open('${APP_URL}?url='+encodeURIComponent(url)+'&name='+encodeURIComponent(name)+'&price='+encodeURIComponent(price)+'&source=kenbi','_blank');})();`
+  },
+  {
+    site: '楽待',
+    cls: 'badge-rakumachi',
+    desc: '楽待の物件詳細ページで実行してください。',
+    code: `javascript:(function(){var t=document.querySelector('h1');var p=document.querySelector('[class*="price"]');var url=location.href;var name=t?t.innerText.trim():'';var price=p?p.innerText.replace(/[^0-9.]/g,''):'';window.open('${APP_URL}?url='+encodeURIComponent(url)+'&name='+encodeURIComponent(name)+'&price='+encodeURIComponent(price)+'&source=rakumachi','_blank');})();`
+  }
+];
+
+function renderBookmarkletPage() {
+  const view = document.getElementById('bookmarklet-view');
+  const savedKey = getGeminiKey();
+  view.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:4px;">取込設定</div>
+    </div>
+
+    <!-- Gemini APIキー設定 -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">✨ Gemini APIキー設定</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.6;">スクショから自動入力するために必要です。Google AI Studioで取得したキーを入力してください。</div>
+      <div style="display:flex;gap:8px;">
+        <input id="gemini-key-input" type="password"
+          placeholder="AIza..."
+          value="${savedKey ? '••••••••••••••••' : ''}"
+          style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:9px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;"
+          onfocus="if(this.value==='••••••••••••••••')this.value=''">
+        <button onclick="saveGeminiKeyFromInput()" style="padding:9px 14px;background:var(--accent);border:none;border-radius:6px;color:#000;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit;">保存</button>
+      </div>
+      ${savedKey ? '<div style="font-size:11px;color:var(--accent);margin-top:6px;">✅ APIキー設定済み</div>' : '<div style="font-size:11px;color:var(--text3);margin-top:6px;">未設定</div>'}
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">ブックマークレット設定</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">各サイトの物件ページでタップするだけで情報を取り込めます。</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--orange);border-radius:10px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--orange);font-weight:700;margin-bottom:4px;">📱 スマホでの登録方法</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.7;">
+        1. 適当なページをブックマーク登録<br>
+        2. ブックマークを編集→URLを下記コードに貼り替え<br>
+        3. 物件ページを開いてブックマークをタップ
+      </div>
+    </div>
+    ${BOOKMARKLETS.map(bm => `
+      <div class="bm-card">
+        <div class="bm-site"><span class="source-badge ${bm.cls}">${bm.site}</span></div>
+        <div class="bm-desc">${bm.desc}</div>
+        <div class="bm-code" onclick="copyCode(this)" data-code="${bm.code.replace(/"/g,'&quot;')}">${bm.code.substring(0,80)}...</div>
+        <div class="bm-copy-hint">タップでコピー →</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function copyCode(el) {
+  const code = el.getAttribute('data-code').replace(/&quot;/g, '"');
+  navigator.clipboard.writeText(code).then(() => {
+    el.style.color = 'var(--accent2)';
+    el.textContent = 'コピーしました！';
+    setTimeout(() => {
+      el.style.color = '';
+      el.textContent = code.substring(0,80) + '...';
+    }, 2000);
+  });
+}
+
+// ===== STATS PAGE =====
+function renderStatsPage() {
+  const view = document.getElementById('bookmarklet-view');
+  const props = db.properties;
+
+  const rentProps = props.filter(p => p.type === 'rent' && p.status === 'active');
+  const saleProps = props.filter(p => p.type === 'sale' && p.status === 'active');
+
+  const avgRent = rentProps.length ? (rentProps.reduce((s,p) => s+p.price,0)/rentProps.length).toFixed(1) : '—';
+  const avgSale = saleProps.length ? (saleProps.reduce((s,p) => s+p.price,0)/saleProps.length).toFixed(0) : '—';
+
+  const byRegion = {};
+  props.forEach(p => {
+    if (!p.region) return;
+    if (!byRegion[p.region]) byRegion[p.region] = { rent: [], sale: [] };
+    byRegion[p.region][p.type].push(p.price);
+  });
+
+  const regionRows = Object.entries(byRegion).map(([r, data]) => {
+    const avgR = data.rent.length ? (data.rent.reduce((a,b)=>a+b,0)/data.rent.length).toFixed(1) + '万/月' : '—';
+    const avgS = data.sale.length ? (data.sale.reduce((a,b)=>a+b,0)/data.sale.length).toLocaleString() + '万円' : '—';
+    return `<div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);gap:8px;">
+      <div style="flex:1;font-size:13px;">📍 ${r}</div>
+      <div style="text-align:right;">
+        ${data.rent.length ? `<div style="font-size:11px;color:var(--text2);">賃貸 ${avgR}</div>` : ''}
+        ${data.sale.length ? `<div style="font-size:11px;color:var(--blue);">売買 ${avgS}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  view.innerHTML = `
+    <div style="font-size:16px;font-weight:700;margin-bottom:14px;">相場分析</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">賃貸 平均</div>
+        <div style="font-family:'DM Mono',monospace;font-size:22px;color:var(--accent);">${avgRent}</div>
+        <div style="font-size:10px;color:var(--text3);">万円/月 (${rentProps.length}件)</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">売買 平均</div>
+        <div style="font-family:'DM Mono',monospace;font-size:22px;color:var(--blue);">${avgSale}</div>
+        <div style="font-size:10px;color:var(--text3);">万円 (${saleProps.length}件)</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);letter-spacing:0.08em;margin-bottom:8px;font-weight:500;">地域別相場</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0 14px;">
+      ${regionRows || '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">物件を追加すると地域別相場が表示されます</div>'}
+    </div>
+    <div style="height:20px;"></div>
+  `;
+}
+
+// ===== INIT =====
+renderList();
+buildRegionChips();
+
+// URLパラメータがあれば追加モーダルを自動オープン
+if (new URLSearchParams(location.search).get('url')) {
+  setTimeout(openAddModal, 300);
+}
+</script>
+</body>
+</html>

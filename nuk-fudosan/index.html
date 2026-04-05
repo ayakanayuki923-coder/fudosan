@@ -3948,9 +3948,14 @@ function openAddMemo(){
   document.getElementById('modal-memo-badge').style.display='none';
   document.getElementById('memo-edit-id').value='';
   const _today=new Date().toISOString().split('T')[0];
-  document.getElementById('memo-date').value=_today;
-  // 念のためrAF後にも設定（ブラウザによっては遅延が必要）
-  requestAnimationFrame(()=>{ const el=document.getElementById('memo-date'); if(el&&!el.value)el.value=_today; });
+  // モーダルを表示する前に確実に値をセット
+  const _dateEl=document.getElementById('memo-date');
+  if(_dateEl){
+    _dateEl.value=_today;
+    // 複数タイミングでセット（ブラウザの挙動対策）
+    setTimeout(()=>{if(_dateEl&&!_dateEl.value)_dateEl.value=_today;},50);
+    setTimeout(()=>{if(_dateEl&&!_dateEl.value)_dateEl.value=_today;},200);
+  }
   document.getElementById('memo-category').value='物件調査';
   document.getElementById('memo-title').value='';
   document.getElementById('memo-content').value='';
@@ -4094,6 +4099,7 @@ function saveSchedule(){
   const idx=data.schedules.findIndex(s=>s.id===id);
   if(idx>=0) data.schedules[idx]=item; else data.schedules.push(item);
   saveLocal();closeModal('schedule');
+  pushToSheets('schedules',item,'upsert');
   renderDashboard();renderCalendar();
 }
 

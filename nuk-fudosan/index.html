@@ -618,7 +618,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
     カスタマイズ設定
   </button>
-  <div class="sidebar-footer">Ver 8.7 · Property Note</div>
+  <div class="sidebar-footer">Ver 8.8 · Property Note</div>
 </aside>
 
 <main class="main">
@@ -1734,6 +1734,8 @@ function init(){
   }else{
     setSyncState('offline');
   }
+  // 設定済みであれば同期状態を反映
+  if(data.gasUrl&&data.gasApiKey) setSyncState('ok');
 }
 
 function clearLocalPhotoData(){
@@ -1915,13 +1917,14 @@ function removeOption(section,fi,oi){tmpFields[section][fi].options.splice(oi,1)
 /* ══ FILTER BARS ══ */
 function renderFilterBars(){
   const srcField=data.fields.learning.find(f=>f.id==='l_source');
-  document.getElementById('source-filter-bar').innerHTML=`<button class="filter-btn active" onclick="setSourceFilter(this,'all')">すべて</button>`+
+  const sfb=document.getElementById('source-filter-bar');
+  if(sfb) sfb.innerHTML=`<button class="filter-btn active" onclick="setSourceFilter(this,'all')">すべて</button>`+
     (srcField?.options||[]).map(o=>`<button class="filter-btn" onclick="setSourceFilter(this,${JSON.stringify(o)})">${escHtml(o)}</button>`).join('');
   const propField=data.fields.property.find(f=>f.id==='p_status');
-  document.getElementById('prop-filter-bar').innerHTML=`<button class="filter-btn active" onclick="setPropFilter(this,'all')">すべて</button>`+
+  const pfb=document.getElementById('prop-filter-bar');if(pfb) pfb.innerHTML=`<button class="filter-btn active" onclick="setPropFilter(this,'all')">すべて</button>`+
     (propField?.options||[]).map(o=>`<button class="filter-btn" onclick="setPropFilter(this,${JSON.stringify(o)})">${escHtml(o)}</button>`).join('');
   const actField=data.fields.action.find(f=>f.id==='a_type');
-  document.getElementById('action-filter-bar').innerHTML=`<button class="filter-btn active" onclick="setActionFilter(this,'all')">すべて</button>`+
+  const afb=document.getElementById('action-filter-bar');if(afb) afb.innerHTML=`<button class="filter-btn active" onclick="setActionFilter(this,'all')">すべて</button>`+
     (actField?.options||[]).map(o=>`<button class="filter-btn" onclick="setActionFilter(this,${JSON.stringify(o)})">${escHtml(o)}</button>`).join('');
 }
 

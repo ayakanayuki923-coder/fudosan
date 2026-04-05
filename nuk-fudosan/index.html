@@ -618,7 +618,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
     カスタマイズ設定
   </button>
-  <div class="sidebar-footer">Ver 8.6 · Property Note</div>
+  <div class="sidebar-footer">Ver 8.7 · Property Note</div>
 </aside>
 
 <main class="main">
@@ -1596,11 +1596,10 @@ async function pushToSheets(section,item,action){
 
 // 全データをシートから pull（起動時 or 手動）
 async function pullFromSheets(silent){
-  if(!data.gasUrl)return;
-  if(!silent)setSyncState('syncing','シートからデータを取得中...');
+  if(!data.gasUrl){setSyncState('offline');return;}
+  setSyncState('syncing','同期中...');
   try{
     const remote=await gasGet();
-    // シートの合計件数を計算
     const remoteTotal=['learning','property','action','diary']
       .reduce((s,k)=>s+(remote[k]&&Array.isArray(remote[k])?remote[k].length:0),0);
     const localTotal=['learning','property','action','diary']
@@ -1608,7 +1607,7 @@ async function pullFromSheets(silent){
 
     // 安全チェック：シートが空でローカルにデータがある場合は上書きしない
     if(remoteTotal===0 && localTotal>0){
-      setSyncState('error','シートにデータがありません。ローカルデータを保護しました。');
+      setSyncState('ok'); // URLは設定済みなのでokに
       if(!silent){
         const push=confirm(
           `シートにデータが見つかりません（0件）。
@@ -1622,7 +1621,7 @@ async function pullFromSheets(silent){
     }
 
     // シートのデータで更新（バックアップを先に保存）
-    makeAutoBackup();
+    if(!silent)makeAutoBackup();
     ['learning','property','action','diary'].forEach(k=>{
       if(remote[k]&&Array.isArray(remote[k]))data[k]=remote[k];
     });

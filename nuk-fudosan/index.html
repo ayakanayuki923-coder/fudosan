@@ -445,7 +445,21 @@ label{display:block;font-size:12px;font-weight:500;color:var(--text3);margin-bot
   #pc-dashboard{display:block !important;}
 }
 /* スマホ版はPC用を非表示 */
+.bottom-tabbar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding-bottom:env(safe-area-inset-bottom,0);}
+.bottom-tabbar-inner{display:flex;align-items:flex-end;height:56px;}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 0 4px;-webkit-tap-highlight-color:transparent;}
+.tab-btn svg{width:22px;height:22px;stroke:var(--text3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.tab-btn span{font-size:10px;color:var(--text3);font-family:'Noto Sans JP',sans-serif;}
+.tab-btn.active svg{stroke:var(--accent2);}
+.tab-btn.active span{color:var(--accent2);font-weight:700;}
+.tab-center-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding-bottom:4px;}
+.tab-fab{width:48px;height:48px;border-radius:50%;background:var(--accent2);border:3px solid var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:8px;-webkit-tap-highlight-color:transparent;}
+.tab-fab svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;}
 @media(max-width:767px){
+  .bottom-tabbar{display:block;}
+  .main{padding-bottom:64px;}
+  .sidebar{display:none !important;}
+  .menu-btn{display:none;}
   #pc-dashboard{display:none !important;}
   #mobile-dashboard{display:block;}
 }
@@ -604,7 +618,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
     カスタマイズ設定
   </button>
-  <div class="sidebar-footer">Ver 7.0 · Property Note</div>
+  <div class="sidebar-footer">Ver 8.6 · Property Note</div>
 </aside>
 
 <main class="main">
@@ -728,87 +742,47 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 
       <!-- ══ PC用ダッシュボード ══ -->
       <div id="pc-dashboard" style="display:none;">
-
-        <!-- 物件追加ボタン -->
-        <button class="dash-add-property-btn" onclick="openAddProperty()">
-          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          物件を追加する
-        </button>
-
-        <!-- 利回り電卓ボタン -->
-        <button onclick="openCalc()" style="width:100%;padding:10px;margin-bottom:10px;background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;">
-          💴 利回り電卓
-        </button>
-
-        <!-- 見送り表示トグル -->
-        <div id="dash-archive-toggle-pc" style="display:none;text-align:right;margin-bottom:8px;">
-          <button id="dash-archive-btn-pc" onclick="toggleArchiveDisplayPc()" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">見送り・購入済も表示</button>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+          <button onclick="openAddMemo()" style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--accent2);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Memo
+          </button>
+          <button onclick="openAddProperty()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:8px;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">物件追加</button>
+          <button onclick="openCalc()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:8px;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">利回り電卓</button>
+          <div style="margin-left:auto;" id="dash-archive-toggle-pc" ><button id="dash-archive-btn-pc" onclick="toggleArchiveDisplayPc()" style="font-size:12px;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:none;">見送り・購入済も表示</button></div>
         </div>
-
-        <!-- 物件カード一覧 -->
-        <div id="dash-prop-list-pc"></div>
-
-        <div class="dash-section-sep"></div>
-
-        <!-- ToDo -->
-        <div class="dash-section-card" id="dash-todo-section-pc" style="display:none;">
-          <div class="dash-section-hd">
-            <span>☑ ToDo</span>
-            <button class="dash-add-btn" onclick="openAddTodo()">＋ 追加</button>
-          </div>
-          <div id="dash-todo-list-pc"></div>
-        </div>
-
-        <!-- Memo -->
-        <div class="dash-section-card">
-          <div class="dash-section-hd">
-            <span>📝 Memo</span>
-            <button class="dash-add-btn" onclick="openAddMemo()">＋ 追加</button>
-          </div>
-          <div id="dash-memo-list-pc"></div>
-        </div>
-
-        <!-- Journal -->
-        <div class="dash-section-card">
-          <div class="dash-section-hd">
-            <span>✏️ Journal</span>
-            <div style="display:flex;gap:6px;">
-              <button class="dash-add-btn" onclick="openAddDiary()">＋ 追加</button>
-              <button class="dash-expand-btn" id="dash-expand-diary-pc" onclick="toggleDashSectionPc('diary')">すべて表示</button>
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;">
+          <div>
+            <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:0;">
+              <button id="pc-tab-btn-prop" onclick="switchPcTab('prop')" style="padding:10px 20px;font-size:13px;font-weight:600;font-family:'Noto Sans JP',sans-serif;background:none;border:none;border-bottom:2px solid var(--accent2);margin-bottom:-2px;color:var(--accent2);cursor:pointer;">物件</button>
+              <button id="pc-tab-btn-memo" onclick="switchPcTab('memo')" style="padding:10px 20px;font-size:13px;font-family:'Noto Sans JP',sans-serif;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text3);cursor:pointer;">学び</button>
             </div>
+            <div id="pc-tab-prop" style="padding-top:14px;"><div id="dash-prop-list-pc"></div></div>
+            <div id="pc-tab-memo" style="display:none;padding-top:14px;"><div id="dash-memo-full-pc"></div></div>
           </div>
-          <div id="dash-diary-list-pc"></div>
-        </div>
-
-        <!-- カレンダー（折りたたみ） -->
-        <div class="dash-section-card" style="padding:0;overflow:hidden;">
-          <div class="dash-section-hd" style="padding:12px 14px;">
-            <span onclick="toggleCalendarPc()" style="cursor:pointer;flex:1;">📅 カレンダー <span id="cal-toggle-icon-pc" style="font-size:11px;color:var(--text3);">▼</span></span>
-            <button class="dash-add-btn" onclick="openAddSchedule()">＋ 予定</button>
-            <button class="dash-add-btn" onclick="openAddDiary()" style="border-color:var(--gold);color:var(--gold);margin-left:4px;">＋ Journal</button>
-          </div>
-          <div id="dash-calendar-wrap-pc" style="display:none;">
-            <div class="cal-header">
-              <div class="cal-month" id="cal-month-label-pc"></div>
-              <div class="cal-nav">
-                <button class="cal-nav-btn" onclick="calPrev()">‹</button>
-                <button class="cal-nav-btn" onclick="calToday()">今日</button>
-                <button class="cal-nav-btn" onclick="calNext()">›</button>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div id="dash-todo-section-pc" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <span style="font-size:13px;font-weight:600;color:var(--text);">ToDo</span>
+                <button onclick="openAddTodo()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--accent2);background:transparent;color:var(--accent2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">＋</button>
+              </div>
+              <div id="dash-todo-list-pc"></div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <span style="font-size:13px;font-weight:600;color:var(--text);">カレンダー</span>
+                <div style="display:flex;gap:4px;">
+                  <button onclick="openAddSchedule()" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">＋ 予定</button>
+                  <button onclick="openAddDiary()" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">✏ Journal</button>
+                </div>
+              </div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;" id="cal-month-label-pc"></div>
+              <div class="cal-grid" style="font-size:11px;">
+                <div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div>
+                <div class="cal-days" id="cal-days-pc"></div>
               </div>
             </div>
-            <div class="cal-grid">
-              <div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div>
-              <div class="cal-days" id="cal-days-pc"></div>
-            </div>
-            <div class="cal-legend">
-              <div class="cal-legend-item"><div class="cal-dot cal-dot-learn"></div><span>Memo</span></div>
-              <div class="cal-legend-item"><div class="cal-dot cal-dot-prop"></div><span>物件</span></div>
-              <div class="cal-legend-item"><div class="cal-dot cal-dot-action"></div><span>Log</span></div>
-              <div class="cal-legend-item"><div class="cal-dot cal-dot-diary"></div><span>Journal</span></div>
-            </div>
           </div>
         </div>
-
       </div><!-- /pc-dashboard -->
 
     </div>
@@ -876,8 +850,59 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       </div>
       <div class="diary-list" id="diary-list"></div>
     </div>
+
+    <!-- CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="section-header">
+        <div class="section-header-title">カレンダー</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="openAddDiary()">✏ Journal</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddSchedule()">＋ 予定</button>
+        </div>
+      </div>
+      <div class="cal-wrap" style="max-width:680px;margin:0 auto;">
+        <div class="cal-header">
+          <div class="cal-month" id="cal-month-label-page"></div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="calPrev();renderCalendarPage()">‹</button>
+            <button class="cal-nav-btn" onclick="calToday();renderCalendarPage()">今日</button>
+            <button class="cal-nav-btn" onclick="calNext();renderCalendarPage()">›</button>
+          </div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div>
+          <div class="cal-days" id="cal-days-page"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </main>
+
+<nav class="bottom-tabbar" id="bottom-tabbar">
+  <div class="bottom-tabbar-inner">
+    <button class="tab-btn active" id="tab-dashboard" onclick="showPage('dashboard');updateTabBar('dashboard')">
+      <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="tab-btn" id="tab-property" onclick="showPage('property');updateTabBar('property')">
+      <svg viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+      <span>物件</span>
+    </button>
+    <div class="tab-center-wrap">
+      <button class="tab-fab" onclick="openAddMemo()">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+    <button class="tab-btn" id="tab-diary" onclick="showPage('diary');updateTabBar('diary')">
+      <svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+      <span>Journal</span>
+    </button>
+    <button class="tab-btn" id="tab-calendar" onclick="showPage('calendar');updateTabBar('calendar')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>カレンダー</span>
+    </button>
+  </div>
+</nav>
 
 <!-- ════════ MODALS ════════ -->
 
@@ -1056,6 +1081,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       <div class="form-group">
         <label>タイトル</label>
         <input type="text" id="memo-title" placeholder="例：不動産屋で空き家情報を収集">
+      </div>
+      <div class="form-group">
+        <label>URL（参考リンクなど）</label>
+        <input type="url" id="memo-url" placeholder="https://...">
       </div>
       <div class="form-group">
         <label>内容</label>
@@ -2012,7 +2041,7 @@ function getFormValues(section){
 /* ══ SIDEBAR / NAV ══ */
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
-const pageTitles={dashboard:'Home',learning:'Note',property:'物件',action:'Log',memo:'Memo',diary:'Journal'};
+const pageTitles={dashboard:'Home',learning:'Note',property:'物件',action:'Log',memo:'Memo',diary:'Journal',calendar:'カレンダー'};
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -2021,13 +2050,20 @@ function showPage(name){
   const pageEl = document.getElementById('page-'+pageId);
   if(pageEl) pageEl.classList.add('active');
   // nav-itemの対応（dashboard,property,memo,diary の4つ）
-  const navOrder=['dashboard','property','memo','diary'];
+  const navOrder=['dashboard','property','memo','diary','calendar'];
   const navIdx=navOrder.indexOf(name==='learning'||name==='action'?'memo':name);
   const navItems=document.querySelectorAll('.nav-item');
   if(navIdx>=0&&navItems[navIdx]) navItems[navIdx].classList.add('active');
   document.getElementById('page-title').textContent=pageTitles[name]||pageTitles['memo']||name;
   if(name==='memo') renderMemo();
 }
+function updateTabBar(name){
+  const map={dashboard:'tab-dashboard',property:'tab-property',diary:'tab-diary',calendar:'tab-calendar'};
+  document.querySelectorAll('.tab-btn[id^="tab-"]').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById(map[name]);
+  if(el)el.classList.add('active');
+}
+
 function closeModal(type){
   document.getElementById('modal-'+type).classList.remove('open');
   // 各モーダルを閉じるときに状態をリセット
@@ -3589,6 +3625,22 @@ function renderPcDashboard(){
   }
 }
 
+function switchPcTab(tab){
+  document.getElementById('pc-tab-prop').style.display=tab==='prop'?'block':'none';
+  document.getElementById('pc-tab-memo').style.display=tab==='memo'?'block':'none';
+  const bp=document.getElementById('pc-tab-btn-prop'),bm=document.getElementById('pc-tab-btn-memo');
+  if(bp){bp.style.borderBottomColor=tab==='prop'?'var(--accent2)':'transparent';bp.style.color=tab==='prop'?'var(--accent2)':'var(--text3)';}
+  if(bm){bm.style.borderBottomColor=tab==='memo'?'var(--accent2)':'transparent';bm.style.color=tab==='memo'?'var(--accent2)':'var(--text3)';}
+  if(tab==='memo')renderPcMemoTab();
+}
+function renderPcMemoTab(){
+  const el=document.getElementById('dash-memo-full-pc');if(!el)return;
+  const items=[...data.learning.map(i=>({...i,_type:'learning'})),...data.action.filter(i=>!i.property).map(i=>({...i,_type:'action'}))].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!items.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px;">まだ学びの記録がありません</div>';return;}
+  const groups={};
+  items.forEach(i=>{const cat=i.category||i.source||i.type||'その他';if(!groups[cat])groups[cat]=[];groups[cat].push(i);});
+  el.innerHTML=Object.entries(groups).map(([cat,catItems])=>`<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);">${escHtml(cat)}</div>${catItems.map(i=>`<div onclick="openEditMemo('${i._type}',${i.id})" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;"><div style="width:6px;height:6px;border-radius:50%;background:var(--accent2);flex-shrink:0;margin-top:5px;"></div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:500;color:var(--text);">${escHtml(i.title||'(無題)')}</div><div style="font-size:11px;color:var(--text3);">${formatDate(i.date)}</div></div><div style="color:var(--text3);">›</div></div>`).join('')}</div>`).join('');
+}
 function toggleArchiveDisplayPc(){
   dashShowArchive=!dashShowArchive;
   renderPcDashboard();
@@ -3752,6 +3804,23 @@ function renderMemo(){
 }
 
 let editingMemoId=null;
+
+function renderMemoPropertyChecks(selectedNames){
+  const wrap=document.getElementById('memo-property-checks');
+  if(!wrap)return;
+  const props=data.property.filter(p=>!ARCHIVE_STATUSES.includes(p.status));
+  if(!props.length){
+    wrap.innerHTML='<div style="font-size:12px;color:var(--text3);padding:4px;">現役の物件がありません</div>';
+    return;
+  }
+  wrap.innerHTML=props.map(p=>`<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 0;"><input type="checkbox" value="${escHtml(p.name)}" ${selectedNames.includes(p.name)?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent2);"><span style="font-size:13px;color:var(--text);">${escHtml(p.name)}</span></label>`).join('');
+}
+
+function getSelectedMemoProperties(){
+  const wrap=document.getElementById('memo-property-checks');
+  if(!wrap)return [];
+  return Array.from(wrap.querySelectorAll('input[type="checkbox"]:checked')).map(cb=>cb.value);
+}
 
 function openEditMemo(type, id){
   const item=type==='learning'
@@ -4499,6 +4568,20 @@ function liveCalc(propId){
 }
 
 /* ══ トースト通知 ══ */
+function renderCalendarPage(){
+  const label=document.getElementById('cal-month-label-page');
+  if(label)label.textContent=calYear+'年 '+(calMonth+1)+'月';
+  const days=document.getElementById('cal-days-page');
+  if(!days)return;
+  const fd=new Date(calYear,calMonth,1).getDay(),ld=new Date(calYear,calMonth+1,0).getDate(),pld=new Date(calYear,calMonth,0).getDate();
+  const ts=dateStr(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
+  let html='',dc=0;
+  for(let i=fd-1;i>=0;i--){html+=cc(dateStr(calYear,calMonth-1,pld-i),pld-i,'other-month',(fd-1-i)%7===0?'sun':(fd-1-i)%7===6?'sat':'',ts);dc++;}
+  for(let d=1;d<=ld;d++){const dow=(fd+d-1)%7;html+=cc(dateStr(calYear,calMonth,d),d,'',dow===0?'sun':dow===6?'sat':'',ts);dc++;}
+  const rem=7-(dc%7);if(rem<7){for(let d=1;d<=rem;d++){html+=cc(dateStr(calYear,calMonth+1,d),d,'other-month',(dc%7)===0?'sun':(dc%7)===6?'sat':'',ts);dc++;}}
+  days.innerHTML=html;
+}
+
 function showToast(msg, duration=2500){
   const el=document.createElement('div');
   el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;box-shadow:0 2px 12px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none;';

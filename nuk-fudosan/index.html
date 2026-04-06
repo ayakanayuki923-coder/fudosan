@@ -445,6 +445,18 @@ label{display:block;font-size:12px;font-weight:500;color:var(--text3);margin-bot
   #pc-dashboard{display:block !important;}
 }
 /* スマホ版はPC用を非表示 */
+.voice-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.88);flex-direction:column;align-items:center;justify-content:center;gap:24px;}
+.voice-overlay.open{display:flex;}
+.voice-status{font-size:16px;font-weight:600;color:#fff;font-family:'Noto Sans JP',sans-serif;text-align:center;line-height:1.7;max-width:300px;}
+.voice-transcript{font-size:14px;color:rgba(255,255,255,.7);font-family:'Noto Sans JP',sans-serif;text-align:center;min-height:28px;max-width:300px;padding:0 16px;}
+.voice-mic{width:80px;height:80px;border-radius:50%;background:var(--accent2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.voice-mic.listening{animation:vpulse 1.5s infinite;}
+.voice-mic svg{width:36px;height:36px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;}
+.voice-cancel{font-size:13px;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;padding:8px 24px;}
+.voice-choices{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:320px;}
+.voice-choice-btn{padding:14px 22px;border-radius:14px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
+.voice-choice-btn:active{background:rgba(255,255,255,.3);}
+@keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(46,107,80,.5);}70%{box-shadow:0 0 0 20px rgba(46,107,80,.0);}100%{box-shadow:0 0 0 0 rgba(46,107,80,.0);}}
 .bottom-tabbar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding-bottom:env(safe-area-inset-bottom,0);}
 .bottom-tabbar-inner{display:flex;align-items:flex-end;height:56px;}
 .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 0 4px;-webkit-tap-highlight-color:transparent;}
@@ -618,7 +630,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
     カスタマイズ設定
   </button>
-  <div class="sidebar-footer">Ver 8.9 · Property Note</div>
+  <div class="sidebar-footer">Ver 9.4 · Property Note</div>
 </aside>
 
 <main class="main">
@@ -647,32 +659,17 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       <!-- ══ スマホ用ダッシュボード ══ -->
       <div id="mobile-dashboard">
 
-        <!-- 今日の予定（期限ToDoも含む） -->
-        <div id="dash-today-section" style="display:none;margin-bottom:12px;">
-          <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;">📅 今日の予定・期限</div>
-          <div id="dash-today-list"></div>
+        <!-- 利回り電卓 ＋ 音声入力 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <button onclick="openCalc()" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">
+            💴 利回り電卓
+          </button>
+          <button onclick="voiceOpen()" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">
+            🎤 音声入力
+          </button>
         </div>
 
-        <!-- 物件追加ボタン（最上部固定） -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <span style="font-size:14px;font-weight:700;color:var(--text);">物件</span>
-          <button class="dash-add-btn" onclick="openAddProperty()" style="font-size:13px;padding:6px 16px;">＋ 追加</button>
-        </div>
-
-        <!-- 簡易電卓ボタン -->
-        <button onclick="openCalc()" style="width:100%;padding:10px;margin-bottom:10px;background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;">
-          💴 利回り電卓
-        </button>
-
-        <!-- 見送り表示トグル -->
-        <div id="dash-archive-toggle" style="display:none;text-align:right;margin-bottom:8px;">
-          <button id="dash-archive-btn" onclick="toggleArchiveDisplay()" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">見送り・購入済も表示</button>
-        </div>
-
-        <!-- 物件カード一覧 -->
-        <div id="dash-prop-list"></div>
-
-        <!-- ToDo一覧（全物件）：あれば最上部 -->
+        <!-- ToDo（あれば表示） -->
         <div class="dash-section-card" id="dash-todo-section" style="display:none;">
           <div class="dash-section-hd">
             <span>☑ ToDo</span>
@@ -681,12 +678,21 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
           <div id="dash-todo-list"></div>
         </div>
 
-        <!-- 区切り -->
-        <div class="dash-section-sep"></div>
+        <!-- 見送り表示トグル -->
+        <div id="dash-archive-toggle" style="display:none;text-align:right;margin-bottom:6px;">
+          <button id="dash-archive-btn" onclick="toggleArchiveDisplay()" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">見送り・購入済も表示</button>
+        </div>
 
-<!-- Activity section removed -->
+        <!-- 🏠 物件一覧 -->
+        <div class="dash-section-card">
+          <div class="dash-section-hd">
+            <span>🏠 物件</span>
+            <button class="dash-add-btn" onclick="openAddProperty()">＋ 追加</button>
+          </div>
+          <div id="dash-prop-list"></div>
+        </div>
 
-        <!-- Note -->
+        <!-- 📝 Memo -->
         <div class="dash-section-card">
           <div class="dash-section-hd">
             <span>📝 Memo</span>
@@ -698,23 +704,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
           <div id="dash-memo-list"></div>
         </div>
 
-        <!-- 日記 -->
-        <div class="dash-section-card">
-          <div class="dash-section-hd">
-            <span id="dash-label-diary">✏️ Journal</span>
-            <button class="dash-expand-btn" id="dash-expand-diary" onclick="toggleDashSection('diary')">すべて表示</button>
-          </div>
-          <div id="dash-diary-list"></div>
-        </div>
-
-        <!-- カレンダー（折りたたみ） -->
+        <!-- 📅 カレンダー（折りたたみ・Journal追加はここから） -->
         <div class="dash-section-card" style="padding:0;overflow:hidden;">
-          <div class="dash-section-hd" style="padding:12px 14px;">
-            <span onclick="toggleCalendar()" style="cursor:pointer;flex:1;">📅 カレンダー <span id="cal-toggle-icon" style="font-size:11px;color:var(--text3);">▼</span></span>
-            <div style="display:flex;gap:6px;">
-              <button class="dash-add-btn" onclick="openAddSchedule()">＋ 予定</button>
-              <button class="dash-add-btn" onclick="openAddDiary()" style="color:var(--text2);border-color:var(--border2);">＋ Journal</button>
-            </div>
+          <div class="dash-section-hd" style="padding:12px 14px;cursor:pointer;" onclick="toggleCalendar()">
+            <span style="flex:1;">📅 カレンダー <span id="cal-toggle-icon" style="font-size:11px;color:var(--text3);">▼</span></span>
+            <button class="dash-add-btn" onclick="event.stopPropagation();openAddSchedule()">＋ 予定</button>
+            <button class="dash-add-btn" onclick="event.stopPropagation();openAddDiary()" style="margin-left:4px;color:var(--text2);border-color:var(--border2);">✏ Journal</button>
           </div>
           <div id="dash-calendar-wrap" style="display:none;">
             <div class="cal-header">
@@ -729,11 +724,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
               <div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div>
               <div class="cal-days" id="cal-days"></div>
             </div>
-            <div class="cal-legend">
-              <div class="cal-legend-item"><div class="cal-dot cal-dot-learn"></div><span id="cal-legend-learning">Note</span></div>
-              <div class="cal-legend-item"><div class="cal-dot cal-dot-prop"></div><span id="cal-legend-property">物件</span></div>
-              <div class="cal-legend-item"><div class="cal-dot cal-dot-action"></div><span id="cal-legend-action">Activity</span></div>
-              <div class="cal-legend-item"><div class="cal-dot cal-dot-diary"></div><span id="cal-legend-diary">Journal</span></div>
+            <div class="cal-legend" style="padding:8px 12px;">
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-learn"></div><span>Memo</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-prop"></div><span>物件</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-action"></div><span>Log</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-diary"></div><span>Journal</span></div>
             </div>
           </div>
         </div>
@@ -877,6 +872,20 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     </div>
   </div>
 </main>
+
+<!-- 音声入力オーバーレイ -->
+<div class="voice-overlay" id="voice-overlay">
+  <div class="voice-status" id="voice-status">何を追加しますか？</div>
+  <div class="voice-choices" id="voice-choices">
+    <button class="voice-choice-btn" onclick="voiceChoose('memo')">📝 Memo</button>
+    <button class="voice-choice-btn" onclick="voiceChoose('property')">🏠 物件</button>
+  </div>
+  <button class="voice-mic" id="voice-mic" onclick="voiceToggleMic()">
+    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </button>
+  <div class="voice-transcript" id="voice-transcript"></div>
+  <button class="voice-cancel" onclick="voiceClose()">キャンセル</button>
+</div>
 
 <nav class="bottom-tabbar" id="bottom-tabbar">
   <div class="bottom-tabbar-inner">
@@ -1351,7 +1360,6 @@ const DEFAULT_FIELDS={
     {id:'p_water',label:'上下水道',type:'select',visible:true,section:'legal',options:['公営（上水・下水）','公営（上水）＋浄化槽','私設','井戸・浄化槽','未確認']},
     {id:'p_rebuild',label:'再建築',type:'select',visible:true,section:'legal',options:['可','不可（再建築不可）','要確認']},
     {id:'p_touki_memo',label:'登記・権利関係メモ（抵当権・差押えなど）',type:'textarea',visible:true,section:'legal'},
-    {id:'p_legal_memo',label:'その他法的メモ',type:'textarea',visible:true,section:'legal'},
     // ── セクション③：収支・数値 ──
     {id:'p_price',label:'購入価格（万円）',type:'number',visible:true,section:'finance'},
     {id:'p_rent_assumed',label:'想定家賃（月額・万円）',type:'number',visible:true,section:'finance'},
@@ -1362,9 +1370,11 @@ const DEFAULT_FIELDS={
     {id:'p_other_income',label:'その他収入（年額・万円）※駐車場・自販機など',type:'number',visible:true,section:'finance'},
     {id:'p_other_cost',label:'その他費用（年額・万円）※管理費・保険・修繕積立など',type:'number',visible:true,section:'finance'},
     // 利回りは自動計算するので入力不要
+    {id:'p_legal_memo',label:'メモ',type:'textarea',visible:true,section:'finance'},
     // ── チェックリスト ──
     {id:'p_checks',label:'Progress',type:'checkbox_group',visible:false,section:'check',options:['現地確認済','法的調査済（登記・接道・用途地域など）','所有者への接触済','相場・収支シミュレーション済','購入判断済']},
     // ── 写真 ──
+    {id:'p_legal_memo',label:'メモ',type:'textarea',visible:true,section:'basic'},
     {id:'p_photos',label:'写真',type:'photos',visible:true,section:'photos'},
   ],
   action:[
@@ -4588,19 +4598,331 @@ function renderCalendarPage(){
   days.innerHTML=html;
 }
 
-function showToast(msg, duration=2500){
-  const el=document.createElement('div');
-  el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;box-shadow:0 2px 12px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none;';
-  el.textContent=msg;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(), duration);
+/* ══ 音声入力 ══ */
+let voiceRecognition=null;
+let voiceStep='choose';
+let voicePropAddress='';
+let voiceMemo='';
+let voiceStep2='';
+let voiceType='';
+let voiceTitle='';
+let voiceLocation='';
+let voiceContent='';
+
+function voiceSpeak(text, onEnd){
+  window.speechSynthesis.cancel();
+  const utter=new SpeechSynthesisUtterance(text);
+  utter.lang='ja-JP';
+  utter.rate=1.1;
+  if(onEnd) utter.onend=onEnd;
+  window.speechSynthesis.speak(utter);
 }
 
-/* ══ UTILS ══ */
-function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function formatDate(s){if(!s)return '';try{const d=new Date(s);return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;}catch(e){return s;}}
+function voiceOpen(){
+  // Web Speech API対応チェック
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    alert('お使いのブラウザは音声入力に対応していません。ChromeでOpen してください。');
+    return;
+  }
+  voiceStep='choose';voiceType='';voiceTitle='';voiceContent='';
+  document.getElementById('voice-overlay').classList.add('open');
+  document.getElementById('voice-status').textContent='何を追加しますか？';
+  document.getElementById('voice-choices').style.display='flex';
+  document.getElementById('voice-transcript').textContent='';
+  document.getElementById('voice-mic').classList.remove('listening');
+}
 
-init();
+function voiceClose(){
+  document.getElementById('voice-overlay').classList.remove('open');
+  if(voiceRecognition){try{voiceRecognition.stop();}catch(e){}}
+  voiceRecognition=null;
+}
+
+function voiceSimpleSave(){
+  voiceClose();
+  const today=new Date().toISOString().split('T')[0];
+  if(voiceType==='memo'){
+    openAddMemo();
+    setTimeout(()=>{
+      const el=document.getElementById('memo-title');if(el)el.value=voiceTitle;
+      const el2=document.getElementById('memo-content');if(el2)el2.value=voiceContent;
+      const el3=document.getElementById('memo-date');if(el3)el3.value=today;
+      // 自動保存
+      setTimeout(()=>saveMemo(),300);
+    },400);
+  } else if(voiceType==='diary'){
+    openAddDiary();
+    setTimeout(()=>{
+      const el=document.getElementById('fld-d_title');if(el)el.value=voiceTitle;
+      const el2=document.getElementById('fld-d_content');if(el2)el2.value=voiceContent;
+      const el3=document.getElementById('fld-d_date');if(el3)el3.value=today;
+      // 自動保存
+      setTimeout(()=>saveDiary(),300);
+    },400);
+  }
+  showToast('🎤 音声入力・保存完了！');
+}
+
+function voiceSimpleRetry(){
+  voiceTitle='';voiceContent='';
+  voiceStep='title';
+  document.getElementById('voice-choices').style.display='none';
+  const titleLabel=voiceType==='property'?'物件名':'タイトル';
+  document.getElementById('voice-status').textContent=titleLabel+'をもう一度話してください';
+  document.getElementById('voice-transcript').textContent='';
+  voiceSpeak(titleLabel+'をもう一度話してください', ()=>voiceStartListening());
+}
+
+function voicePropSave(){
+  voiceClose();
+  const today=new Date().toISOString().split('T')[0];
+  openAddProperty();
+  setTimeout(()=>{
+    const n=document.getElementById('fld-p_name');if(n)n.value=voiceTitle;
+    const l=document.getElementById('fld-p_location');if(l)l.value=voicePropAddress;
+    const m=document.getElementById('fld-p_legal_memo');if(m)m.value=voiceMemo;
+    const d=document.getElementById('fld-p_date');if(d)d.value=today;
+    // 自動保存
+    setTimeout(()=>saveProperty(),300);
+  },400);
+  showToast('🎤 音声入力・保存完了！');
+}
+
+function voicePropRetry(){
+  // やり直し：タイトルから
+  voiceTitle='';voicePropAddress='';voiceMemo='';
+  voiceStep='title';
+  document.getElementById('voice-choices').style.display='none';
+  document.getElementById('voice-choices').innerHTML=`
+    <button class="voice-choice-btn" onclick="voiceChoose('memo')">📝 Memo</button>
+    <button class="voice-choice-btn" onclick="voiceChoose('property')">🏠 物件</button>
+    <button class="voice-choice-btn" onclick="voiceChoose('diary')">✏️ Journal</button>`;
+  document.getElementById('voice-status').textContent='物件名をもう一度話してください';
+  document.getElementById('voice-transcript').textContent='';
+  setTimeout(()=>voiceStartListening(),400);
+}
+
+function voiceChoose(type){
+  voiceType=type;
+  voiceStep='title';
+  voiceStep2=type==='property'?'location':'';
+  voiceLocation='';
+  document.getElementById('voice-choices').style.display='none';
+  const labels={memo:'Memo',property:'物件',diary:'Journal'};
+  const titleLabels={memo:'タイトルを話してください',property:'物件名を話してください',diary:'タイトルを話してください'};
+  document.getElementById('voice-status').textContent=`${labels[type]}を追加
+${titleLabels[type]}`;
+  voiceStartListening();
+}
+
+function voiceToggleMic(){
+  if(voiceStep==='choose')return;
+  if(voiceRecognition){
+    try{voiceRecognition.stop();}catch(e){}
+    voiceRecognition=null;
+    document.getElementById('voice-mic').classList.remove('listening');
+  } else {
+    voiceStartListening();
+  }
+}
+
+function voiceStartListening(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
+  voiceRecognition=new SR();
+  voiceRecognition.lang='ja-JP';
+  voiceRecognition.continuous=false;
+  voiceRecognition.interimResults=true;
+
+  const mic=document.getElementById('voice-mic');
+  const transcript=document.getElementById('voice-transcript');
+  mic.classList.add('listening');
+  transcript.textContent='🎤 聞いています...';
+
+  voiceRecognition.onresult=(e)=>{
+    const t=Array.from(e.results).map(r=>r[0].transcript).join('');
+    transcript.textContent=t;
+  };
+
+  voiceRecognition.onend=()=>{
+    mic.classList.remove('listening');
+    const finalText=transcript.textContent;
+    if(!finalText||finalText==='🎤 聞いています...')return;
+    voiceHandleResult(finalText);
+  };
+
+  voiceRecognition.onerror=(e)=>{
+    mic.classList.remove('listening');
+    transcript.textContent='認識エラー。もう一度タップしてください。';
+  };
+
+  voiceRecognition.start();
+}
+
+function voiceHandleResult(text){
+  const transcript=document.getElementById('voice-transcript');
+  const status=document.getElementById('voice-status');
+  const normalized=text.replace(/[。、！？\s]/g,'').toLowerCase();
+
+  if(voiceStep==='title'){
+    voiceTitle=text;
+    transcript.textContent='';
+    if(voiceType==='property'){
+      voiceStep='prop_address';
+      status.textContent='住所を話してください';
+      voiceSpeak('住所を話してください', ()=>voiceStartListening());
+    } else {
+      voiceStep='content';
+      status.textContent='内容を話してください';
+      voiceSpeak('内容を話してください', ()=>voiceStartListening());
+    }
+
+  } else if(voiceStep==='prop_address'){
+    voicePropAddress=text;
+    voiceStep='prop_memo';
+    status.textContent='メモを話してください
+（なければ「なし」と言ってください）';
+    voiceSpeak('メモを話してください。なければ、なし、と言ってください。', ()=>voiceStartListening());
+
+  } else if(voiceStep==='prop_memo'){
+    voiceMemo=(normalized==='なし'||normalized==='スキップ'||text.length<2)?'':text;
+    voiceShowConfirmProp();
+
+  } else if(voiceStep==='confirm'){
+    if(/保存|ok|はい|セーブ/i.test(normalized)){
+      voicePropSave();
+    } else if(/修正|やり直|いや|ちが|変更/i.test(normalized)){
+      voiceShowEditChoiceProp();
+    } else {
+      voiceSpeak('保存する、か、修正する、と言ってください。', ()=>voiceStartListening());
+    }
+
+  } else if(voiceStep==='edit_choice_prop'){
+    // 修正項目選択
+    if(/物件名|名前|なまえ/i.test(normalized)){
+      voiceEditField('prop_name');
+    } else if(/住所|じゅうしょ/i.test(normalized)){
+      voiceEditField('prop_address');
+    } else if(/メモ/i.test(normalized)){
+      voiceEditField('prop_memo_edit');
+    } else {
+      voiceSpeak('物件名、住所、メモ、のどれを修正しますか？', ()=>voiceStartListening());
+    }
+
+  } else if(voiceStep==='edit_field'){
+    // 修正した値をセット
+    if(voiceEditTarget==='prop_name') voiceTitle=text;
+    else if(voiceEditTarget==='prop_address') voicePropAddress=text;
+    else if(voiceEditTarget==='prop_memo_edit') voiceMemo=text;
+    voiceShowConfirmProp();
+
+  } else if(voiceStep==='content'){
+    voiceContent=text;
+    voiceShowConfirmSimple();
+
+  } else if(voiceStep==='confirm_simple'){
+    if(/保存|ok|はい|セーブ/i.test(normalized)){
+      voiceSimpleSave();
+    } else if(/修正|やり直|いや|ちが|変更/i.test(normalized)){
+      voiceShowEditChoiceSimple();
+    } else {
+      voiceSpeak('保存する、か、修正する、と言ってください。', ()=>voiceStartListening());
+    }
+
+  } else if(voiceStep==='edit_choice_simple'){
+    if(/タイトル|題名/i.test(normalized)){
+      voiceEditField('simple_title');
+    } else if(/内容|ないよう/i.test(normalized)){
+      voiceEditField('simple_content');
+    } else {
+      const label=voiceType==='memo'?'タイトル、内容':'タイトル、内容';
+      voiceSpeak(label+'のどれを修正しますか？', ()=>voiceStartListening());
+    }
+
+  } else if(voiceStep==='edit_field'){
+    if(voiceEditTarget==='simple_title') voiceTitle=text;
+    else if(voiceEditTarget==='simple_content') voiceContent=text;
+    voiceShowConfirmSimple();
+  }
+}
+
+let voiceEditTarget='';
+
+function voiceShowConfirmProp(){
+  voiceStep='confirm';
+  const choices=document.getElementById('voice-choices');
+  choices.style.display='flex';
+  choices.innerHTML=
+    '<button class="voice-choice-btn" onclick="voicePropSave()">✓ 保存する</button>'+
+    '<button class="voice-choice-btn" onclick="voiceShowEditChoiceProp()">✏ 修正する</button>';
+  const msg='物件名：'+voiceTitle+'。住所：'+voicePropAddress+'。'+(voiceMemo?'メモ：'+voiceMemo+'。':'');
+  const displayMsg='確認してください
+物件名：'+voiceTitle+'
+住所：'+voicePropAddress+(voiceMemo?'
+メモ：'+voiceMemo:'');
+  document.getElementById('voice-status').textContent=displayMsg;
+  document.getElementById('voice-transcript').textContent='「保存する」か「修正する」と言ってください';
+  voiceSpeak(msg+'保存する、か、修正する、と言ってください。', ()=>voiceStartListening());
+}
+
+function voiceShowEditChoiceProp(){
+  voiceStep='edit_choice_prop';
+  document.getElementById('voice-choices').style.display='flex';
+  document.getElementById('voice-choices').innerHTML=
+    '<button class="voice-choice-btn" onclick="voiceEditField('prop_name')">物件名</button>'+
+    '<button class="voice-choice-btn" onclick="voiceEditField('prop_address')">住所</button>'+
+    '<button class="voice-choice-btn" onclick="voiceEditField('prop_memo_edit')">メモ</button>';
+  document.getElementById('voice-status').textContent='どの項目を修正しますか？';
+  document.getElementById('voice-transcript').textContent='物件名・住所・メモから選んでください';
+  voiceSpeak('物件名、住所、メモ、のどれを修正しますか？', ()=>voiceStartListening());
+}
+
+function voiceEditField(target){
+  voiceEditTarget=target;
+  voiceStep='edit_field';
+  document.getElementById('voice-choices').style.display='none';
+  const labels={
+    prop_name:'物件名を話してください',
+    prop_address:'住所を話してください',
+    prop_memo_edit:'メモを話してください',
+    simple_title:'タイトルを話してください',
+    simple_content:'内容を話してください',
+  };
+  const msg=labels[target]||'話してください';
+  document.getElementById('voice-status').textContent=msg;
+  document.getElementById('voice-transcript').textContent='';
+  voiceSpeak(msg, ()=>voiceStartListening());
+}
+
+function voiceShowConfirmSimple(){
+  voiceStep='confirm_simple';
+  const choices=document.getElementById('voice-choices');
+  choices.style.display='flex';
+  choices.innerHTML=
+    '<button class="voice-choice-btn" onclick="voiceSimpleSave()">✓ 保存する</button>'+
+    '<button class="voice-choice-btn" onclick="voiceShowEditChoiceSimple()">✏ 修正する</button>';
+  const labels={memo:'Memo',diary:'Journal'};
+  const msg='タイトル：'+voiceTitle+'。内容：'+voiceContent+'。';
+  document.getElementById('voice-status').textContent='確認してください
+タイトル：'+voiceTitle+'
+内容：'+voiceContent;
+  document.getElementById('voice-transcript').textContent='「保存する」か「修正する」と言ってください';
+  voiceSpeak(msg+'保存する、か、修正する、と言ってください。', ()=>voiceStartListening());
+}
+
+function voiceShowEditChoiceSimple(){
+  voiceStep='edit_choice_simple';
+  document.getElementById('voice-choices').style.display='flex';
+  document.getElementById('voice-choices').innerHTML=
+    '<button class="voice-choice-btn" onclick="voiceEditField('simple_title')">タイトル</button>'+
+    '<button class="voice-choice-btn" onclick="voiceEditField('simple_content')">内容</button>';
+  document.getElementById('voice-status').textContent='どの項目を修正しますか？';
+  document.getElementById('voice-transcript').textContent='タイトル・内容から選んでください';
+  voiceSpeak('タイトル、内容、のどれを修正しますか？', ()=>voiceStartListening());
+}
+
+>
 </script>
 </body>
 </html>

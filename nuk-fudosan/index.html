@@ -448,10 +448,6 @@ label{display:block;font-size:12px;font-weight:500;color:var(--text3);margin-bot
 @media(max-width:767px){
   #pc-dashboard{display:none !important;}
   #mobile-dashboard{display:block;}
-  .bottom-tabbar{display:block;}
-  .main{padding-bottom:100px;}
-  .sidebar{display:none !important;}
-  .menu-btn{display:none !important;}
 }
 
 
@@ -572,29 +568,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .sync-setup-step{padding:10px;}
 }
 @media(hover:none){.property-card:hover{transform:none;}.card-actions{opacity:1!important;}}
-
-.voice-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.88);flex-direction:column;align-items:center;justify-content:center;gap:24px;}
-.voice-overlay.open{display:flex;}
-.voice-status{font-size:15px;font-weight:600;color:#fff;font-family:'Noto Sans JP',sans-serif;text-align:center;line-height:1.8;max-width:300px;white-space:pre-line;}
-.voice-transcript{font-size:13px;color:rgba(255,255,255,.7);font-family:'Noto Sans JP',sans-serif;text-align:center;min-height:24px;max-width:300px;}
-.voice-mic{width:72px;height:72px;border-radius:50%;background:var(--accent2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.voice-mic.listening{animation:vpulse 1.5s infinite;}
-.voice-mic svg{width:32px;height:32px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;}
-.voice-cancel{font-size:13px;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;padding:8px 24px;}
-.voice-choices{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:320px;}
-.voice-choice-btn{padding:12px 20px;border-radius:12px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
-@keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(46,107,80,.5);}70%{box-shadow:0 0 0 20px rgba(46,107,80,0);}100%{box-shadow:0 0 0 0 rgba(46,107,80,0);}}
-.bottom-tabbar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;padding-bottom:env(safe-area-inset-bottom,0);}
-.bottom-tabbar-inner{display:flex;align-items:flex-end;height:56px;}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;padding:6px 0 4px;}
-.tab-btn svg{width:22px;height:22px;stroke:var(--text3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-.tab-btn span{font-size:10px;color:var(--text3);font-family:'Noto Sans JP',sans-serif;}
-.tab-btn.active svg{stroke:var(--accent2);}
-.tab-btn.active span{color:var(--accent2);font-weight:700;}
-.tab-center-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding-bottom:4px;}
-.tab-fab{width:48px;height:48px;border-radius:50%;background:var(--accent2);border:3px solid var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-bottom:8px;}
-.tab-fab svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;}
-@media(max-width:767px){.bottom-tabbar{display:block;}.main{padding-bottom:80px;}.sidebar{display:none !important;}.menu-btn{display:none !important;}#pc-dashboard{display:none !important;}#mobile-dashboard{display:block;}}
 </style>
 </head>
 <body>
@@ -631,7 +604,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
     カスタマイズ設定
   </button>
-  <div class="sidebar-footer">Ver 9.9.3 · Property Note</div>
+  <div class="sidebar-footer">Ver 7.0 · Property Note</div>
 </aside>
 
 <main class="main">
@@ -659,47 +632,183 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 
       <!-- ══ スマホ用ダッシュボード ══ -->
       <div id="mobile-dashboard">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-          <button onclick="openCalc()" style="padding:12px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">💴 利回り電卓</button>
-          <button onclick="voiceOpen()" style="padding:12px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">🎤 音声入力</button>
+
+        <!-- 今日の予定（期限ToDoも含む） -->
+        <div id="dash-today-section" style="display:none;margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;">📅 今日の予定・期限</div>
+          <div id="dash-today-list"></div>
         </div>
-        <div class="dash-section-card" id="dash-todo-section" style="display:none;"><div class="dash-section-hd"><span>☑ ToDo</span><button class="dash-add-btn" onclick="openAddTodo()">＋</button></div><div id="dash-todo-list"></div></div>
-        <div id="dash-archive-toggle" style="display:none;text-align:right;margin-bottom:6px;"><button id="dash-archive-btn" onclick="toggleArchiveDisplay()" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">見送り・購入済も表示</button></div>
-        <div class="dash-section-card"><div class="dash-section-hd"><span>🏠 物件</span><button class="dash-add-btn" onclick="openAddProperty()">＋ 追加</button></div><div id="dash-prop-list"></div></div>
-        <div class="dash-section-card"><div class="dash-section-hd"><span>📝 Memo</span><div style="display:flex;gap:6px;"><button class="dash-add-btn" onclick="openAddMemo()">＋ 追加</button><button class="dash-expand-btn" id="dash-expand-memo" onclick="toggleDashSection('memo')">すべて表示</button></div></div><div id="dash-memo-list"></div></div>
-        <div class="dash-section-card" style="padding:0;overflow:hidden;margin-bottom:8px;"><div class="dash-section-hd" style="padding:12px 14px;cursor:pointer;" onclick="toggleCalendar()"><span style="flex:1;">📅 カレンダー <span id="cal-toggle-icon" style="font-size:11px;color:var(--text3);">▼</span></span><button class="dash-add-btn" onclick="event.stopPropagation();openAddSchedule()">＋ 予定</button><button class="dash-add-btn" onclick="event.stopPropagation();openAddDiary()" style="margin-left:4px;color:var(--text2);border-color:var(--border2);">✏ Journal</button></div><div id="dash-calendar-wrap" style="display:none;"><div class="cal-header"><div class="cal-month" id="cal-month-label"></div><div class="cal-nav"><button class="cal-nav-btn" onclick="calPrev()">‹</button><button class="cal-nav-btn" onclick="calToday()">今日</button><button class="cal-nav-btn" onclick="calNext()">›</button></div></div><div class="cal-grid"><div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div><div class="cal-days" id="cal-days"></div></div></div></div>
+
+        <!-- 物件追加ボタン（最上部固定） -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <span style="font-size:14px;font-weight:700;color:var(--text);">物件</span>
+          <button class="dash-add-btn" onclick="openAddProperty()" style="font-size:13px;padding:6px 16px;">＋ 追加</button>
+        </div>
+
+        <!-- 簡易電卓ボタン -->
+        <button onclick="openCalc()" style="width:100%;padding:10px;margin-bottom:10px;background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;">
+          💴 利回り電卓
+        </button>
+
+        <!-- 見送り表示トグル -->
+        <div id="dash-archive-toggle" style="display:none;text-align:right;margin-bottom:8px;">
+          <button id="dash-archive-btn" onclick="toggleArchiveDisplay()" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">見送り・購入済も表示</button>
+        </div>
+
+        <!-- 物件カード一覧 -->
+        <div id="dash-prop-list"></div>
+
+        <!-- ToDo一覧（全物件）：あれば最上部 -->
+        <div class="dash-section-card" id="dash-todo-section" style="display:none;">
+          <div class="dash-section-hd">
+            <span>☑ ToDo</span>
+            <button class="dash-add-btn" onclick="openAddTodo()">＋ 追加</button>
+          </div>
+          <div id="dash-todo-list"></div>
+        </div>
+
+        <!-- 区切り -->
+        <div class="dash-section-sep"></div>
+
+<!-- Activity section removed -->
+
+        <!-- Note -->
+        <div class="dash-section-card">
+          <div class="dash-section-hd">
+            <span>📝 Memo</span>
+            <div style="display:flex;gap:6px;">
+              <button class="dash-add-btn" onclick="openAddMemo()">＋ 追加</button>
+              <button class="dash-expand-btn" id="dash-expand-memo" onclick="toggleDashSection('memo')">すべて表示</button>
+            </div>
+          </div>
+          <div id="dash-memo-list"></div>
+        </div>
+
+        <!-- 日記 -->
+        <div class="dash-section-card">
+          <div class="dash-section-hd">
+            <span id="dash-label-diary">✏️ Journal</span>
+            <button class="dash-expand-btn" id="dash-expand-diary" onclick="toggleDashSection('diary')">すべて表示</button>
+          </div>
+          <div id="dash-diary-list"></div>
+        </div>
+
+        <!-- カレンダー（折りたたみ） -->
+        <div class="dash-section-card" style="padding:0;overflow:hidden;">
+          <div class="dash-section-hd" style="padding:12px 14px;">
+            <span onclick="toggleCalendar()" style="cursor:pointer;flex:1;">📅 カレンダー <span id="cal-toggle-icon" style="font-size:11px;color:var(--text3);">▼</span></span>
+            <div style="display:flex;gap:6px;">
+              <button class="dash-add-btn" onclick="openAddSchedule()">＋ 予定</button>
+              <button class="dash-add-btn" onclick="openAddDiary()" style="color:var(--text2);border-color:var(--border2);">＋ Journal</button>
+            </div>
+          </div>
+          <div id="dash-calendar-wrap" style="display:none;">
+            <div class="cal-header">
+              <div class="cal-month" id="cal-month-label"></div>
+              <div class="cal-nav">
+                <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+                <button class="cal-nav-btn" onclick="calToday()">今日</button>
+                <button class="cal-nav-btn" onclick="calNext()">›</button>
+              </div>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div>
+              <div class="cal-days" id="cal-days"></div>
+            </div>
+            <div class="cal-legend">
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-learn"></div><span id="cal-legend-learning">Note</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-prop"></div><span id="cal-legend-property">物件</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-action"></div><span id="cal-legend-action">Activity</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-diary"></div><span id="cal-legend-diary">Journal</span></div>
+            </div>
+          </div>
+        </div>
+
       </div><!-- /mobile-dashboard -->
 
       <!-- ══ PC用ダッシュボード ══ -->
       <div id="pc-dashboard" style="display:none;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
-          <button onclick="openAddMemo()" style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--accent2);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">+ Memo</button>
-          <button onclick="openAddProperty()" style="padding:8px 14px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:8px;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">物件追加</button>
-          <button onclick="openCalc()" style="padding:8px 14px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:8px;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">💴 利回り電卓</button>
-          <button onclick="voiceOpen()" style="padding:8px 14px;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:8px;font-size:13px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">🎤 音声入力</button>
-          <div style="margin-left:auto;"><button id="dash-archive-btn-pc" onclick="toggleArchiveDisplayPc()" style="display:none;font-size:12px;padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">見送り・購入済も表示</button></div>
+
+        <!-- 物件追加ボタン -->
+        <button class="dash-add-property-btn" onclick="openAddProperty()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          物件を追加する
+        </button>
+
+        <!-- 利回り電卓ボタン -->
+        <button onclick="openCalc()" style="width:100%;padding:10px;margin-bottom:10px;background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;">
+          💴 利回り電卓
+        </button>
+
+        <!-- 見送り表示トグル -->
+        <div id="dash-archive-toggle-pc" style="display:none;text-align:right;margin-bottom:8px;">
+          <button id="dash-archive-btn-pc" onclick="toggleArchiveDisplayPc()" style="font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">見送り・購入済も表示</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;">
-          <div>
-            <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:0;">
-              <button id="pc-tab-btn-prop" onclick="switchPcTab('prop')" style="padding:10px 20px;font-size:13px;font-weight:600;font-family:'Noto Sans JP',sans-serif;background:none;border:none;border-bottom:2px solid var(--accent2);margin-bottom:-2px;color:var(--accent2);cursor:pointer;">物件</button>
-              <button id="pc-tab-btn-memo" onclick="switchPcTab('memo')" style="padding:10px 20px;font-size:13px;font-family:'Noto Sans JP',sans-serif;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text3);cursor:pointer;">学び</button>
-            </div>
-            <div id="pc-tab-prop" style="padding-top:14px;"><div id="dash-prop-list-pc"></div></div>
-            <div id="pc-tab-memo" style="display:none;padding-top:14px;"><div id="dash-memo-full-pc"></div></div>
+
+        <!-- 物件カード一覧 -->
+        <div id="dash-prop-list-pc"></div>
+
+        <div class="dash-section-sep"></div>
+
+        <!-- ToDo -->
+        <div class="dash-section-card" id="dash-todo-section-pc" style="display:none;">
+          <div class="dash-section-hd">
+            <span>☑ ToDo</span>
+            <button class="dash-add-btn" onclick="openAddTodo()">＋ 追加</button>
           </div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <div id="dash-todo-section-pc" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><span style="font-size:13px;font-weight:600;color:var(--text);">ToDo</span><button onclick="openAddTodo()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--accent2);background:transparent;color:var(--accent2);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">＋</button></div>
-              <div id="dash-todo-list-pc"></div>
+          <div id="dash-todo-list-pc"></div>
+        </div>
+
+        <!-- Memo -->
+        <div class="dash-section-card">
+          <div class="dash-section-hd">
+            <span>📝 Memo</span>
+            <button class="dash-add-btn" onclick="openAddMemo()">＋ 追加</button>
+          </div>
+          <div id="dash-memo-list-pc"></div>
+        </div>
+
+        <!-- Journal -->
+        <div class="dash-section-card">
+          <div class="dash-section-hd">
+            <span>✏️ Journal</span>
+            <div style="display:flex;gap:6px;">
+              <button class="dash-add-btn" onclick="openAddDiary()">＋ 追加</button>
+              <button class="dash-expand-btn" id="dash-expand-diary-pc" onclick="toggleDashSectionPc('diary')">すべて表示</button>
             </div>
-            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><span style="font-size:13px;font-weight:600;color:var(--text);">カレンダー</span><div style="display:flex;gap:4px;"><button onclick="openAddSchedule()" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">＋ 予定</button><button onclick="openAddDiary()" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">✏ Journal</button></div></div>
-              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;" id="cal-month-label-pc"></div>
-              <div class="cal-grid" style="font-size:11px;"><div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div><div class="cal-days" id="cal-days-pc"></div></div>
+          </div>
+          <div id="dash-diary-list-pc"></div>
+        </div>
+
+        <!-- カレンダー（折りたたみ） -->
+        <div class="dash-section-card" style="padding:0;overflow:hidden;">
+          <div class="dash-section-hd" style="padding:12px 14px;">
+            <span onclick="toggleCalendarPc()" style="cursor:pointer;flex:1;">📅 カレンダー <span id="cal-toggle-icon-pc" style="font-size:11px;color:var(--text3);">▼</span></span>
+            <button class="dash-add-btn" onclick="openAddSchedule()">＋ 予定</button>
+            <button class="dash-add-btn" onclick="openAddDiary()" style="border-color:var(--gold);color:var(--gold);margin-left:4px;">＋ Journal</button>
+          </div>
+          <div id="dash-calendar-wrap-pc" style="display:none;">
+            <div class="cal-header">
+              <div class="cal-month" id="cal-month-label-pc"></div>
+              <div class="cal-nav">
+                <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+                <button class="cal-nav-btn" onclick="calToday()">今日</button>
+                <button class="cal-nav-btn" onclick="calNext()">›</button>
+              </div>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div>
+              <div class="cal-days" id="cal-days-pc"></div>
+            </div>
+            <div class="cal-legend">
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-learn"></div><span>Memo</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-prop"></div><span>物件</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-action"></div><span>Log</span></div>
+              <div class="cal-legend-item"><div class="cal-dot cal-dot-diary"></div><span>Journal</span></div>
             </div>
           </div>
         </div>
+
       </div><!-- /pc-dashboard -->
 
     </div>
@@ -760,10 +869,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     </div>
 
     <!-- DIARY -->
-    <div class="page" id="page-calendar">
-      <div class="section-header"><div class="section-header-title">カレンダー</div><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="openAddDiary()">✏ Journal</button><button class="btn btn-primary btn-sm" onclick="openAddSchedule()">＋ 予定</button></div></div>
-      <div class="cal-wrap" style="max-width:680px;margin:0 auto;"><div class="cal-header"><div class="cal-month" id="cal-month-label-page"></div><div class="cal-nav"><button class="cal-nav-btn" onclick="calPrev();renderCalendarPage()">‹</button><button class="cal-nav-btn" onclick="calToday();renderCalendarPage()">今日</button><button class="cal-nav-btn" onclick="calNext();renderCalendarPage()">›</button></div></div><div class="cal-grid"><div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div><div class="cal-days" id="cal-days-page"></div></div></div>
-    </div>
     <div class="page" id="page-diary">
       <div class="section-header">
         <div class="section-header-title" id="section-title-diary">Journal</div>
@@ -772,45 +877,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       <div class="diary-list" id="diary-list"></div>
     </div>
   </div>
-
-<div class="voice-overlay" id="voice-overlay">
-  <div class="voice-status" id="voice-status">何を追加しますか？</div>
-  <div class="voice-choices" id="voice-choices">
-    <button class="voice-choice-btn" onclick="voiceChoose('memo')">📝 Memo</button>
-    <button class="voice-choice-btn" onclick="voiceChoose('property')">🏠 物件</button>
-  </div>
-  <button class="voice-mic" id="voice-mic" onclick="voiceToggleMic()">
-    <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-  </button>
-  <div class="voice-transcript" id="voice-transcript"></div>
-  <button class="voice-cancel" onclick="voiceClose()">キャンセル</button>
-</div>
-<nav class="bottom-tabbar" id="bottom-tabbar">
-  <div class="bottom-tabbar-inner">
-    <button class="tab-btn active" id="tab-dashboard" onclick="showPage('dashboard');updateTabBar('dashboard')">
-      <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      <span>Home</span>
-    </button>
-    <button class="tab-btn" id="tab-property" onclick="showPage('property');updateTabBar('property')">
-      <svg viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-      <span>物件</span>
-    </button>
-    <div class="tab-center-wrap">
-      <button class="tab-fab" id="tab-memo" onclick="showPage('memo');updateTabBar('memo')">
-        <svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-      </button>
-    </div>
-    <button class="tab-btn" id="tab-diary" onclick="showPage('diary');updateTabBar('diary')">
-      <svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-      <span>Journal</span>
-    </button>
-    <button class="tab-btn" id="tab-calendar" onclick="showPage('calendar');updateTabBar('calendar')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>カレンダー</span>
-    </button>
-  </div>
-</nav>
-
+</main>
 
 <!-- ════════ MODALS ════════ -->
 
@@ -983,8 +1050,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
         </select>
       </div>
       <div class="form-group">
-        <label>関連物件（複数選択可）</label>
-        <div id="memo-property-checks" style="display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto;padding:8px;background:var(--surface2);border-radius:8px;border:1px solid var(--border2);"></div>
+        <label>関連物件（選択すると物件のLogに追加）</label>
+        <select id="memo-property">
+          <option value="">物件に紐づけない</option>
+        </select>
       </div>
       <div class="form-group">
         <label>タイトル</label>
@@ -1599,10 +1668,9 @@ async function testAndSaveGasUrl(){
     const res=await fetch(url+'?'+params.toString());
     const json=await res.json();
     if(json.ok===true||json.data!==undefined){
-      data.gasUrl=url;data.gasApiKey=apiKey;data.gasWritePassword=writePw;
-      saveLocal();setSyncState('ok');
       document.getElementById('cfg-gas-url').classList.add('connected');
-      document.getElementById('gas-test-result').innerHTML='<span style="color:#27AE60;font-weight:600;">✓ 接続成功・保存しました。</span>';
+      document.getElementById('gas-test-result').innerHTML=
+        '<span style="color:#27AE60;font-weight:600;">✓ 接続・認証成功！「保存する」を押して設定を確定してください。</span>';
     }else{
       throw new Error(json.error||'レスポンスエラー');
     }
@@ -1633,7 +1701,13 @@ function init(){
   updateCounts();renderCalendar();renderProperty();renderAction();renderDiary();renderDashboard();renderMemo();
   renderFilterBars();
   updateStorageUsage();
-  if(data.gasUrl&&data.gasApiKey){setSyncState('ok');pullFromSheets(true);}else{setSyncState('offline');}
+  // 起動時に同期
+  if(data.gasUrl){
+    setSyncState('syncing');
+    pullFromSheets(true);
+  }else{
+    setSyncState('offline');
+  }
 }
 
 function clearLocalPhotoData(){
@@ -1940,23 +2014,21 @@ function getFormValues(section){
 /* ══ SIDEBAR / NAV ══ */
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebar-overlay').classList.add('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('open');}
-const pageTitles={dashboard:'Home',learning:'Note',property:'物件',action:'Log',memo:'Memo',diary:'Journal',calendar:'カレンダー'};
+const pageTitles={dashboard:'Home',learning:'Note',property:'物件',action:'Log',memo:'Memo',diary:'Journal'};
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  // memo表示時はpage-memoをアクティブに
   const pageId = name==='memo'?'memo':name;
   const pageEl = document.getElementById('page-'+pageId);
   if(pageEl) pageEl.classList.add('active');
-  const navOrder=['dashboard','property','memo','diary','calendar'];
+  // nav-itemの対応（dashboard,property,memo,diary の4つ）
+  const navOrder=['dashboard','property','memo','diary'];
   const navIdx=navOrder.indexOf(name==='learning'||name==='action'?'memo':name);
   const navItems=document.querySelectorAll('.nav-item');
   if(navIdx>=0&&navItems[navIdx]) navItems[navIdx].classList.add('active');
-  const titleEl=document.getElementById('page-title');
-  if(titleEl) titleEl.textContent=pageTitles[name]||name;
+  document.getElementById('page-title').textContent=pageTitles[name]||pageTitles['memo']||name;
   if(name==='memo') renderMemo();
-  if(name==='calendar') renderCalendarPage();
-  if(name==='diary') renderDiary();
-  updateTabBar(name);
 }
 function closeModal(type){
   document.getElementById('modal-'+type).classList.remove('open');
@@ -3228,7 +3300,6 @@ let dashShowArchive=false;
 
 function renderDashboard(){
   const isMobile=window.innerWidth<900;
-  if(!isMobile){renderPcDashboard();return;}
   const mob=document.getElementById('mobile-dashboard');
   const pc=document.getElementById('pc-dashboard');
   if(mob) mob.style.display=isMobile?'block':'none';
@@ -3686,8 +3757,8 @@ let editingMemoId=null;
 
 function openEditMemo(type, id){
   const item=type==='learning'
-    ?data.learning.find(i=>String(i.id)===String(id))
-    :data.action.find(i=>String(i.id)===String(id));
+    ?data.learning.find(i=>i.id===id)
+    :data.action.find(i=>i.id===id);
   if(!item)return;
   document.getElementById('modal-memo-title').textContent='Memo を編集';
   document.getElementById('modal-memo-badge').style.display='inline-flex';
@@ -3700,8 +3771,12 @@ function openEditMemo(type, id){
   document.getElementById('memo-content').value=item.content||'';
   document.getElementById('memo-next').value=item.next||item.actionNote||'';
   document.getElementById('memo-next-due').value=item.nextDue||'';
-  var _existProps=item.properties||(item.property?[item.property]:[]);
-  renderMemoPropertyChecks(_existProps);
+  const sel=document.getElementById('memo-property');
+  if(sel){
+    sel.innerHTML='<option value="">物件に紐づけない</option>'+
+      data.property.filter(p=>!ARCHIVE_STATUSES.includes(p.status))
+        .map(p=>`<option value="${escHtml(p.name)}"${item.property===p.name?' selected':''}>${escHtml(p.name)}</option>`).join('');
+  }
   document.getElementById('modal-memo').classList.add('open');
 }
 
@@ -3716,7 +3791,11 @@ function openAddMemo(){
   document.getElementById('memo-content').value='';
   document.getElementById('memo-next').value='';
   document.getElementById('memo-next-due').value='';
-  renderMemoPropertyChecks([]);
+  // 物件プルダウン更新
+  const sel=document.getElementById('memo-property');
+  sel.innerHTML='<option value="">物件に紐づけない</option>'+
+    data.property.filter(p=>!ARCHIVE_STATUSES.includes(p.status))
+      .map(p=>`<option value="${escHtml(p.name)}">${escHtml(p.name)}</option>`).join('');
   document.getElementById('modal-memo').classList.add('open');
 }
 
@@ -4439,439 +4518,6 @@ function showToast(msg, duration=2500){
 /* ══ UTILS ══ */
 function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function formatDate(s){if(!s)return '';try{const d=new Date(s);return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;}catch(e){return s;}}
-
-/* ══ updateTabBar ══ */
-function updateTabBar(name) {
-  var map = {dashboard:'tab-dashboard', property:'tab-property', memo:'tab-memo', diary:'tab-diary', calendar:'tab-calendar'};
-  document.querySelectorAll('[id^="tab-"]').forEach(function(b) { b.classList.remove('active'); });
-  var el = document.getElementById(map[name]);
-  if (el) el.classList.add('active');
-}
-
-/* ══ renderCalendarPage ══ */
-function renderCalendarPage() {
-  var label = document.getElementById('cal-month-label-page');
-  if (label) label.textContent = calYear + '年 ' + (calMonth + 1) + '月';
-  var days = document.getElementById('cal-days-page');
-  if (!days) return;
-  var fd = new Date(calYear, calMonth, 1).getDay();
-  var ld = new Date(calYear, calMonth + 1, 0).getDate();
-  var pld = new Date(calYear, calMonth, 0).getDate();
-  var ts = dateStr(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-  var html = '', dc = 0;
-  for (var i = fd - 1; i >= 0; i--) { html += cc(dateStr(calYear, calMonth - 1, pld - i), pld - i, 'other-month', (fd - 1 - i) % 7 === 0 ? 'sun' : (fd - 1 - i) % 7 === 6 ? 'sat' : '', ts); dc++; }
-  for (var d = 1; d <= ld; d++) { var dow = (fd + d - 1) % 7; html += cc(dateStr(calYear, calMonth, d), d, '', dow === 0 ? 'sun' : dow === 6 ? 'sat' : '', ts); dc++; }
-  var rem = 7 - (dc % 7);
-  if (rem < 7) { for (var d2 = 1; d2 <= rem; d2++) { html += cc(dateStr(calYear, calMonth + 1, d2), d2, 'other-month', (dc % 7) === 0 ? 'sun' : (dc % 7) === 6 ? 'sat' : '', ts); dc++; } }
-  days.innerHTML = html;
-}
-
-/* ══ PC版タブ・ダッシュボード ══ */
-function switchPcTab(tab) {
-  document.getElementById('pc-tab-prop').style.display = tab === 'prop' ? 'block' : 'none';
-  document.getElementById('pc-tab-memo').style.display = tab === 'memo' ? 'block' : 'none';
-  var bp = document.getElementById('pc-tab-btn-prop');
-  var bm = document.getElementById('pc-tab-btn-memo');
-  if (bp) { bp.style.borderBottomColor = tab === 'prop' ? 'var(--accent2)' : 'transparent'; bp.style.color = tab === 'prop' ? 'var(--accent2)' : 'var(--text3)'; }
-  if (bm) { bm.style.borderBottomColor = tab === 'memo' ? 'var(--accent2)' : 'transparent'; bm.style.color = tab === 'memo' ? 'var(--accent2)' : 'var(--text3)'; }
-  if (tab === 'memo') renderPcMemoTab();
-}
-
-function renderPcMemoTab() {
-  var el = document.getElementById('dash-memo-full-pc');
-  if (!el) return;
-  var items = data.learning.map(function(i) { return Object.assign({}, i, {_type: 'learning'}); }).concat(
-    data.action.filter(function(i) { return !i.property; }).map(function(i) { return Object.assign({}, i, {_type: 'action'}); })
-  ).sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
-  if (!items.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3);">まだ学びの記録がありません</div>'; return; }
-  var groups = {};
-  items.forEach(function(i) { var cat = i.category || i.source || i.type || 'その他'; if (!groups[cat]) groups[cat] = []; groups[cat].push(i); });
-  el.innerHTML = Object.entries(groups).map(function(entry) {
-    var cat = entry[0], catItems = entry[1];
-    return '<div style="margin-bottom:16px;">' +
-      '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);">' + escHtml(cat) + '</div>' +
-      catItems.map(function(i) {
-        return '<div onclick="openEditMemo(\'' + i._type + '\',' + i.id + ')" style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
-          '<div style="width:6px;height:6px;border-radius:50%;background:var(--accent2);flex-shrink:0;margin-top:5px;"></div>' +
-          '<div style="flex:1;min-width:0;">' +
-            '<div style="font-size:13px;font-weight:500;color:var(--text);">' + escHtml(i.title || '(無題)') + '</div>' +
-            '<div style="font-size:11px;color:var(--text3);">' + formatDate(i.date) + '</div>' +
-          '</div><div style="color:var(--text3);">›</div></div>';
-      }).join('') + '</div>';
-  }).join('');
-}
-
-function toggleArchiveDisplayPc() {
-  dashShowArchive = !dashShowArchive;
-  renderPcDashboard();
-}
-
-function renderPcDashboard() {
-  var toggleBtn = document.getElementById('dash-archive-btn-pc');
-  if (toggleBtn) {
-    var hasArchive = data.property.some(function(p) { return ARCHIVE_STATUSES.includes(p.status); });
-    toggleBtn.style.display = hasArchive ? 'inline-flex' : 'none';
-    toggleBtn.textContent = dashShowArchive ? '見送り・購入済を隠す' : '見送り・購入済も表示';
-  }
-
-  var propListEl = document.getElementById('dash-prop-list-pc');
-  if (propListEl) {
-    var activeS = ['候補発見', '調査中', '問い合わせ済', '内覧済', '交渉中', '購入検討中'];
-    var props = (dashShowArchive ? data.property.slice() : data.property.filter(function(p) { return activeS.includes(p.status); }))
-      .sort(function(a, b) {
-        var aL = (a.timeline && a.timeline.length) ? a.timeline.slice().sort(function(x, y) { return y.date.localeCompare(x.date); })[0].date : a.date || '';
-        var bL = (b.timeline && b.timeline.length) ? b.timeline.slice().sort(function(x, y) { return y.date.localeCompare(x.date); })[0].date : b.date || '';
-        return bL.localeCompare(aL);
-      });
-    if (!props.length) {
-      propListEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text3);font-size:13px;">現役の物件がありません</div>';
-    } else {
-      propListEl.innerHTML = props.map(function(item) {
-        var yld = calcYield(item);
-        var tl = item.timeline || [];
-        var lastLog = tl.length ? tl.slice().sort(function(a, b) { return b.date.localeCompare(a.date); })[0] : null;
-        var daysSince = lastLog ? Math.floor((Date.now() - new Date(lastLog.date)) / (1000 * 60 * 60 * 24)) : -1;
-        var lastStr = daysSince < 0 ? '記録なし' : daysSince === 0 ? '今日' : daysSince === 1 ? '昨日' : daysSince + '日前';
-        var freshColor = daysSince < 0 ? 'var(--text3)' : daysSince <= 3 ? 'var(--accent2)' : daysSince <= 7 ? 'var(--gold)' : 'var(--text3)';
-        var sc = statusColors[item.status] || '#888';
-        return '<div class="dash-prop-card" onclick="showPropDetail(' + item.id + ')" style="margin-bottom:8px;">' +
-          '<div style="height:3px;background:' + sc + ';"></div>' +
-          '<div style="display:flex;gap:12px;padding:12px 16px;align-items:center;">' +
-            '<div style="flex:1;min-width:0;">' +
-              '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">' +
-                '<span style="font-size:10px;font-weight:600;padding:1px 8px;border-radius:8px;background:' + sc + '22;color:' + sc + ';">' + escHtml(item.status || '') + '</span>' +
-                '<span style="font-size:11px;color:var(--text3);">' + escHtml(item.location || '—') + '</span>' +
-              '</div>' +
-              '<div style="font-size:14px;font-weight:700;color:var(--text);">' + escHtml(item.name) + '</div>' +
-              '<div style="display:flex;gap:12px;align-items:center;margin-top:3px;">' +
-                (item.price ? '<span style="font-size:12px;font-weight:600;color:var(--text);">' + item.price + '万円</span>' : '') +
-                (yld ? '<span style="font-size:12px;font-weight:600;color:var(--accent2);">表面' + yld.gross + '%</span>' : '') +
-                '<span style="font-size:11px;color:' + freshColor + ';">● ' + lastStr + '</span>' +
-              '</div>' +
-            '</div>' +
-            '<div style="color:var(--text3);font-size:18px;">›</div>' +
-          '</div></div>';
-      }).join('');
-    }
-  }
-
-  var todoSection = document.getElementById('dash-todo-section-pc');
-  var todoEl = document.getElementById('dash-todo-list-pc');
-  if (todoEl) {
-    var today = new Date().toISOString().split('T')[0];
-    var allTodos = [];
-    data.property.forEach(function(prop) {
-      (prop.todos || []).forEach(function(t) { allTodos.push(Object.assign({}, t, {propId: prop.id, propName: prop.name})); });
-    });
-    var active = allTodos.filter(function(t) { return !t.done; }).sort(function(a, b) {
-      if (a.due && b.due) return a.due.localeCompare(b.due);
-      if (a.due) return -1; if (b.due) return 1; return 0;
-    });
-    if (todoSection) todoSection.style.display = active.length ? 'block' : 'none';
-    todoEl.innerHTML = active.map(function(t) {
-      var isOverdue = t.due && t.due < today;
-      var dueColor = isOverdue ? 'var(--danger)' : t.due === today ? 'var(--gold)' : 'var(--text3)';
-      return '<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">' +
-        '<input type="checkbox" onchange="toggleTodoDone(' + t.propId + ',\'' + t.id + '\')" style="width:15px;height:15px;cursor:pointer;flex-shrink:0;margin-top:2px;">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div style="font-size:12px;color:var(--text);">' + escHtml(t.title) + '</div>' +
-          '<div style="font-size:10px;color:var(--text3);">' + escHtml(t.propName) + (t.due ? ' · <span style="color:' + dueColor + ';">' + t.due + '</span>' : '') + '</div>' +
-        '</div></div>';
-    }).join('');
-  }
-
-  var pcLabel = document.getElementById('cal-month-label-pc');
-  if (pcLabel) pcLabel.textContent = calYear + '年 ' + (calMonth + 1) + '月';
-  var pcDays = document.getElementById('cal-days-pc');
-  if (pcDays) {
-    var fd2 = new Date(calYear, calMonth, 1).getDay();
-    var ld2 = new Date(calYear, calMonth + 1, 0).getDate();
-    var pld2 = new Date(calYear, calMonth, 0).getDate();
-    var ts2 = dateStr(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-    var h = '', dc2 = 0;
-    for (var i2 = fd2 - 1; i2 >= 0; i2--) { h += cc(dateStr(calYear, calMonth - 1, pld2 - i2), pld2 - i2, 'other-month', (fd2 - 1 - i2) % 7 === 0 ? 'sun' : (fd2 - 1 - i2) % 7 === 6 ? 'sat' : '', ts2); dc2++; }
-    for (var d3 = 1; d3 <= ld2; d3++) { var dow2 = (fd2 + d3 - 1) % 7; h += cc(dateStr(calYear, calMonth, d3), d3, '', dow2 === 0 ? 'sun' : dow2 === 6 ? 'sat' : '', ts2); dc2++; }
-    var rem2 = 7 - (dc2 % 7);
-    if (rem2 < 7) { for (var d4 = 1; d4 <= rem2; d4++) { h += cc(dateStr(calYear, calMonth + 1, d4), d4, 'other-month', (dc2 % 7) === 0 ? 'sun' : (dc2 % 7) === 6 ? 'sat' : '', ts2); dc2++; } }
-    pcDays.innerHTML = h;
-  }
-}
-
-/* ══ 音声入力 ══ */
-var voiceRecognition = null, voiceStep = 'choose', voiceType = '', voiceTitle = '', voiceContent = '', voicePropAddress = '', voiceMemo = '', voiceEditTarget = '';
-
-function voiceSpeak(text, onEnd) {
-  window.speechSynthesis.cancel();
-  var u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ja-JP'; u.rate = 1.1;
-  if (onEnd) u.onend = onEnd;
-  window.speechSynthesis.speak(u);
-}
-
-function voiceOpen() {
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Chromeブラウザで開いてください。'); return; }
-  voiceStep = 'choose'; voiceType = ''; voiceTitle = ''; voiceContent = ''; voicePropAddress = ''; voiceMemo = '';
-  document.getElementById('voice-overlay').classList.add('open');
-  document.getElementById('voice-status').textContent = '何を追加しますか？';
-  document.getElementById('voice-choices').style.display = 'flex';
-  document.getElementById('voice-choices').innerHTML = '<button class="voice-choice-btn" onclick="voiceChoose(\'memo\')">📝 Memo</button><button class="voice-choice-btn" onclick="voiceChoose(\'property\')">🏠 物件</button>';
-  document.getElementById('voice-transcript').textContent = '';
-  document.getElementById('voice-mic').classList.remove('listening');
-  voiceSpeak('MemoかProperty、どちらに追加しますか？');
-}
-
-function voiceClose() {
-  clearTimeout(voiceSilenceTimer);
-  window.speechSynthesis.cancel();
-  document.getElementById('voice-overlay').classList.remove('open');
-  if (voiceRecognition) { try { voiceRecognition.stop(); } catch(e) {} }
-  voiceRecognition = null;
-}
-
-function voiceChoose(type) {
-  voiceType = type; voiceStep = 'title';
-  document.getElementById('voice-choices').style.display = 'none';
-  var label = type === 'property' ? '物件名' : 'タイトル';
-  document.getElementById('voice-status').textContent = label + 'を話してください';
-  document.getElementById('voice-transcript').textContent = '';
-  voiceSpeak(label + 'を話してください', function() { voiceStartListening(); });
-}
-
-function voiceToggleMic() {
-  if (voiceRecognition) {
-    clearTimeout(voiceSilenceTimer);
-    try { voiceRecognition.stop(); } catch(e) {}
-    voiceRecognition = null;
-    document.getElementById('voice-mic').classList.remove('listening');
-  } else {
-    voiceStartListening();
-  }
-}
-
-var voiceSilenceTimer = null;
-var voiceLastResult = '';
-
-function voiceStartListening() {
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return;
-  voiceRecognition = new SR();
-  voiceRecognition.lang = 'ja-JP';
-  voiceRecognition.continuous = true;  // 継続モードで長めに聞く
-  voiceRecognition.interimResults = true;
-  var mic = document.getElementById('voice-mic');
-  var transcript = document.getElementById('voice-transcript');
-  mic.classList.add('listening');
-  transcript.textContent = '聞いています...';
-  voiceLastResult = '';
-
-  voiceRecognition.onresult = function(e) {
-    var t = '';
-    for (var i = 0; i < e.results.length; i++) {
-      t += e.results[i][0].transcript;
-    }
-    transcript.textContent = t;
-    voiceLastResult = t;
-    // 発話のたびにタイマーをリセット（2秒無音で終了）
-    clearTimeout(voiceSilenceTimer);
-    voiceSilenceTimer = setTimeout(function() {
-      if (voiceLastResult && voiceLastResult !== '聞いています...') {
-        voiceStopAndProcess();
-      }
-    }, 2000);
-  };
-
-  voiceRecognition.onerror = function(e) {
-    clearTimeout(voiceSilenceTimer);
-    if (e.error === 'no-speech') {
-      // 無音タイムアウト → 何も言わなかった
-      transcript.textContent = 'もう一度話してください';
-      mic.classList.remove('listening');
-    } else {
-      transcript.textContent = 'エラー。マイクをタップして再試行。';
-      mic.classList.remove('listening');
-    }
-  };
-
-  voiceRecognition.start();
-}
-
-function voiceStopAndProcess() {
-  clearTimeout(voiceSilenceTimer);
-  if (voiceRecognition) {
-    try { voiceRecognition.stop(); } catch(e) {}
-    voiceRecognition = null;
-  }
-  var mic = document.getElementById('voice-mic');
-  var transcript = document.getElementById('voice-transcript');
-  mic.classList.remove('listening');
-  var finalText = voiceLastResult;
-  if (!finalText || finalText === '聞いています...') return;
-  voiceHandleResult(finalText);
-}
-
-function voiceHandleResult(text) {
-  var status = document.getElementById('voice-status');
-  var transcript = document.getElementById('voice-transcript');
-  var norm = text.replace(/[。、！？ ]/g, '').toLowerCase();
-
-  if (voiceStep === 'choose') {
-    // 音声で Memo か 物件を選択
-    if (/メモ|memo|Memo/i.test(norm)) { voiceChoose('memo'); return; }
-    if (/物件|ぶっけん|プロパティ|property/i.test(norm)) { voiceChoose('property'); return; }
-    // 聞き取れなかった場合は再試行
-    voiceSpeak('MemoかProperty、どちらに追加しますか？', function() { voiceStartListening(); });
-    return;
-  }
-
-  if (voiceStep === 'title') {
-    voiceTitle = text; transcript.textContent = '';
-    if (voiceType === 'property') {
-      voiceStep = 'prop_address'; status.textContent = '住所を話してください';
-      voiceSpeak('住所を話してください', function() { voiceStartListening(); });
-    } else {
-      voiceStep = 'content'; status.textContent = '内容を話してください';
-      voiceSpeak('内容を話してください', function() { voiceStartListening(); });
-    }
-  } else if (voiceStep === 'prop_address') {
-    voicePropAddress = text; voiceStep = 'prop_memo'; transcript.textContent = '';
-    status.textContent = 'メモを話してください（なければ「なし」）';
-    voiceSpeak('メモがあれば話してください。なければ、なし、と言ってください', function() { voiceStartListening(); });
-  } else if (voiceStep === 'prop_memo') {
-    voiceMemo = (norm === 'なし' || norm === 'スキップ' || text.length < 2) ? '' : text;
-    voiceShowConfirmProp();
-  } else if (voiceStep === 'confirm') {
-    if (/保存|ok|はい|セーブ/i.test(norm)) voicePropSave();
-    else if (/修正|やり直|いや|ちが/i.test(norm)) voiceShowEditChoiceProp();
-    else voiceSpeak('保存するか修正すると言ってください', function() { voiceStartListening(); });
-  } else if (voiceStep === 'edit_choice_prop') {
-    if (/物件名|名前/i.test(norm)) voiceEditField('prop_name');
-    else if (/住所/i.test(norm)) voiceEditField('prop_address');
-    else if (/メモ/i.test(norm)) voiceEditField('prop_memo_edit');
-    else voiceSpeak('物件名、住所、メモのどれを修正しますか？', function() { voiceStartListening(); });
-  } else if (voiceStep === 'edit_field') {
-    if (voiceEditTarget === 'prop_name') voiceTitle = text;
-    else if (voiceEditTarget === 'prop_address') voicePropAddress = text;
-    else if (voiceEditTarget === 'prop_memo_edit') voiceMemo = text;
-    else if (voiceEditTarget === 'simple_title') voiceTitle = text;
-    else if (voiceEditTarget === 'simple_content') voiceContent = text;
-    if (voiceType === 'property') voiceShowConfirmProp();
-    else voiceShowConfirmSimple();
-  } else if (voiceStep === 'content') {
-    voiceContent = text;
-    voiceShowConfirmSimple();
-  } else if (voiceStep === 'confirm_simple') {
-    if (/保存|ok|はい|セーブ/i.test(norm)) voiceSimpleSave();
-    else if (/修正|やり直|いや|ちが/i.test(norm)) voiceShowEditChoiceSimple();
-    else voiceSpeak('保存するか修正すると言ってください', function() { voiceStartListening(); });
-  } else if (voiceStep === 'edit_choice_simple') {
-    if (/タイトル|題名/i.test(norm)) voiceEditField('simple_title');
-    else if (/内容/i.test(norm)) voiceEditField('simple_content');
-    else voiceSpeak('タイトルか内容どちらを修正しますか？', function() { voiceStartListening(); });
-  }
-}
-
-function voiceShowConfirmProp() {
-  voiceStep = 'confirm';
-  var choices = document.getElementById('voice-choices');
-  choices.style.display = 'flex';
-  choices.innerHTML = '<button class="voice-choice-btn" onclick="voicePropSave()">✓ 保存</button><button class="voice-choice-btn" onclick="voiceShowEditChoiceProp()">✏ 修正</button>';
-  var displayMsg = '確認\n物件名：' + voiceTitle + '\n住所：' + voicePropAddress + (voiceMemo ? '\nメモ：' + voiceMemo : '');
-  var speakMsg = '物件名' + voiceTitle + '、住所' + voicePropAddress + (voiceMemo ? '、メモ' + voiceMemo : '') + '。保存するか修正すると言ってください。';
-  document.getElementById('voice-status').textContent = displayMsg;
-  document.getElementById('voice-transcript').textContent = '「保存する」か「修正する」と言ってください';
-  voiceSpeak(speakMsg, function() { voiceStartListening(); });
-}
-
-function voiceShowEditChoiceProp() {
-  voiceStep = 'edit_choice_prop';
-  var choices = document.getElementById('voice-choices');
-  choices.style.display = 'flex';
-  choices.innerHTML = '<button class="voice-choice-btn" onclick="voiceEditField(\'prop_name\')">物件名</button><button class="voice-choice-btn" onclick="voiceEditField(\'prop_address\')">住所</button><button class="voice-choice-btn" onclick="voiceEditField(\'prop_memo_edit\')">メモ</button>';
-  document.getElementById('voice-status').textContent = 'どの項目を修正しますか？';
-  voiceSpeak('物件名、住所、メモのどれを修正しますか？', function() { voiceStartListening(); });
-}
-
-function voiceEditField(target) {
-  voiceEditTarget = target; voiceStep = 'edit_field';
-  document.getElementById('voice-choices').style.display = 'none';
-  var labels = {prop_name: '物件名', prop_address: '住所', prop_memo_edit: 'メモ', simple_title: 'タイトル', simple_content: '内容'};
-  var msg = (labels[target] || '内容') + 'を話してください';
-  document.getElementById('voice-status').textContent = msg;
-  document.getElementById('voice-transcript').textContent = '';
-  voiceSpeak(msg, function() { voiceStartListening(); });
-}
-
-function voiceShowConfirmSimple() {
-  voiceStep = 'confirm_simple';
-  var choices = document.getElementById('voice-choices');
-  choices.style.display = 'flex';
-  choices.innerHTML = '<button class="voice-choice-btn" onclick="voiceSimpleSave()">✓ 保存</button><button class="voice-choice-btn" onclick="voiceShowEditChoiceSimple()">✏ 修正</button>';
-  var displayMsg = '確認\nタイトル：' + voiceTitle + '\n内容：' + voiceContent;
-  var speakMsg = 'タイトル' + voiceTitle + '、内容' + voiceContent + '。保存するか修正すると言ってください。';
-  document.getElementById('voice-status').textContent = displayMsg;
-  document.getElementById('voice-transcript').textContent = '「保存する」か「修正する」と言ってください';
-  voiceSpeak(speakMsg, function() { voiceStartListening(); });
-}
-
-function voiceShowEditChoiceSimple() {
-  voiceStep = 'edit_choice_simple';
-  var choices = document.getElementById('voice-choices');
-  choices.style.display = 'flex';
-  choices.innerHTML = '<button class="voice-choice-btn" onclick="voiceEditField(\'simple_title\')">タイトル</button><button class="voice-choice-btn" onclick="voiceEditField(\'simple_content\')">内容</button>';
-  document.getElementById('voice-status').textContent = 'どの項目を修正しますか？';
-  voiceSpeak('タイトルか内容どちらを修正しますか？', function() { voiceStartListening(); });
-}
-
-function voiceSimpleSave() {
-  voiceClose();
-  var today = new Date().toISOString().split('T')[0];
-  if (voiceType === 'memo') {
-    openAddMemo();
-    setTimeout(function() {
-      var el = document.getElementById('memo-title'); if (el) el.value = voiceTitle;
-      var el2 = document.getElementById('memo-content'); if (el2) el2.value = voiceContent;
-      var el3 = document.getElementById('memo-date'); if (el3) el3.value = today;
-      setTimeout(function() { saveMemo(); }, 300);
-    }, 400);
-  }
-  showToast('音声入力・保存完了！');
-}
-
-function voicePropSave() {
-  voiceClose();
-  var today = new Date().toISOString().split('T')[0];
-  openAddProperty();
-  setTimeout(function() {
-    var n = document.getElementById('fld-p_name'); if (n) n.value = voiceTitle;
-    var l = document.getElementById('fld-p_location'); if (l) l.value = voicePropAddress;
-    var m = document.getElementById('fld-p_legal_memo'); if (m) m.value = voiceMemo;
-    var d = document.getElementById('fld-p_date'); if (d) d.value = today;
-    setTimeout(function() { saveProperty(); }, 300);
-  }, 400);
-  showToast('音声入力・保存完了！');
-}
-
-/* ══ Memo複数選択 ══ */
-function renderMemoPropertyChecks(selectedNames) {
-  var wrap = document.getElementById('memo-property-checks');
-  if (!wrap) return;
-  var props = data.property.filter(function(p) { return !ARCHIVE_STATUSES.includes(p.status); });
-  if (!props.length) { wrap.innerHTML = '<div style="font-size:12px;color:var(--text3);">現役の物件がありません</div>'; return; }
-  wrap.innerHTML = props.map(function(p) {
-    var checked = selectedNames.includes(p.name) ? 'checked' : '';
-    return '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 0;">' +
-      '<input type="checkbox" value="' + escHtml(p.name) + '" ' + checked + ' style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent2);">' +
-      '<span style="font-size:13px;color:var(--text);">' + escHtml(p.name) + '</span></label>';
-  }).join('');
-}
-
-function getSelectedMemoProperties() {
-  var wrap = document.getElementById('memo-property-checks');
-  if (!wrap) return [];
-  return Array.from(wrap.querySelectorAll('input[type="checkbox"]:checked')).map(function(cb) { return cb.value; });
-}
-
 
 init();
 </script>

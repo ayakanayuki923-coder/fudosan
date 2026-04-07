@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Property Note Ver 10.0</title>
+<title>Property Note Ver 10.1</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="不動産ノート">
@@ -449,7 +449,7 @@ label{display:block;font-size:12px;font-weight:500;color:var(--text3);margin-bot
   #pc-dashboard{display:none !important;}
   #mobile-dashboard{display:block;}
   .bottom-tabbar{display:block;}
-  .main{padding-bottom:100px;overscroll-behavior-y:contain;}
+  .main{padding-bottom:120px;}
   .sidebar{display:none !important;}
   .menu-btn{display:none !important;}
 }
@@ -651,7 +651,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
     カスタマイズ設定
   </button>
-  <div class="sidebar-footer">Ver 10.0 · Property Note</div>
+  <div class="sidebar-footer">Ver 10.1 · Property Note</div>
 </aside>
 
 <main class="main">
@@ -880,7 +880,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     </div>
     <div class="modal-body">
       <input type="hidden" id="learn-edit-id">
-      <div class="form-group"><label>日付</label><input type="date" id="learn-date"></div>
+      <div class="form-group"><label>日付</label><input type="text" id="learn-date" placeholder="YYYY-MM-DD" style="ime-mode:disabled;"></div>
       <div class="form-group"><label>タイトル</label><input type="text" id="learn-title-input" placeholder="例：家賃相場の調べ方、接道規制について"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="form-group"><label>カテゴリ</label><select id="learn-category"><option>書籍</option><option>セミナー</option><option>現場</option><option>ネット</option><option>YouTube</option><option selected>その他</option></select></div>
@@ -1069,7 +1069,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       <input type="hidden" id="memo-edit-id">
       <div class="form-group">
         <label>日付</label>
-        <input type="date" id="memo-date">
+        <input type="text" id="memo-date" placeholder="YYYY-MM-DD" style="ime-mode:disabled;">
       </div>
       <div class="form-group">
         <label>カテゴリ</label>
@@ -1105,7 +1105,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       </div>
       <div class="form-group">
         <label>次のアクション予定日</label>
-        <input type="date" id="memo-next-due">
+        <input type="text" id="memo-next-due" placeholder="YYYY-MM-DD（任意）" style="ime-mode:disabled;">
       </div>
     </div>
     <div class="modal-footer">
@@ -1188,7 +1188,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       <input type="hidden" id="sched-edit-id">
       <div class="form-group">
         <label>日付</label>
-        <input type="date" id="sched-date">
+        <input type="text" id="sched-date" placeholder="YYYY-MM-DD" style="ime-mode:disabled;">
       </div>
       <div class="form-group">
         <label>時刻（任意）</label>
@@ -1280,7 +1280,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       </div>
       <div class="form-group">
         <label>期限（任意）</label>
-        <input type="date" id="todo-due">
+        <input type="text" id="todo-due" placeholder="YYYY-MM-DD（任意）" style="ime-mode:disabled;">
       </div>
       <div class="form-group">
         <label>関連物件</label>
@@ -1640,7 +1640,8 @@ async function pullFromSheets(silent){
     });
     saveLocal();
     updateCounts(); renderCalendar();
-    renderLearning(); renderProperty(); renderAction(); renderDiary(); renderDashboard(); renderMemo();
+    renderLearning(); renderProperty(); renderAction(); renderDiary(); renderMemo();
+    renderCurrentPage();
     setSyncState('ok');
   }catch(e){
     setSyncState('error','取得エラー: '+e.message);
@@ -3830,10 +3831,7 @@ function openAddMemo(){
   document.getElementById('modal-memo-title').textContent='Memo を追加';
   document.getElementById('modal-memo-badge').style.display='none';
   document.getElementById('memo-edit-id').value='';
-  var _today=new Date().toISOString().split('T')[0];
-  var _dateEl=document.getElementById('memo-date');
-  if(_dateEl){_dateEl.value=_today;}
-  setTimeout(function(){var el=document.getElementById('memo-date');if(el&&!el.value)el.value=_today;},100);
+  setDateField('memo-date');
   document.getElementById('memo-category').value='現地調査';
   document.getElementById('memo-title').value='';
   document.getElementById('memo-content').value='';
@@ -3915,9 +3913,11 @@ ${content_val}`;
     pushToSheets('action',item,'upsert');
   }
 
-  saveLocal();closeModal('memo');
-  updateCounts();renderMemo();renderCalendar();renderDashboard();
-  showToast('📝 Memoを保存しました');
+  try{
+    saveLocal();closeModal('memo');
+    updateCounts();renderMemo();renderCalendar();renderDashboard();
+    showSaveSuccess('Memoを保存しました');
+  }catch(e){showSaveError('Memo保存エラー: '+e.message);}
 }
 
 /* ══ 予定管理 ══ */
@@ -3928,7 +3928,7 @@ function openAddSchedule(dateStr){
   document.getElementById('modal-schedule-title').textContent='予定を追加';
   document.getElementById('modal-schedule-badge').style.display='none';
   document.getElementById('sched-edit-id').value='';
-  document.getElementById('sched-date').value=dateStr||new Date().toISOString().split('T')[0];
+  setDateField('sched-date');
   document.getElementById('sched-time').value='';
   document.getElementById('sched-title').value='';
   document.getElementById('sched-memo').value='';
@@ -4602,13 +4602,7 @@ function renderCalDayRecords(dateStr) {
   }).join('');
 }
 
-function showToast(msg, duration=2500){
-  const el=document.createElement('div');
-  el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;box-shadow:0 2px 12px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none;';
-  el.textContent=msg;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(), duration);
-}
+
 
 /* ══ UTILS ══ */
 function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -5177,7 +5171,7 @@ function openAddLearn() {
   editingLearnId = null;
   document.getElementById('modal-learn-title-text').textContent = '学びを追加';
   document.getElementById('learn-edit-id').value = '';
-  document.getElementById('learn-date').value = new Date().toISOString().split('T')[0];
+  setDateField('learn-date');
   document.getElementById('learn-title-input').value = '';
   document.getElementById('learn-category').value = 'その他';
   document.getElementById('learn-url').value = '';
@@ -5214,12 +5208,14 @@ function saveLearn() {
   var item = { id: id, date: date, title: titleVal || richContent.replace(/<[^>]+>/g,'').slice(0, 30), category: category, url: url, content: richContent };
   var idx = data.learns.findIndex(function(i) { return String(i.id) === String(id); });
   if (idx >= 0) data.learns[idx] = item; else data.learns.unshift(item);
-  saveLocal();
-  pushToSheets('learns', item, 'upsert');
-  closeModal('learn');
-  renderLearn();
-  updateCounts();
-  showToast('保存しました');
+  try{
+    saveLocal();
+    pushToSheets('learns', item, 'upsert');
+    closeModal('learn');
+    renderLearn();
+    updateCounts();
+    showSaveSuccess('Learnを保存しました');
+  }catch(e){showSaveError('Learn保存エラー: '+e.message);}
 }
 
 function learnRtCmd(cmd) {
@@ -5232,6 +5228,52 @@ function learnRtCmd(cmd) {
   else if (cmd === 'ul') document.execCommand('insertUnorderedList', false, null);
   else if (cmd === 'ol') document.execCommand('insertOrderedList', false, null);
   else document.execCommand(cmd, false, null);
+}
+
+/* ══ 共通保存フィードバック ══ */
+
+function showSaveSuccess(msg) {
+  showToast('✅ ' + (msg || '保存しました'), 'success');
+}
+
+function showSaveError(msg) {
+  showToast('❌ ' + (msg || '保存に失敗しました'), 'error');
+}
+
+function showToast(msg, type) {
+  var existing = document.getElementById('toast-msg');
+  if (existing) existing.remove();
+  var el = document.createElement('div');
+  el.id = 'toast-msg';
+  var bg = type === 'error' ? '#e74c3c' : type === 'success' ? '#27ae60' : '#333';
+  el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:24px;color:#fff;font-size:14px;font-weight:600;z-index:9999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:\'Noto Sans JP\',sans-serif;background:' + bg + ';transition:opacity .3s;';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function() {
+    el.style.opacity = '0';
+    setTimeout(function() { if (el.parentNode) el.remove(); }, 300);
+  }, 2500);
+}
+
+
+function setDateField(id, dateStr) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.value = dateStr || new Date().toISOString().split('T')[0];
+}
+
+
+function renderCurrentPage() {
+  var activePage = document.querySelector('.page.active');
+  if (!activePage) { renderDashboard(); return; }
+  var pageId = activePage.id.replace('page-', '');
+  if (pageId === 'dashboard') renderDashboard();
+  else if (pageId === 'property') renderProperty();
+  else if (pageId === 'memo') renderMemo();
+  else if (pageId === 'learn') renderLearn();
+  else if (pageId === 'calendar') renderCalendarPage();
+  else if (pageId === 'diary') renderDiary();
+  else renderDashboard();
 }
 
 init();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Property Note Ver 9.9.8</title>
+<title>Property Note Ver 10.0</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="不動産ノート">
@@ -24,7 +24,7 @@
   --sidebar-w:230px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
+html,body{overscroll-behavior-y:contain;height:100%;}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;-webkit-text-size-adjust:100%;}
 
 /* Layout */
@@ -197,7 +197,7 @@ label{display:block;font-size:12px;font-weight:500;color:var(--text3);margin-bot
 .cal-nav{display:flex;gap:4px;}
 .cal-nav-btn{background:var(--surface2);border:none;border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:14px;color:var(--text2);display:flex;align-items:center;justify-content:center;}
 .cal-nav-btn:hover{background:var(--surface3);}
-.cal-grid{padding:10px 14px 14px;}
+.cal-grid{padding:10px 14px 14px;display:block;}
 .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;}
 .cal-dow-cell{text-align:center;font-size:10px;font-weight:600;color:var(--text3);padding:4px 0;}
 .cal-dow-cell:first-child{color:#C0392B;}.cal-dow-cell:last-child{color:var(--info);}
@@ -448,6 +448,10 @@ label{display:block;font-size:12px;font-weight:500;color:var(--text3);margin-bot
 @media(max-width:767px){
   #pc-dashboard{display:none !important;}
   #mobile-dashboard{display:block;}
+  .bottom-tabbar{display:block;}
+  .main{padding-bottom:100px;overscroll-behavior-y:contain;}
+  .sidebar{display:none !important;}
+  .menu-btn{display:none !important;}
 }
 
 
@@ -647,7 +651,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
     カスタマイズ設定
   </button>
-  <div class="sidebar-footer">Ver 9.9.8 · Property Note</div>
+  <div class="sidebar-footer">Ver 10.0 · Property Note</div>
 </aside>
 
 <main class="main">
@@ -717,7 +721,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><span style="font-size:13px;font-weight:600;">カレンダー</span><div style="display:flex;gap:4px;"><button onclick="openAddSchedule()" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;">＋ 予定</button><button onclick="openAddDiary()" style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;">✏ Journal</button></div></div>
               <div style="font-size:12px;font-weight:600;margin-bottom:6px;" id="cal-month-label-pc"></div>
-              <div class="cal-grid" style="font-size:11px;"><div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div><div class="cal-days" id="cal-days-pc"></div></div>
+              <div class="cal-grid" style="font-size:11px;width:100%;"><div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div><div class="cal-days" id="cal-days-pc"></div></div>
             </div>
           </div>
         </div>
@@ -781,10 +785,44 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     </div>
 
     <!-- DIARY -->
-    <div class="page" id="page-calendar">
-      <div class="section-header"><div class="section-header-title">カレンダー</div><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="openAddDiary()">✏ Journal</button><button class="btn btn-primary btn-sm" onclick="openAddSchedule()">＋ 予定</button></div></div>
-      <div class="cal-wrap" style="max-width:680px;margin:0 auto;"><div class="cal-header"><div class="cal-month" id="cal-month-label-page"></div><div class="cal-nav"><button class="cal-nav-btn" onclick="calPrev();renderCalendarPage()">‹</button><button class="cal-nav-btn" onclick="calToday();renderCalendarPage()">今日</button><button class="cal-nav-btn" onclick="calNext();renderCalendarPage()">›</button></div></div><div class="cal-grid"><div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div><div class="cal-days" id="cal-days-page"></div></div></div>
+    <div class="page" id="page-learn">
+      <div class="section-header">
+        <div class="section-header-title">📖 Learn</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddLearn()">＋ 追加</button>
+      </div>
+      <div class="filter-bar" id="learn-filter-bar" style="margin-bottom:12px;"></div>
+      <div id="learn-list"></div>
     </div>
+    <div class="page" id="page-calendar">
+      <div class="section-header">
+        <div class="section-header-title">📅 カレンダー</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm" onclick="openAddDiary()">✏ Journal</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddSchedule()">＋ 予定</button>
+        </div>
+      </div>
+      <!-- カレンダーグリッド -->
+      <div class="cal-wrap" style="max-width:680px;margin:0 auto 20px;">
+        <div class="cal-header">
+          <div class="cal-month" id="cal-month-label-page"></div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="calPrev();renderCalendarPage()">‹</button>
+            <button class="cal-nav-btn" onclick="calToday();renderCalendarPage()">今日</button>
+            <button class="cal-nav-btn" onclick="calNext();renderCalendarPage()">›</button>
+          </div>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-dow"><div class="cal-dow-cell">日</div><div class="cal-dow-cell">月</div><div class="cal-dow-cell">火</div><div class="cal-dow-cell">水</div><div class="cal-dow-cell">木</div><div class="cal-dow-cell">金</div><div class="cal-dow-cell">土</div></div>
+          <div class="cal-days" id="cal-days-page"></div>
+        </div>
+      </div>
+      <!-- 選択日の全記録 -->
+      <div id="cal-day-records" style="max-width:680px;margin:0 auto;">
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px;" id="cal-selected-date-label">日付をタップすると記録が表示されます</div>
+        <div id="cal-day-records-list"></div>
+      </div>
+    </div>
+    <div class="page" id="page-diary">iv>
     <div class="page" id="page-diary">
       <div class="section-header">
         <div class="section-header-title" id="section-title-diary">Journal</div>
@@ -1036,10 +1074,14 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       <div class="form-group">
         <label>カテゴリ</label>
         <select id="memo-category">
+          <option value="物件探し">物件探し</option>
           <option value="現地調査">現地調査</option>
           <option value="環境調査">環境調査</option>
+          <option value="行政・法的確認">行政・法的確認</option>
           <option value="オーナー接触">オーナー接触</option>
           <option value="競合・相場調査">競合・相場調査</option>
+          <option value="修繕・収支検討">修繕・収支検討</option>
+          <option value="その他">その他</option></option>
           <option value="修繕・収支検討">修繕・収支検討</option>
           <option value="学び">学び</option>
           <option value="その他">その他</option>
@@ -2474,9 +2516,18 @@ function cc(ds,dn,ex,dow,ts){
   ].join('');
   const isOther=ex==='other-month';
   const cls=['cal-cell',ex,dow,isT?'today':'',any?'has-data':(!isOther?'tappable':'')].filter(Boolean).join(' ');
-  return `<div class="${cls}" ${!isOther?`onclick="openDayDetail('${ds}')"`:''}><div class="cal-day-num">${dn}</div><div class="cal-dots">${dots}</div></div>`;
+  return `<div class="${cls}" onclick="openDayDetail('${ds}')"><div class="cal-day-num">${dn}</div><div class="cal-dots">${dots}</div></div>`;
 }
 function openDayDetail(ds){
+  // 前月翌月の日付をタップした場合は月を移動
+  var clickedDate=new Date(ds+'T00:00:00');
+  var clickedYear=clickedDate.getFullYear();
+  var clickedMonth=clickedDate.getMonth();
+  if(clickedYear!==calYear||clickedMonth!==calMonth){
+    calYear=clickedYear;calMonth=clickedMonth;
+    renderCalendar();renderCalendarPage();
+    return;
+  }
   const a=getActs(ds);const d=new Date(ds+'T00:00:00');const wd=['日','月','火','水','木','金','土'];
   document.getElementById('day-detail-title').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${wd[d.getDay()]}）`;
   let html='';
@@ -2506,6 +2557,11 @@ function openDayDetail(ds){
   </div>`;
   document.getElementById('day-detail-body').innerHTML=html;
   document.getElementById('modal-day-detail').classList.add('open');
+  // カレンダーページがアクティブなら日付別記録も表示
+  var calPage = document.getElementById('page-calendar');
+  if (calPage && calPage.classList.contains('active')) {
+    renderCalDayRecords(ds);
+  }
 }
 function closeDayGo(p){closeModal('day-detail');showPage(p);}
 function closeDayGoLearn(sid){closeModal('day-detail');showPage('learning');setActiveFlowStep(sid);}
@@ -3686,7 +3742,7 @@ function previewNewPhotos(input){
 /* ══ Memo（Log＋Note統合） ══ */
 let memoFilter='all';
 
-const MEMO_CATEGORIES=['現地調査','環境調査','オーナー接触','競合・相場調査','修繕・収支検討','学び','その他'];
+const MEMO_CATEGORIES=['物件探し','現地調査','環境調査','行政・法的確認','オーナー接触','競合・相場調査','修繕・収支検討','その他'];
 
 function renderMemoFilterBar(){
   const bar=document.getElementById('memo-filter-bar');
@@ -3774,8 +3830,11 @@ function openAddMemo(){
   document.getElementById('modal-memo-title').textContent='Memo を追加';
   document.getElementById('modal-memo-badge').style.display='none';
   document.getElementById('memo-edit-id').value='';
-  document.getElementById('memo-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('memo-category').value='物件調査';
+  var _today=new Date().toISOString().split('T')[0];
+  var _dateEl=document.getElementById('memo-date');
+  if(_dateEl){_dateEl.value=_today;}
+  setTimeout(function(){var el=document.getElementById('memo-date');if(el&&!el.value)el.value=_today;},100);
+  document.getElementById('memo-category').value='現地調査';
   document.getElementById('memo-title').value='';
   document.getElementById('memo-content').value='';
   document.getElementById('memo-next').value='';
@@ -3858,6 +3917,7 @@ ${content_val}`;
 
   saveLocal();closeModal('memo');
   updateCounts();renderMemo();renderCalendar();renderDashboard();
+  showToast('📝 Memoを保存しました');
 }
 
 /* ══ 予定管理 ══ */
@@ -4492,6 +4552,56 @@ function liveCalc(propId){
 }
 
 /* ══ トースト通知 ══ */
+function renderCalDayRecords(dateStr) {
+  var label = document.getElementById('cal-selected-date-label');
+  var list = document.getElementById('cal-day-records-list');
+  if (!label || !list) return;
+  label.textContent = dateStr + ' の記録';
+
+  // 全データから該当日を集約
+  var records = [];
+  // Memo (action)
+  (data.action || []).filter(function(i) { return i.date === dateStr; }).forEach(function(i) {
+    records.push({type:'Memo', icon:'📝', title:i.title||'(無題)', content:i.content||'', cat:i.category||''});
+  });
+  // Learn
+  (data.learns || []).filter(function(i) { return i.date === dateStr; }).forEach(function(i) {
+    records.push({type:'Learn', icon:'📖', title:i.title||'(無題)', content:i.content?i.content.replace(/<[^>]+>/g,'').slice(0,60):'', cat:i.category||''});
+  });
+  // 物件Log
+  (data.property || []).forEach(function(prop) {
+    (prop.timeline || []).filter(function(t) { return t.date === dateStr; }).forEach(function(t) {
+      records.push({type:'物件Log', icon:'🏠', title:'['+prop.name+'] '+( t.title||t.type||''), content:t.content||'', cat:t.type||''});
+    });
+  });
+  // Journal
+  (data.diary || []).filter(function(i) { return i.date === dateStr; }).forEach(function(i) {
+    records.push({type:'Journal', icon:'✏️', title:i.title||'(無題)', content:i.content||'', cat:''});
+  });
+  // スケジュール
+  (data.schedules || []).filter(function(i) { return i.date === dateStr; }).forEach(function(i) {
+    records.push({type:'予定', icon:'📌', title:i.title||'(無題)', content:i.memo||'', cat:''});
+  });
+
+  if (!records.length) {
+    list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text3);font-size:13px;">この日の記録はありません</div>';
+    return;
+  }
+  list.innerHTML = records.map(function(r) {
+    return '<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">' +
+      '<span style="font-size:18px;flex-shrink:0;">' + r.icon + '</span>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:var(--surface2);color:var(--text3);">' + r.type + '</span>' +
+          (r.cat ? '<span style="font-size:10px;color:var(--text3);">' + escHtml(r.cat) + '</span>' : '') +
+        '</div>' +
+        '<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px;">' + escHtml(r.title) + '</div>' +
+        (r.content ? '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + escHtml(r.content.slice(0,80)) + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
 function showToast(msg, duration=2500){
   const el=document.createElement('div');
   el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent2);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;box-shadow:0 2px 12px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none;';

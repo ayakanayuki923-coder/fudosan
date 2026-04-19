@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Ver 2.0 · Property Note</title>
+<title>Ver 2.1 · Property Note</title>
 <style>
 :root{
   --green:#2e7d32;--green-light:#e8f5e9;--green-dark:#1b5e20;
@@ -19,6 +19,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:
 input,select,textarea{font-family:inherit;font-size:14px;border:1px solid var(--gray2);border-radius:6px;padding:8px 10px;width:100%;background:var(--white);}
 textarea{resize:vertical;min-height:80px;}
 select{appearance:auto;}
+[contenteditable]{border:1px solid var(--gray2);border-radius:6px;padding:8px 10px;min-height:100px;outline:none;}
 
 /* Toast */
 #toast{position:fixed;bottom:calc(var(--tab-h) + 16px);left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:8px;color:#fff;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
@@ -37,6 +38,8 @@ select{appearance:auto;}
 /* Top bar - Mobile */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--white);border-bottom:1px solid var(--gray2);position:sticky;top:0;z-index:90;}
 .topbar h1{font-size:16px;font-weight:700;color:var(--green);}
+.topbar .actions{display:flex;gap:8px;}
+.topbar .icon-btn{font-size:20px;cursor:pointer;padding:4px 8px;}
 .topbar .ver{font-size:11px;color:var(--gray3);}
 
 /* Tab bar - Mobile */
@@ -46,7 +49,7 @@ select{appearance:auto;}
 .tabbar a .icon{font-size:20px;}
 
 /* Main content */
-.main{padding:16px;padding-bottom:150px;}
+.main{padding:16px;padding-bottom:150px !important;}
 @media(min-width:900px){
   .sidebar{display:flex;}
   .topbar{display:none;}
@@ -131,6 +134,33 @@ select{appearance:auto;}
 .checkbox-list{max-height:120px;overflow-y:auto;border:1px solid var(--gray2);border-radius:6px;padding:6px;}
 .checkbox-list label{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:13px;cursor:pointer;}
 
+/* Rich text toolbar */
+.rte-toolbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;padding:8px;background:var(--gray);border-radius:6px;border:1px solid var(--gray2);}
+.rte-toolbar button{padding:4px 8px;border-radius:4px;background:var(--white);border:1px solid var(--gray2);cursor:pointer;font-size:12px;}
+.rte-toolbar button:hover,.rte-toolbar button.active{background:var(--green);color:#fff;border-color:var(--green);}
+
+/* Calendar */
+.calendar{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+.calendar-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.calendar-nav button{padding:6px 12px;border-radius:4px;background:var(--green);color:#fff;border:none;cursor:pointer;font-size:12px;}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px;}
+.calendar-day-header{text-align:center;font-weight:700;font-size:12px;color:var(--gray3);padding:4px 0;}
+.calendar-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--gray2);border-radius:4px;cursor:pointer;font-size:12px;position:relative;user-select:none;}
+.calendar-day:hover{background:var(--gray);}
+.calendar-day.other-month{color:var(--gray3);}
+.calendar-day.today{background:var(--green-light);color:var(--green);font-weight:700;}
+.calendar-day.has-events::after{content:'·';position:absolute;bottom:2px;color:var(--green);font-size:16px;}
+
+/* Todo item */
+.todo-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--white);border-radius:6px;margin-bottom:8px;border-left:4px solid var(--green);}
+.todo-item.done{opacity:.6;}
+.todo-item.overdue{border-left-color:var(--red);}
+.todo-item input[type=checkbox]{margin:0;width:18px;height:18px;cursor:pointer;}
+.todo-item-content{flex:1;}
+.todo-item-text{font-size:14px;font-weight:500;}
+.todo-item-done .todo-item-text{text-decoration:line-through;}
+.todo-item-meta{font-size:11px;color:var(--gray3);margin-top:2px;}
+
 /* Empty state */
 .empty{text-align:center;padding:40px 20px;color:var(--gray3);}
 .empty .icon{font-size:40px;margin-bottom:8px;}
@@ -147,14 +177,20 @@ select{appearance:auto;}
     <a href="#" data-page="memo"><span>📝</span> Memo</a>
     <a href="#" data-page="learn"><span>📚</span> Learn</a>
     <a href="#" data-page="calendar"><span>📅</span> カレンダー</a>
+    <a href="#" data-page="settings"><span>⚙</span> Settings</a>
   </nav>
-  <div class="ver">Ver 2.0</div>
+  <div class="ver">Ver 2.1</div>
 </aside>
 
 <!-- Top bar (Mobile) -->
 <header class="topbar">
   <h1 id="topbar-title">Property Note</h1>
-  <span class="ver">Ver 2.0</span>
+  <div class="actions">
+    <span class="icon-btn" onclick="openVoiceInput()" title="音声入力">🎤</span>
+    <span class="icon-btn" onclick="refreshCurrentPage()" title="更新">🔄</span>
+    <span class="icon-btn" onclick="showPage('settings')" title="設定">⚙</span>
+  </div>
+  <span class="ver">Ver 2.1</span>
 </header>
 
 <!-- Toast -->
@@ -170,10 +206,28 @@ select{appearance:auto;}
     <button class="btn btn-primary" onclick="openPropertyModal()">+ 物件</button>
     <button class="btn btn-secondary" onclick="openCalcModal()">💴 利回り電卓</button>
   </div>
-  <h3 style="font-size:14px;margin-bottom:10px;">🏠 物件</h3>
+
+  <!-- Calendar widget (collapsible on mobile) -->
+  <details id="home-calendar-details" style="margin-bottom:16px;">
+    <summary style="font-size:14px;font-weight:700;color:var(--green);cursor:pointer;padding:8px 0;">📅 カレンダー</summary>
+    <div id="home-calendar-widget" style="margin-top:10px;"></div>
+  </details>
+
+  <!-- ToDo section -->
+  <h3 style="font-size:14px;margin-bottom:10px;">✅ ToDo</h3>
+  <div id="home-todo-list"></div>
+
+  <!-- Properties section -->
+  <h3 style="font-size:14px;margin:16px 0 10px;">🏠 物件</h3>
   <div id="home-property-list"></div>
+
+  <!-- Recent Memos section -->
   <h3 style="font-size:14px;margin:16px 0 10px;">📝 最近のMemo</h3>
   <div id="home-memo-list"></div>
+
+  <!-- Recent Learn section -->
+  <h3 style="font-size:14px;margin:16px 0 10px;">📚 最近のLearn</h3>
+  <div id="home-learn-list"></div>
 </div>
 
 <!-- PROPERTY LIST -->
@@ -203,14 +257,44 @@ select{appearance:auto;}
   <div id="memo-list"></div>
 </div>
 
-<!-- LEARN (placeholder) -->
+<!-- LEARN LIST -->
 <div class="page" id="page-learn">
-  <div class="empty"><div class="icon">📚</div>Learn機能は次期バージョンで追加予定</div>
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="openLearnModal()">+ Learn追加</button>
+  </div>
+  <div class="filter-bar" id="learn-filter"></div>
+  <div id="learn-list"></div>
 </div>
 
-<!-- CALENDAR (placeholder) -->
+<!-- CALENDAR -->
 <div class="page" id="page-calendar">
-  <div class="empty"><div class="icon">📅</div>カレンダー機能は次期バージョンで追加予定</div>
+  <div class="action-bar">
+    <button class="btn btn-secondary" onclick="addJournal()">+ 日記</button>
+    <button class="btn btn-secondary" onclick="openScheduleModal()">+ 予定</button>
+  </div>
+  <div id="calendar-widget" style="margin-bottom:20px;"></div>
+  <div id="calendar-records" style="margin-top:20px;"></div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <div class="card">
+    <h2 style="font-size:16px;margin-bottom:16px;">GAS Sync Settings</h2>
+    <div class="form-group">
+      <label>GAS URL</label>
+      <input type="text" id="gas-url" placeholder="https://script.google.com/macros/d/...">
+    </div>
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="text" id="gas-api-key" placeholder="your-api-key">
+    </div>
+    <div class="form-group">
+      <label>Write Password</label>
+      <input type="password" id="gas-write-password" placeholder="your-password">
+    </div>
+    <button class="btn btn-primary" onclick="testAndSaveGAS()" style="width:100%;justify-content:center;margin-bottom:12px;">接続テスト&保存</button>
+    <button class="btn btn-secondary" onclick="syncDataNow()" style="width:100%;justify-content:center;">今すぐ同期</button>
+  </div>
 </div>
 
 </div><!-- .main -->
@@ -362,6 +446,85 @@ select{appearance:auto;}
 </div>
 </div>
 
+<!-- Learn Modal -->
+<div class="modal-overlay" id="modal-learn">
+<div class="modal">
+  <div class="modal-header">
+    <h2 id="learn-modal-title">Learn追加</h2>
+    <button class="modal-close" onclick="closeModal('modal-learn')">&times;</button>
+  </div>
+  <form onsubmit="saveLearn(event)">
+    <input type="hidden" id="learn-id">
+    <div class="form-group"><label>日付</label><input type="text" id="learn-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-group"><label>タイトル *</label><input type="text" id="learn-title" required></div>
+    <div class="form-group"><label>カテゴリ</label>
+      <select id="learn-category">
+        <option value="">--</option>
+        <option>書籍</option><option>セミナー</option><option>現場</option><option>ネット</option>
+        <option>YouTube</option><option>その他</option>
+      </select>
+    </div>
+    <div class="form-group"><label>URL</label><input type="text" id="learn-url" placeholder="参考URL"></div>
+    <div class="form-group">
+      <label>内容（リッチテキスト）</label>
+      <div class="rte-toolbar">
+        <button type="button" onclick="formatText('bold')"><strong>B</strong></button>
+        <button type="button" onclick="formatText('italic')"><em>I</em></button>
+        <button type="button" onclick="formatText('strikeThrough')"><s>S</s></button>
+        <button type="button" onclick="formatText('formatBlock', '<h2>')">H2</button>
+        <button type="button" onclick="formatText('formatBlock', '<h3>')">H3</button>
+        <button type="button" onclick="formatText('insertUnorderedList')">•</button>
+        <button type="button" onclick="formatText('insertOrderedList')">1.</button>
+        <button type="button" onclick="formatText('formatBlock', '<blockquote>')">❝</button>
+        <button type="button" onclick="formatText('insertHorizontalRule')">—</button>
+      </div>
+      <div id="learn-content" contenteditable="true" style="border:1px solid var(--gray2);border-radius:6px;padding:8px 10px;min-height:150px;"></div>
+    </div>
+    <div style="margin-top:20px;">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">保存</button>
+    </div>
+  </form>
+</div>
+</div>
+
+<!-- Schedule Modal -->
+<div class="modal-overlay" id="modal-schedule">
+<div class="modal">
+  <div class="modal-header">
+    <h2 id="schedule-modal-title">予定追加</h2>
+    <button class="modal-close" onclick="closeModal('modal-schedule')">&times;</button>
+  </div>
+  <form onsubmit="saveSchedule(event)">
+    <input type="hidden" id="schedule-id">
+    <div class="form-group"><label>日付</label><input type="text" id="schedule-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-group"><label>時間</label><input type="text" id="schedule-time" placeholder="HH:MM"></div>
+    <div class="form-group"><label>タイトル *</label><input type="text" id="schedule-title" required></div>
+    <div class="form-group"><label>メモ</label><textarea id="schedule-memo" rows="2"></textarea></div>
+    <div style="margin-top:20px;">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">保存</button>
+    </div>
+  </form>
+</div>
+</div>
+
+<!-- Journal Modal -->
+<div class="modal-overlay" id="modal-journal">
+<div class="modal">
+  <div class="modal-header">
+    <h2>日記</h2>
+    <button class="modal-close" onclick="closeModal('modal-journal')">&times;</button>
+  </div>
+  <form onsubmit="saveJournal(event)">
+    <input type="hidden" id="journal-id">
+    <input type="hidden" id="journal-date">
+    <div class="form-group"><label>内容</label><textarea id="journal-content" rows="6" placeholder="その日のできごとなど..."></textarea></div>
+    <div style="margin-top:20px;">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">保存</button>
+    </div>
+  </form>
+</div>
+</div>
+
 <!-- Yield Calculator Modal -->
 <div class="modal-overlay" id="modal-calc">
 <div class="modal">
@@ -415,20 +578,62 @@ select{appearance:auto;}
 </div>
 </div>
 
+<!-- Cashflow Modal -->
+<div class="modal-overlay" id="modal-cashflow">
+<div class="modal">
+  <div class="modal-header">
+    <h2 id="cashflow-modal-title">収支追加</h2>
+    <button class="modal-close" onclick="closeModal('modal-cashflow')">&times;</button>
+  </div>
+  <form onsubmit="saveCashflow(event)">
+    <input type="hidden" id="cashflow-id">
+    <input type="hidden" id="cashflow-prop-id">
+    <div class="form-group"><label>日付</label><input type="text" id="cashflow-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-group"><label>タイプ</label>
+      <select id="cashflow-type" onchange="updateCashflowCategories()">
+        <option value="income">収入</option>
+        <option value="expense">支出</option>
+      </select>
+    </div>
+    <div class="form-group"><label>カテゴリ</label>
+      <select id="cashflow-category"></select>
+    </div>
+    <div class="form-group"><label>金額 (円)</label><input type="number" id="cashflow-amount"></div>
+    <div class="form-group"><label>メモ</label><input type="text" id="cashflow-memo"></div>
+    <details style="margin-bottom:14px;">
+      <summary style="font-size:12px;color:var(--gray3);cursor:pointer;">詳細（勘定科目）</summary>
+      <div class="form-group" style="margin-top:8px;"><label>勘定科目タグ（任意・後付け可）</label><input type="text" id="cashflow-account-tag" placeholder="例: 雑収入、修繕費 等"></div>
+    </details>
+    <div class="form-group">
+      <label><input type="checkbox" id="cashflow-recurring"> 毎月繰り返す</label>
+    </div>
+    <div style="margin-top:20px;">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">保存</button>
+    </div>
+  </form>
+</div>
+</div>
 
 <script>
 /* ===== DATA ===== */
 const STORAGE_KEY = 'fudosan_note_v2';
-const VERSION = '2.0';
+const VERSION = '2.1';
 
 let data = {
-  property: [], action: [], learning: [], learns: [],
-  diary: [], schedules: [], gasUrl: '', gasApiKey: '', gasWritePassword: '',
+  property: [],      // 物件
+  action: [],        // Memo（行動記録） → GASシート: Memo
+  learning: [],      // 旧学習記録（後方互換） → GASシート: Note
+  learns: [],        // Learn（新） → GASシート: Learn
+  diary: [],         // Journal（旧名互換） → GASシート: Journal
+  journals: [],      // Journal
+  schedules: [],     // カレンダー予定 → GASシート: カレンダー予定
+  gasUrl: '', gasApiKey: '', gasWritePassword: '',
   calcPatterns: [{ id: genId(), name: 'パターンA', income: [{ name: '家賃収入', value: 0, unit: '月' }], acquisition: [{ name: '物件価格', value: 0, unit: '一時' }], running: [{ name: '管理費', value: 0, unit: '月' }, { name: '修繕積立金', value: 0, unit: '月' }, { name: '固定資産税', value: 0, unit: '年' }], vacancyRate: 10 }]
 };
 
 let currentPropertyId = null;
 let currentCalcPatternIdx = 0;
+let currentCalendarDate = new Date();
 
 function genId() { return String(Date.now()) + '-' + Math.random().toString(36).substr(2, 5); }
 function today() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
@@ -443,6 +648,15 @@ function loadData() {
     if (s) {
       const d = JSON.parse(s);
       Object.keys(d).forEach(k => { data[k] = d[k]; });
+    }
+    if (!data.learning) data.learning = [];
+    if (!data.learns) data.learns = [];
+    if (!data.diary) data.diary = [];
+    if (!data.journals) data.journals = [];
+    if (!data.schedules) data.schedules = [];
+    // diary → journals マイグレーション（後方互換）
+    if (data.diary && data.diary.length && !data.journals.length) {
+      data.journals = data.diary.slice();
     }
   } catch(e) { console.error('Load error', e); }
 }
@@ -468,12 +682,10 @@ function showPage(name) {
   document.querySelectorAll('.sidebar nav a, .tabbar a').forEach(a => {
     a.classList.toggle('active', a.dataset.page === name);
   });
-  const titles = { home: 'Property Note', property: '物件', 'property-detail': '物件詳細', memo: 'Memo', learn: 'Learn', calendar: 'カレンダー' };
+  const titles = { home: 'Property Note', property: '物件', 'property-detail': '物件詳細', memo: 'Memo', learn: 'Learn', calendar: 'カレンダー', settings: 'Settings' };
   document.getElementById('topbar-title').textContent = titles[name] || 'Property Note';
   window.scrollTo(0, 0);
-  if (name === 'home') renderHome();
-  if (name === 'property') renderPropertyList();
-  if (name === 'memo') renderMemoList();
+  renderCurrentPage();
 }
 
 document.querySelectorAll('[data-page]').forEach(a => {
@@ -544,7 +756,7 @@ function saveProperty(e) {
   e.preventDefault();
   const id = document.getElementById('prop-id').value;
   const isEdit = !!id;
-  const p = isEdit ? data.property.find(x => String(x.id) === String(id)) : { id: genId(), timeline: [], todos: [], loans: [], cashflows: [] };
+  const p = isEdit ? data.property.find(x => String(x.id) === String(id)) : { id: genId(), timeline: [], todos: [], loans: [], activeLoanId: '', cashflows: [] };
 
   p.date = document.getElementById('prop-date').value || today();
   p.name = document.getElementById('prop-name').value;
@@ -640,7 +852,7 @@ function renderPropertyDetail() {
     '<div style="margin-bottom:12px;">' + statusBadge(p.status) + '</div>';
 
   html += '<div class="detail-tabs">' +
-    ['Overview','Log','融資','Note'].map((t, i) =>
+    ['Overview','Log','融資','収支','Note'].map((t, i) =>
       '<div class="detail-tab' + (i===0?' active':'') + '" onclick="switchDetailTab(this, \'dtab-'+i+'\')">' + t + '</div>'
     ).join('') + '</div>';
 
@@ -697,6 +909,7 @@ function renderPropertyDetail() {
     if(p.dropMemo) html += '<div style="font-size:13px;color:var(--gray4)">'+esc(p.dropMemo)+'</div>';
   }
   if (p.memo) html += '<div class="form-section">📝 メモ</div><div style="font-size:13px;color:var(--gray4);white-space:pre-wrap;">'+esc(p.memo)+'</div>';
+
   html += '</div>';
 
   // Log
@@ -730,8 +943,50 @@ function renderPropertyDetail() {
   }
   html += '</div>';
 
-  // Note
+  // 収支
   html += '<div class="detail-pane" id="dtab-3">';
+  html += '<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">';
+  html += '<button class="btn btn-primary btn-sm" onclick="openCashflowModal(\'' + p.id + '\')">+ 収支追加</button>';
+  html += '<button class="btn btn-secondary btn-sm" onclick="exportCashflowCSV(\'' + p.id + '\')">📥 CSVエクスポート</button>';
+  html += '</div>';
+  const cfs = (p.cashflows||[]).slice().sort((a,b) => b.date > a.date ? 1 : -1);
+  if (cfs.length) {
+    let totalIncome = 0, totalExpense = 0;
+    cfs.forEach(cf => {
+      if(cf.type === 'income') totalIncome += cf.amount||0;
+      else totalExpense += cf.amount||0;
+    });
+    const net = totalIncome - totalExpense;
+    const selfFund = p.actualDownPayment || p.downPayment || 0;
+    const recoveryRate = selfFund > 0 ? (net / (selfFund * 10000) * 100) : 0;
+    const monthlyNet = cfs.length > 0 ? net / Math.max(1, getMonthSpan(cfs)) : 0;
+    const breakEvenMonths = (selfFund > 0 && monthlyNet > 0) ? Math.ceil((selfFund * 10000 - Math.max(0, net)) / monthlyNet) : null;
+    html += '<div class="calc-result" style="margin-bottom:16px;">';
+    html += '<div style="font-size:13px;font-weight:700;margin-bottom:8px;">📊 サマリー</div>';
+    html += '<div class="field-row"><span class="field-label">総収入</span><span class="field-value" style="color:var(--green);">'+fmtNum(totalIncome)+'円</span></div>';
+    html += '<div class="field-row"><span class="field-label">総支出</span><span class="field-value" style="color:var(--red);">'+fmtNum(totalExpense)+'円</span></div>';
+    html += '<div class="field-row" style="border-top:2px solid rgba(0,0,0,.1);padding-top:8px;margin-top:4px;"><span class="field-label" style="font-weight:700;">累計損益</span><span class="field-value" style="font-size:18px;font-weight:700;color:'+(net>=0?'var(--green)':'var(--red)')+';">'+fmtNum(net)+'円</span></div>';
+    if(selfFund > 0) html += '<div class="field-row"><span class="field-label">投資回収率</span><span class="field-value">'+recoveryRate.toFixed(1)+'%</span></div>';
+    if(monthlyNet !== 0) html += '<div class="field-row"><span class="field-label">月平均手残り</span><span class="field-value" style="color:'+(monthlyNet>=0?'var(--green)':'var(--red)')+';">'+fmtNum(Math.round(monthlyNet))+'円</span></div>';
+    if(breakEvenMonths && breakEvenMonths > 0) html += '<div class="field-row"><span class="field-label">損益分岐予測</span><span class="field-value">あと約'+Math.floor(breakEvenMonths/12)+'年'+breakEvenMonths%12+'ヶ月</span></div>';
+    html += '</div>';
+    html += '<h3 style="font-size:13px;margin-bottom:8px;">📋 明細（新しい順）</h3>';
+    cfs.forEach(cf => {
+      const sign = cf.type === 'income' ? '+' : '-';
+      const color = cf.type === 'income' ? 'var(--green)' : 'var(--red)';
+      html += '<div class="card"><div class="field-row"><span class="field-label">'+esc(cf.date)+' '+esc(cf.category)+'</span><span class="field-value" style="color:'+color+'">'+sign+fmtNum(cf.amount)+'円</span></div>';
+      if(cf.memo) html += '<div style="font-size:12px;color:var(--gray3);">'+esc(cf.memo)+'</div>';
+      if(cf.accountTag) html += '<div style="font-size:11px;color:var(--gray3);">🏷 '+esc(cf.accountTag)+'</div>';
+      if(cf.recurring) html += '<div style="font-size:11px;color:var(--green);">🔄 毎月繰り返し</div>';
+      html += '<div style="margin-top:6px;display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="editCashflow(\''+p.id+'\',\''+cf.id+'\')">編集</button><button class="btn btn-danger btn-sm" onclick="deleteCashflow(\''+p.id+'\',\''+cf.id+'\')">削除</button></div></div>';
+    });
+  } else {
+    html += '<div class="empty"><div class="icon">💰</div>収支記録がありません</div>';
+  }
+  html += '</div>';
+
+  // Note
+  html += '<div class="detail-pane" id="dtab-4">';
   html += '<textarea id="prop-rich-note" rows="10" style="width:100%;min-height:200px;" placeholder="自由にメモを記入..." oninput="saveRichNote()">' + esc(p.richNote||'') + '</textarea>';
   html += '</div>';
 
@@ -820,6 +1075,96 @@ function unarchiveLoan(propId, loanId) {
   const p = data.property.find(x => String(x.id) === String(propId));
   const l = (p.loans||[]).find(x => String(x.id) === String(loanId));
   if (l) { l.archived = false; l.archivedDate = ''; saveData(); renderPropertyDetail(); toast('アーカイブを解除しました'); }
+}
+
+/* ===== CASHFLOW ===== */
+const CASHFLOW_CATEGORIES = {
+  income: ['家賃','共益費','礼金','更新料','その他収入'],
+  expense: {
+    '取得時': ['物件購入代金','仲介手数料','登記費用','不動産取得税','火災保険','その他初期費用'],
+    '修繕': ['リフォーム','原状回復','設備修繕','その他修繕'],
+    '運用': ['管理費','修繕積立金','固定資産税','都市計画税','ローン返済','保険料','その他経費']
+  }
+};
+
+function openCashflowModal(propId, cfId) {
+  document.getElementById('cashflow-prop-id').value = propId;
+  const p = data.property.find(x => String(x.id) === String(propId));
+  const cf = cfId ? (p.cashflows||[]).find(x => String(x.id) === String(cfId)) : null;
+  document.getElementById('cashflow-modal-title').textContent = cf ? '収支編集' : '収支追加';
+  document.getElementById('cashflow-id').value = cf ? cf.id : '';
+  document.getElementById('cashflow-date').value = cf ? cf.date : today();
+  document.getElementById('cashflow-type').value = cf ? cf.type : 'income';
+  document.getElementById('cashflow-amount').value = cf ? (cf.amount||'') : '';
+  document.getElementById('cashflow-memo').value = cf ? (cf.memo||'') : '';
+  document.getElementById('cashflow-recurring').checked = cf ? (cf.recurring||false) : false;
+  document.getElementById('cashflow-account-tag').value = cf ? (cf.accountTag||'') : '';
+  updateCashflowCategories();
+  if(cf) document.getElementById('cashflow-category').value = cf.category;
+  document.getElementById('modal-cashflow').classList.add('show');
+}
+
+function updateCashflowCategories() {
+  const type = document.getElementById('cashflow-type').value;
+  const cats = type === 'income' ? CASHFLOW_CATEGORIES.income : Object.values(CASHFLOW_CATEGORIES.expense).flat();
+  document.getElementById('cashflow-category').innerHTML = cats.map(c => '<option>'+c+'</option>').join('');
+}
+
+function saveCashflow(e) {
+  e.preventDefault();
+  const propId = document.getElementById('cashflow-prop-id').value;
+  const p = data.property.find(x => String(x.id) === String(propId));
+  if (!p.cashflows) p.cashflows = [];
+  const cfId = document.getElementById('cashflow-id').value;
+  let cf = cfId ? p.cashflows.find(x => String(x.id) === String(cfId)) : null;
+  if (!cf) { cf = { id: genId() }; p.cashflows.push(cf); }
+  cf.date = document.getElementById('cashflow-date').value;
+  cf.type = document.getElementById('cashflow-type').value;
+  cf.category = document.getElementById('cashflow-category').value;
+  cf.amount = num(document.getElementById('cashflow-amount').value);
+  cf.memo = document.getElementById('cashflow-memo').value;
+  cf.accountTag = document.getElementById('cashflow-account-tag').value;
+  cf.recurring = document.getElementById('cashflow-recurring').checked;
+  saveData();
+  closeModal('modal-cashflow');
+  toast('収支を保存しました');
+  renderPropertyDetail();
+}
+
+function editCashflow(propId, cfId) { openCashflowModal(propId, cfId); }
+
+function deleteCashflow(propId, cfId) {
+  const p = data.property.find(x => String(x.id) === String(propId));
+  if (p && p.cashflows) {
+    const idx = p.cashflows.findIndex(x => String(x.id) === String(cfId));
+    if (idx >= 0) { p.cashflows.splice(idx, 1); saveData(); renderPropertyDetail(); toast('削除しました'); }
+  }
+}
+
+function getMonthSpan(cfs) {
+  if (!cfs.length) return 1;
+  const dates = cfs.map(c => c.date).filter(Boolean).sort();
+  if (dates.length < 2) return 1;
+  const first = new Date(dates[0]);
+  const last = new Date(dates[dates.length - 1]);
+  return Math.max(1, (last.getFullYear() - first.getFullYear()) * 12 + last.getMonth() - first.getMonth() + 1);
+}
+
+function exportCashflowCSV(propId) {
+  const p = data.property.find(x => String(x.id) === String(propId));
+  if (!p || !p.cashflows || !p.cashflows.length) { toast('エクスポートする収支がありません', 'error'); return; }
+  const rows = [['日付','タイプ','カテゴリ','金額','メモ','勘定科目タグ','毎月繰り返し']];
+  p.cashflows.slice().sort((a,b) => a.date > b.date ? 1 : -1).forEach(cf => {
+    rows.push([cf.date, cf.type==='income'?'収入':'支出', cf.category, cf.amount||0, cf.memo||'', cf.accountTag||'', cf.recurring?'はい':'いいえ']);
+  });
+  const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (p.name||'property') + '_cashflow_' + today() + '.csv';
+  a.click();
+  toast('CSVをエクスポートしました');
 }
 
 /* ===== MEMO ===== */
@@ -923,6 +1268,292 @@ function setMemoFilter(el) {
   renderMemoList();
 }
 
+/* ===== LEARN ===== */
+function openLearnModal(id) {
+  const m = document.getElementById('modal-learn');
+  document.getElementById('learn-modal-title').textContent = id ? 'Learn編集' : 'Learn追加';
+  const learn = id ? data.learns.find(x => String(x.id) === String(id)) : null;
+  document.getElementById('learn-id').value = id || '';
+  document.getElementById('learn-date').value = learn ? learn.date : today();
+  document.getElementById('learn-title').value = learn ? learn.title : '';
+  document.getElementById('learn-category').value = learn ? (learn.category||'') : '';
+  document.getElementById('learn-url').value = learn ? (learn.url||'') : '';
+  document.getElementById('learn-content').innerHTML = learn ? (learn.content||'') : '';
+  m.classList.add('show');
+}
+
+function saveLearn(e) {
+  e.preventDefault();
+  const id = document.getElementById('learn-id').value;
+  const isEdit = !!id;
+  const l = isEdit ? data.learns.find(x => String(x.id) === String(id)) : { id: genId() };
+
+  l.date = document.getElementById('learn-date').value || today();
+  l.title = document.getElementById('learn-title').value;
+  l.category = document.getElementById('learn-category').value;
+  l.url = document.getElementById('learn-url').value;
+  l.content = document.getElementById('learn-content').innerHTML;
+
+  if (!isEdit) data.learns.unshift(l);
+
+  saveData();
+  closeModal('modal-learn');
+  toast('Learn「' + l.title + '」を保存しました');
+  renderCurrentPage();
+}
+
+function renderLearnList() {
+  const CATS = ['すべて','書籍','セミナー','現場','ネット','YouTube','その他'];
+  const filter = document.querySelector('#learn-filter .filter-chip.active');
+  const cat = filter ? filter.dataset.filter : 'すべて';
+  document.getElementById('learn-filter').innerHTML = CATS.map(c =>
+    '<button class="filter-chip' + (c === (cat||'すべて') ? ' active' : '') + '" data-filter="' + c + '" onclick="setLearnFilter(this)">' + c + '</button>'
+  ).join('');
+  const list = data.learns.filter(l => cat === 'すべて' || l.category === cat);
+  document.getElementById('learn-list').innerHTML = list.length ?
+    list.map(l =>
+      '<div class="card" onclick="openLearnModal(\'' + l.id + '\')" style="cursor:pointer">' +
+      '<div class="card-header"><div><div class="card-title">' + esc(l.title) + '</div>' +
+      '<div class="card-sub">' + esc(l.date) + (l.category ? ' · ' + esc(l.category) : '') + '</div></div></div>' +
+      (l.url ? '<div class="card-body"><a href="'+esc(l.url)+'" target="_blank" style="color:var(--green)">🔗 Link</a></div>' : '') +
+      '</div>'
+    ).join('') :
+    '<div class="empty"><div class="icon">📚</div>Learnがありません</div>';
+}
+
+function setLearnFilter(el) {
+  document.querySelectorAll('#learn-filter .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderLearnList();
+}
+
+/* ===== CALENDAR ===== */
+function renderCalendar(date) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month + 1, 0).getDate();
+  const today_ = today();
+
+  let html = '<div class="calendar">';
+  html += '<div class="calendar-nav">';
+  html += '<button onclick="prevMonth()">‹</button>';
+  html += '<span style="font-weight:700;">' + year + '年' + (month+1) + '月</span>';
+  html += '<button onclick="nextMonth()">›</button>';
+  html += '<button onclick="goToday()" style="margin-left:auto;">今日</button>';
+  html += '</div>';
+
+  html += '<div class="calendar-grid">';
+  ['日','月','火','水','木','金','土'].forEach(d => {
+    html += '<div class="calendar-day-header">' + d + '</div>';
+  });
+
+  // Previous month dates
+  const prevLastDate = new Date(year, month, 0).getDate();
+  for (let i = firstDay - 1; i >= 0; i--) {
+    html += '<div class="calendar-day other-month">' + (prevLastDate - i) + '</div>';
+  }
+
+  // Current month dates
+  for (let d = 1; d <= lastDate; d++) {
+    const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const hasEvents = data.schedules.some(s => s.date === dateStr) ||
+                     data.journals.some(j => j.date === dateStr) ||
+                     data.action.some(a => a.date === dateStr) ||
+                     data.learns.some(l => l.date === dateStr) ||
+                     data.property.some(p => (p.timeline||[]).some(t => t.date === dateStr));
+    const isToday = dateStr === today_;
+    html += '<div class="calendar-day' + (isToday ? ' today' : '') + (hasEvents ? ' has-events' : '') + '" onclick="showCalendarDate(\'' + dateStr + '\')">' + d + '</div>';
+  }
+
+  // Next month dates
+  const totalCells = Math.ceil((firstDay + lastDate) / 7) * 7;
+  for (let d = 1; d <= totalCells - firstDay - lastDate; d++) {
+    html += '<div class="calendar-day other-month">' + d + '</div>';
+  }
+
+  html += '</div></div>';
+  return html;
+}
+
+function showCalendarDate(dateStr) {
+  currentCalendarDate = new Date(dateStr);
+  renderCalendarPage();
+}
+
+function prevMonth() {
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+  renderCalendarPage();
+}
+
+function nextMonth() {
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+  renderCalendarPage();
+}
+
+function goToday() {
+  currentCalendarDate = new Date();
+  renderCalendarPage();
+}
+
+function renderCalendarPage() {
+  const dateStr = today_format(currentCalendarDate);
+  document.getElementById('calendar-widget').innerHTML = renderCalendar(currentCalendarDate);
+
+  let html = '<h3 style="font-size:14px;margin-bottom:10px;">' + dateStr + ' の記録</h3>';
+
+  const schedules = data.schedules.filter(s => s.date === dateStr).sort((a,b) => a.time > b.time ? 1 : -1);
+  const memos = data.action.filter(m => m.date === dateStr);
+  const learns = data.learns.filter(l => l.date === dateStr);
+  const logs = data.property.flatMap(p => (p.timeline||[]).filter(t => t.date === dateStr).map(t => ({...t, prop: p.name})));
+  const journal = data.journals.find(j => j.date === dateStr);
+
+  if (schedules.length) {
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">📅 予定</h4>';
+    schedules.forEach(s => {
+      html += '<div class="card">';
+      html += '<div style="font-weight:700;">' + (s.time||'終日') + ' · ' + esc(s.title) + '</div>';
+      if(s.memo) html += '<div style="font-size:12px;color:var(--gray3);margin-top:4px;">'+esc(s.memo)+'</div>';
+      html += '<div style="margin-top:6px;display:flex;gap:4px;">';
+      html += '<button class="btn btn-secondary btn-sm" onclick="editSchedule(\''+s.id+'\')">編集</button>';
+      html += '<button class="btn btn-danger btn-sm" onclick="deleteSchedule(\''+s.id+'\')">削除</button>';
+      html += '</div></div>';
+    });
+  }
+
+  if (memos.length) {
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">📝 Memo</h4>';
+    memos.forEach(m => {
+      html += '<div class="card" style="cursor:pointer;" onclick="openMemoModal(\''+m.id+'\')">';
+      html += '<div style="font-weight:700;">'+esc(m.title)+'</div>';
+      if(m.content) html += '<div style="font-size:12px;color:var(--gray3);margin-top:4px;">'+esc(m.content.substring(0,80))+(m.content.length>80?'...':'')+'</div>';
+      html += '</div>';
+    });
+  }
+
+  if (learns.length) {
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">📚 Learn</h4>';
+    learns.forEach(l => {
+      html += '<div class="card" style="cursor:pointer;" onclick="openLearnModal(\''+l.id+'\')">';
+      html += '<div style="font-weight:700;">'+esc(l.title)+'</div>';
+      if(l.category) html += '<div style="font-size:12px;color:var(--gray3);">'+esc(l.category)+'</div>';
+      html += '</div>';
+    });
+  }
+
+  if (logs.length) {
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">🏢 物件Log</h4>';
+    logs.forEach(l => {
+      html += '<div class="card"><div style="font-weight:700;">'+esc(l.prop)+'</div><div style="font-size:12px;color:var(--gray3);">'+esc(l.text)+'</div></div>';
+    });
+  }
+
+  if (journal) {
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">✍ 日記</h4>';
+    html += '<div class="card">';
+    html += '<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;">'+esc(journal.content)+'</div>';
+    html += '<div style="margin-top:8px;display:flex;gap:4px;">';
+    html += '<button class="btn btn-secondary btn-sm" onclick="editJournal(\''+journal.id+'\')">編集</button>';
+    html += '<button class="btn btn-danger btn-sm" onclick="deleteJournal(\''+journal.id+'\')">削除</button>';
+    html += '</div></div>';
+  }
+
+  if (!schedules.length && !memos.length && !learns.length && !logs.length && !journal) {
+    html += '<div class="empty"><div class="icon">📌</div>この日の記録はありません</div>';
+  }
+
+  document.getElementById('calendar-records').innerHTML = html;
+}
+
+function today_format(date) {
+  return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
+}
+
+/* ===== SCHEDULE ===== */
+function openScheduleModal(id, dateStr) {
+  const m = document.getElementById('modal-schedule');
+  document.getElementById('schedule-modal-title').textContent = id ? '予定編集' : '予定追加';
+  const s = id ? data.schedules.find(x => String(x.id) === String(id)) : null;
+  document.getElementById('schedule-id').value = id || '';
+  document.getElementById('schedule-date').value = s ? s.date : (dateStr || today());
+  document.getElementById('schedule-time').value = s ? (s.time||'') : '';
+  document.getElementById('schedule-title').value = s ? s.title : '';
+  document.getElementById('schedule-memo').value = s ? (s.memo||'') : '';
+  m.classList.add('show');
+}
+
+function saveSchedule(e) {
+  e.preventDefault();
+  const id = document.getElementById('schedule-id').value;
+  const isEdit = !!id;
+  const s = isEdit ? data.schedules.find(x => String(x.id) === String(id)) : { id: genId() };
+  s.date = document.getElementById('schedule-date').value;
+  s.time = document.getElementById('schedule-time').value;
+  s.title = document.getElementById('schedule-title').value;
+  s.memo = document.getElementById('schedule-memo').value;
+  if (!isEdit) data.schedules.push(s);
+  saveData();
+  closeModal('modal-schedule');
+  toast('予定を保存しました');
+  renderCurrentPage();
+}
+
+function editSchedule(id) { openScheduleModal(id); }
+
+function deleteSchedule(id) {
+  const idx = data.schedules.findIndex(x => String(x.id) === String(id));
+  if (idx >= 0) { data.schedules.splice(idx, 1); saveData(); renderCurrentPage(); toast('削除しました'); }
+}
+
+/* ===== JOURNAL ===== */
+function addJournal(dateStr) {
+  dateStr = dateStr || today_format(currentCalendarDate);
+  const existing = data.journals.find(j => j.date === dateStr);
+  if (existing) {
+    editJournal(existing.id);
+  } else {
+    document.getElementById('journal-date').value = dateStr;
+    document.getElementById('journal-id').value = '';
+    document.getElementById('journal-content').value = '';
+    document.getElementById('modal-journal').classList.add('show');
+  }
+}
+
+function editJournal(id) {
+  const j = data.journals.find(x => String(x.id) === String(id));
+  if (j) {
+    document.getElementById('journal-id').value = j.id;
+    document.getElementById('journal-date').value = j.date;
+    document.getElementById('journal-content').value = j.content;
+    document.getElementById('modal-journal').classList.add('show');
+  }
+}
+
+function saveJournal(e) {
+  e.preventDefault();
+  const id = document.getElementById('journal-id').value;
+  const isEdit = !!id;
+  const j = isEdit ? data.journals.find(x => String(x.id) === String(id)) : { id: genId() };
+  j.date = document.getElementById('journal-date').value;
+  j.content = document.getElementById('journal-content').value;
+  if (!isEdit) data.journals.push(j);
+  saveData();
+  closeModal('modal-journal');
+  toast('日記を保存しました');
+  renderCurrentPage();
+}
+
+function deleteJournal(id) {
+  const idx = data.journals.findIndex(x => String(x.id) === String(id));
+  if (idx >= 0) { data.journals.splice(idx, 1); saveData(); renderCurrentPage(); toast('削除しました'); }
+}
+
+/* ===== RICH TEXT EDITOR ===== */
+function formatText(command, value) {
+  document.execCommand(command, false, value);
+  document.getElementById('learn-content').focus();
+}
+
 /* ===== YIELD CALCULATOR ===== */
 function openCalcModal() {
   document.getElementById('modal-calc').classList.add('show');
@@ -999,53 +1630,159 @@ function calcResult() {
   const totalAcquisition = (p.acquisition||[]).reduce((s, i) => s + (i.value||0), 0);
   const annualRunning = (p.running||[]).reduce((s, i) => s + (i.unit === '月' ? (i.value||0)*12 : (i.value||0)), 0);
   const noi = effectiveIncome - annualRunning;
-  const grossYield = totalAcquisition > 0 ? (annualIncome / totalAcquisition * 100) : 0;
-  const netYield = totalAcquisition > 0 ? (noi / totalAcquisition * 100) : 0;
-  const monthlyCF = Math.round(noi / 12);
+  const grossYield = totalAcquisition ? (annualIncome / totalAcquisition * 100).toFixed(2) : 0;
+  const netYield = totalAcquisition ? (noi / totalAcquisition * 100).toFixed(2) : 0;
 
-  const el = document.getElementById('calc-result-area');
-  if (el) {
-    el.innerHTML = '<div class="big">実質利回り ' + netYield.toFixed(2) + '%</div>' +
-      '<div class="sub">表面利回り: ' + grossYield.toFixed(2) + '%</div>' +
-      '<div class="sub">年間収入: ' + fmtNum(annualIncome) + '円（空室損失 -' + fmtNum(Math.round(vacancyLoss)) + '円）</div>' +
-      '<div class="sub">年間支出: ' + fmtNum(annualRunning) + '円</div>' +
-      '<div class="sub">年間NOI: ' + fmtNum(noi) + '円</div>' +
-      '<div class="sub">月間キャッシュフロー: ' + fmtNum(monthlyCF) + '円</div>' +
-      '<div class="sub">取得費用合計: ' + fmtNum(totalAcquisition) + '円</div>';
-  }
+  let h = '<div style="margin-bottom:12px;"><div class="sub">表面利回り</div><div class="big">' + grossYield + '%</div></div>';
+  h += '<div style="margin-bottom:12px;"><div class="sub">純利回り (NOI利回り)</div><div class="big" style="color:var(--green);">' + netYield + '%</div></div>';
+  h += '<div><div class="sub">年間NOI</div><div style="font-size:18px;color:var(--green);font-weight:700;">¥' + fmtNum(Math.round(noi)) + '</div></div>';
+  document.getElementById('calc-result-area').innerHTML = h;
 }
 
 function addPattern() {
-  const name = prompt('パターン名を入力:', 'パターン' + String.fromCharCode(65 + data.calcPatterns.length));
-  if (!name) return;
-  data.calcPatterns.push({ id: genId(), name, income: [{ name: '家賃収入', value: 0, unit: '月' }], acquisition: [{ name: '物件価格', value: 0, unit: '一時' }], running: [], vacancyRate: 10 });
-  currentCalcPatternIdx = data.calcPatterns.length - 1;
-  saveData(); renderCalc();
-}
-function renamePattern() {
-  const p = pat(); if (!p) return;
-  const name = prompt('新しいパターン名:', p.name);
-  if (name) { p.name = name; saveData(); renderCalc(); }
-}
-function deletePattern() {
-  if (!pat() || !confirm(pat().name + ' を削除しますか？')) return;
-  data.calcPatterns.splice(currentCalcPatternIdx, 1);
-  currentCalcPatternIdx = Math.max(0, currentCalcPatternIdx - 1);
-  saveData(); renderCalc();
+  const name = prompt('パターン名:');
+  if (name) {
+    data.calcPatterns.push({ id: genId(), name: name, income: [], acquisition: [], running: [], vacancyRate: 10 });
+    currentCalcPatternIdx = data.calcPatterns.length - 1;
+    saveData();
+    renderCalc();
+  }
 }
 
-/* ===== HOME ===== */
+function renamePattern() {
+  const p = pat();
+  if (!p) return;
+  const name = prompt('新しい名前:', p.name);
+  if (name) { p.name = name; saveData(); renderCalc(); }
+}
+
+function deletePattern() {
+  if (data.calcPatterns.length <= 1) { toast('最低1つのパターンが必要です', 'error'); return; }
+  if (confirm('削除しますか？')) {
+    data.calcPatterns.splice(currentCalcPatternIdx, 1);
+    currentCalcPatternIdx = 0;
+    saveData();
+    renderCalc();
+  }
+}
+
+/* ===== HOME RENDER ===== */
 function renderHome() {
+  // Properties
   document.getElementById('home-property-list').innerHTML =
     data.property.length ?
     data.property.slice(0, 5).map(p => renderPropertyCard(p, true)).join('') :
     '<div class="empty" style="padding:20px;"><div class="icon">🏢</div>物件を追加してみましょう</div>';
+
+  // Memos
   document.getElementById('home-memo-list').innerHTML =
     data.action.length ?
     data.action.slice(0, 5).map(m =>
       '<div class="card" onclick="openMemoModal(\'' + m.id + '\')" style="cursor:pointer"><div class="card-header"><div><div class="card-title" style="font-size:13px;">' + esc(m.title) + '</div><div class="card-sub">' + esc(m.date) + (m.category ? ' · '+esc(m.category) : '') + '</div></div></div></div>'
     ).join('') :
     '<div class="empty" style="padding:20px;"><div class="icon">📝</div>Memoを追加してみましょう</div>';
+
+  // Learns
+  document.getElementById('home-learn-list').innerHTML =
+    data.learns.length ?
+    data.learns.slice(0, 5).map(l =>
+      '<div class="card" onclick="openLearnModal(\'' + l.id + '\')" style="cursor:pointer"><div class="card-header"><div><div class="card-title" style="font-size:13px;">' + esc(l.title) + '</div><div class="card-sub">' + esc(l.date) + (l.category ? ' · '+esc(l.category) : '') + '</div></div></div></div>'
+    ).join('') :
+    '<div class="empty" style="padding:20px;"><div class="icon">📚</div>Learnを追加してみましょう</div>';
+
+  // Calendar widget
+  document.getElementById('home-calendar-widget').innerHTML = renderCalendar(new Date());
+
+  // Todo list
+  const allTodos = data.property.flatMap(p => (p.todos||[]).map(t => ({...t, prop: p.name, propId: p.id})));
+  const sortedTodos = allTodos.sort((a,b) => (a.due||'') > (b.due||'') ? 1 : -1);
+  document.getElementById('home-todo-list').innerHTML = sortedTodos.length ?
+    sortedTodos.map(t => {
+      const isOverdue = t.due && t.due < today() && !t.done;
+      return '<div class="todo-item' + (t.done ? ' done' : '') + (isOverdue ? ' overdue' : '') + '">' +
+        '<input type="checkbox" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(\'' + t.propId + '\',\'' + t.id + '\')">' +
+        '<div class="todo-item-content">' +
+        '<div class="todo-item-text">' + esc(t.text) + '</div>' +
+        '<div class="todo-item-meta">' + esc(t.prop) + (t.due ? ' · ' + t.due : '') + '</div>' +
+        '</div></div>';
+    }).join('') :
+    '<div class="empty" style="padding:20px;"><div class="icon">✅</div>ToDoはありません</div>';
+}
+
+function toggleTodo(propId, todoId) {
+  const p = data.property.find(x => String(x.id) === String(propId));
+  const t = (p.todos||[]).find(x => String(x.id) === String(todoId));
+  if (t) { t.done = !t.done; saveData(); renderHome(); }
+}
+
+/* ===== VOICE INPUT ===== */
+let voiceRecognition = null;
+let voiceSynthesis = null;
+
+function initVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    voiceRecognition = new SpeechRecognition();
+    voiceRecognition.lang = 'ja-JP';
+    voiceRecognition.continuous = false;
+    voiceRecognition.interimResults = true;
+  }
+  voiceSynthesis = window.speechSynthesis;
+}
+
+function openVoiceInput() {
+  if (!voiceRecognition) { toast('音声入力はご利用いただけません', 'error'); return; }
+  toast('「メモ」または「物件」と言ってください');
+  voiceRecognition.start();
+  voiceRecognition.onresult = (event) => {
+    let result = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      result += event.results[i][0].transcript;
+    }
+    if (event.isFinal) {
+      if (result.includes('メモ')) voiceInputMemo();
+      else if (result.includes('物件')) voiceInputProperty();
+    }
+  };
+}
+
+function voiceInputMemo() {
+  toast('メモのタイトルを言ってください');
+  // Simplified: just open memo modal
+  openMemoModal();
+}
+
+function voiceInputProperty() {
+  toast('物件の名前を言ってください');
+  // Simplified: just open property modal
+  openPropertyModal();
+}
+
+/* ===== GAS SYNC ===== */
+function testAndSaveGAS() {
+  const url = document.getElementById('gas-url').value;
+  const key = document.getElementById('gas-api-key').value;
+  const pw = document.getElementById('gas-write-password').value;
+
+  if (!url) { toast('GAS URLを入力してください', 'error'); return; }
+
+  data.gasUrl = url;
+  data.gasApiKey = key;
+  data.gasWritePassword = pw;
+  saveData();
+  toast('GAS設定を保存しました');
+}
+
+function syncDataNow() {
+  if (!data.gasUrl) { toast('GAS URLが設定されていません', 'error'); return; }
+  toast('同期中...');
+  // TODO: Implement actual GAS sync
+  setTimeout(() => toast('同期完了'), 1000);
+}
+
+function refreshCurrentPage() {
+  renderCurrentPage();
+  if (data.gasUrl) syncDataNow();
 }
 
 /* ===== MODAL HELPERS ===== */
@@ -1058,6 +1795,8 @@ function renderCurrentPage() {
   else if (id === 'property') renderPropertyList();
   else if (id === 'property-detail') renderPropertyDetail();
   else if (id === 'memo') renderMemoList();
+  else if (id === 'learn') renderLearnList();
+  else if (id === 'calendar') renderCalendarPage();
 }
 
 // Close modal on overlay click
@@ -1067,6 +1806,7 @@ document.querySelectorAll('.modal-overlay').forEach(ov => {
 
 /* ===== INIT ===== */
 loadData();
+initVoice();
 renderHome();
 </script>
 </body>

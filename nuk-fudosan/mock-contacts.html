@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>モック: 連絡先リスト · Property Note</title>
+<style>
+:root{
+  --green:#2e7d32;--green-light:#e8f5e9;--green-dark:#1b5e20;
+  --red:#c62828;--red-light:#ffebee;
+  --orange:#e65100;--orange-light:#fff3e0;
+  --blue:#1565c0;--blue-light:#e3f2fd;
+  --purple:#6a1b9a;--purple-light:#f3e5f5;
+  --teal:#00695c;--teal-light:#e0f2f1;
+  --brown:#4e342e;--brown-light:#efebe9;
+  --gray:#f5f5f5;--gray2:#e0e0e0;--gray3:#9e9e9e;--gray4:#616161;
+  --white:#fff;--black:#212121;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:#fafafa;color:var(--black);padding:24px 32px 80px;max-width:1200px;margin:0 auto;}
+a{color:var(--green);text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:13px;}
+input,select{font-family:inherit;font-size:13px;border:1px solid var(--gray2);border-radius:6px;padding:6px 10px;background:var(--white);}
+
+h1{font-size:22px;font-weight:700;margin-bottom:4px;}
+.page-sub{color:var(--gray3);font-size:13px;margin-bottom:16px;}
+
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;background:var(--white);padding:12px 14px;border-radius:var(--radius);box-shadow:var(--shadow);}
+.toolbar input[type=search]{flex:1;min-width:200px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;}
+.btn-primary{background:var(--green);color:#fff;}
+.btn-secondary{background:var(--gray);color:var(--gray4);border:1px solid var(--gray2);}
+
+/* フィルタチップ */
+.filter-bar{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding:4px 0;flex-wrap:wrap;}
+.chip{padding:6px 12px;border-radius:14px;font-size:12px;font-weight:500;background:var(--white);color:var(--gray4);white-space:nowrap;border:1px solid var(--gray2);cursor:pointer;}
+.chip.active{background:var(--green);color:#fff;border-color:var(--green);font-weight:700;}
+.chip .count{opacity:.7;margin-left:4px;font-size:11px;}
+.chip-group{display:flex;gap:4px;align-items:center;}
+.chip-group-label{font-size:11px;color:var(--gray3);margin-right:4px;}
+
+/* 業種色 */
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10.5px;font-weight:600;margin-right:3px;margin-bottom:2px;}
+.tag.bank{background:var(--blue-light);color:var(--blue);}
+.tag.estate{background:var(--green-light);color:var(--green);}
+.tag.reform{background:var(--orange-light);color:var(--orange);}
+.tag.pro{background:var(--purple-light);color:var(--purple);}
+.tag.owner{background:var(--brown-light);color:var(--brown);}
+.tag.friend{background:var(--teal-light);color:var(--teal);}
+.tag.other{background:var(--gray);color:var(--gray4);}
+
+/* カードグリッド */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.contact-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;position:relative;transition:transform .15s;cursor:pointer;}
+.contact-card:hover{transform:translateY(-2px);}
+.contact-card .star{position:absolute;top:10px;right:12px;font-size:16px;color:var(--gray2);}
+.contact-card .star.fav{color:#f9a825;}
+.contact-head{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;}
+.contact-avatar{width:40px;height:40px;border-radius:50%;background:var(--gray);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gray4);font-size:15px;flex-shrink:0;}
+.contact-avatar.bank{background:var(--blue-light);color:var(--blue);}
+.contact-avatar.estate{background:var(--green-light);color:var(--green);}
+.contact-avatar.reform{background:var(--orange-light);color:var(--orange);}
+.contact-avatar.pro{background:var(--purple-light);color:var(--purple);}
+.contact-avatar.owner{background:var(--brown-light);color:var(--brown);}
+.contact-avatar.friend{background:var(--teal-light);color:var(--teal);}
+.contact-name{font-size:15px;font-weight:700;line-height:1.2;}
+.contact-title{font-size:11.5px;color:var(--gray3);margin-top:2px;}
+.contact-company{font-size:12.5px;color:var(--gray4);margin-top:2px;}
+.contact-tags{margin-top:4px;line-height:1.6;}
+
+.contact-meta{margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0;font-size:11.5px;color:var(--gray3);display:flex;flex-direction:column;gap:2px;}
+.contact-meta .line{display:flex;justify-content:space-between;gap:6px;}
+.contact-meta .areas{color:var(--gray4);}
+.last-contact{font-weight:600;}
+.last-contact.hot{color:var(--green);}
+.last-contact.cold{color:var(--orange);}
+
+.contact-actions{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;}
+.mini-btn{padding:4px 8px;font-size:11px;border-radius:10px;background:var(--gray);color:var(--gray4);}
+.mini-btn:hover{background:var(--green-light);color:var(--green);}
+.mini-btn.tel{background:var(--blue-light);color:var(--blue);}
+.mini-btn.mail{background:var(--orange-light);color:var(--orange);}
+.mini-btn.line{background:#e8f5e9;color:#2e7d32;}
+
+/* 統計サマリー */
+.stats-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:700px){.stats-summary{grid-template-columns:repeat(2,1fr);}}
+.stat-box{background:var(--white);border-radius:var(--radius);padding:10px 14px;box-shadow:var(--shadow);}
+.stat-box .num{font-size:20px;font-weight:700;color:var(--green);}
+.stat-box .lbl{font-size:11px;color:var(--gray3);}
+
+/* 編集モーダル（フォーム） */
+.edit-modal{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-top:24px;}
+.edit-modal h3{font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--gray2);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-bottom:10px;}
+.form-row.col-3{grid-template-columns:1fr 1fr 1fr;}
+.form-row.col-1{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:3px;}
+.form-group label{font-size:11.5px;font-weight:600;color:var(--gray4);}
+.tag-select{display:flex;flex-wrap:wrap;gap:4px;}
+.tag-select label{padding:3px 9px;border:1px solid var(--gray2);border-radius:12px;font-size:11px;color:var(--gray4);cursor:pointer;}
+.tag-select label.active{background:var(--green-light);color:var(--green);border-color:var(--green);font-weight:600;}
+.tag-select input{display:none;}
+input,select,textarea{width:100%;}
+textarea{font-family:inherit;font-size:13px;border:1px solid var(--gray2);border-radius:6px;padding:6px 10px;resize:vertical;min-height:60px;}
+
+.mock-banner{background:#fff59d;color:#5d4037;padding:10px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;}
+.mock-banner b{color:#d84315;}
+
+.breadcrumb{font-size:12px;color:var(--gray3);margin-bottom:8px;}
+.breadcrumb a{color:var(--gray4);}
+</style>
+</head>
+<body>
+
+<div class="mock-banner">
+  🧪 <b>連絡先リスト モック</b>（物件横断の人脈管理）<br>
+  サイドバー新規追加ページ想定。物件・ヒアリング・融資等からもここの連絡先を呼び出して紐付け可能。
+</div>
+
+<div class="breadcrumb"><a href="/mock-overview.html">← Overview</a> / <a href="/mock-edit.html">編集モーダル</a> / <b>連絡先</b></div>
+
+<h1>📇 連絡先リスト</h1>
+<div class="page-sub">関係者を業種別に一元管理。物件・ヒアリング・融資などから横断参照。</div>
+
+<!-- 統計サマリー -->
+<div class="stats-summary">
+  <div class="stat-box"><div class="num">28</div><div class="lbl">総連絡先</div></div>
+  <div class="stat-box"><div class="num">6</div><div class="lbl">★ お気に入り</div></div>
+  <div class="stat-box"><div class="num">3</div><div class="lbl">⚠ 3ヶ月以上未接触</div></div>
+  <div class="stat-box"><div class="num">12</div><div class="lbl">💬 今月接触</div></div>
+</div>
+
+<!-- ツールバー -->
+<div class="toolbar">
+  <input type="search" placeholder="🔍 名前・会社名・メモで検索...">
+  <select style="width:160px;">
+    <option>全エリア</option>
+    <option>仙台市青葉区</option>
+    <option>仙台市若林区</option>
+    <option>川崎市川崎区</option>
+  </select>
+  <button class="btn btn-secondary">★ お気に入りのみ</button>
+  <button class="btn btn-primary">+ 連絡先を追加</button>
+</div>
+
+<!-- 業種フィルタ (12種類に厳選) -->
+<div class="filter-bar">
+  <div class="chip active">すべて<span class="count">28</span></div>
+  <div class="chip-group">
+    <span class="chip-group-label">🏦</span>
+    <div class="chip">銀行<span class="count">3</span></div>
+    <div class="chip">信金・信組<span class="count">1</span></div>
+    <div class="chip">日本政策金融公庫<span class="count">1</span></div>
+  </div>
+  <div class="chip-group">
+    <span class="chip-group-label">🏢</span>
+    <div class="chip">元付け<span class="count">3</span></div>
+    <div class="chip">客付け<span class="count">6</span></div>
+    <div class="chip">管理会社<span class="count">2</span></div>
+  </div>
+  <div class="chip-group">
+    <span class="chip-group-label">🔨</span>
+    <div class="chip">工務店・リフォーム<span class="count">3</span></div>
+    <div class="chip">設備業者<span class="count">2</span></div>
+  </div>
+  <div class="chip-group">
+    <span class="chip-group-label">📜</span>
+    <div class="chip">司法書士系<span class="count">2</span></div>
+    <div class="chip">税理士<span class="count">1</span></div>
+  </div>
+  <div class="chip-group">
+    <span class="chip-group-label">🏠</span>
+    <div class="chip">オーナー系<span class="count">2</span></div>
+  </div>
+  <div class="chip-group">
+    <span class="chip-group-label">👥</span>
+    <div class="chip">大家仲間・メンター<span class="count">3</span></div>
+  </div>
+  <div class="chip-group">
+    <span class="chip-group-label">・</span>
+    <div class="chip">その他</div>
+  </div>
+</div>
+
+<!-- 連絡先カードグリッド -->
+<div class="contact-grid">
+
+  <!-- 銀行 -->
+  <div class="contact-card">
+    <div class="star fav">★</div>
+    <div class="contact-head">
+      <div class="contact-avatar bank">山</div>
+      <div>
+        <div class="contact-name">山田 太郎</div>
+        <div class="contact-title">融資担当・法人向け</div>
+        <div class="contact-company">○○銀行 仙台支店</div>
+        <div class="contact-tags">
+          <span class="tag bank">銀行</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-meta">
+      <div class="line"><span class="areas">📍 仙台市全域</span><span class="last-contact hot">📅 5日前</span></div>
+      <div>💬 戸建て投資の融資方針ヒアリング済・前向き</div>
+    </div>
+    <div class="contact-actions">
+      <button class="mini-btn tel">📞 022-XXX</button>
+      <button class="mini-btn mail">✉ メール</button>
+      <button class="mini-btn">📝 Memo追加</button>
+    </div>
+  </div>
+
+  <!-- 不動産 元付け -->
+  <div class="contact-card">
+    <div class="star fav">★</div>
+    <div class="contact-head">
+      <div class="contact-avatar estate">佐</div>
+      <div>
+        <div class="contact-name">佐藤 花子</div>
+        <div class="contact-title">営業課長</div>
+        <div class="contact-company">○○不動産 青葉区店</div>
+        <div class="contact-tags">
+          <span class="tag estate">元付け</span>
+          <span class="tag estate">客付け</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-meta">
+      <div class="line"><span class="areas">📍 仙台市青葉区</span><span class="last-contact hot">📅 2日前</span></div>
+      <div>💬 戸建て専門・エリア詳しい・反応良い</div>
+    </div>
+    <div class="contact-actions">
+      <button class="mini-btn tel">📞 直通</button>
+      <button class="mini-btn line">💚 LINE</button>
+      <button class="mini-btn">📝 Memo追加</button>
+    </div>
+  </div>
+
+  <!-- 客付け -->
+  <div class="contact-card">
+    <div class="star">☆</div>
+    <div class="contact-head">
+      <div class="contact-avatar estate">田</div>
+      <div>
+        <div class="contact-name">田中 次郎</div>
+        <div class="contact-title">賃貸仲介担当</div>
+        <div class="contact-company">△△不動産 若林区店</div>
+        <div class="contact-tags">
+          <span class="tag estate">客付け</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-meta">
+      <div class="line"><span class="areas">📍 仙台市若林区</span><span class="last-contact cold">📅 4ヶ月前</span></div>
+      <div>💬 繁忙期1-3月・単身向けに強い</div>
+    </div>
+    <div class="contact-actions">
+      <button class="mini-btn tel">📞 022-XXX</button>
+      <button class="mini-btn">📝 Memo追加</button>
+    </div>
+  </div>
+
+  <!-- 工務店 -->
+  <div class="contact-card">
+    <div class="star fav">★</div>
+    <div class="contact-head">
+      <div class="contact-avatar reform">鈴</div>
+      <div>
+        <div class="contact-name">鈴木 大工</div>
+        <div class="contact-title">代表</div>
+        <div class="contact-company">鈴木工務店</div>
+        <div class="contact-tags">
+          <span class="tag reform">工務店</span>
+          <span class="tag reform">大工</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-meta">
+      <div class="line"><span class="areas">📍 仙台市・周辺</span><span class="last-contact hot">📅 1週間前</span></div>
+      <div>💬 古家再生得意・単価安い・対応早い</div>
+    </div>
+    <div class="contact-actions">
+      <button class="mini-btn tel">📞 携帯</button>
+      <button class="mini-btn line">💚 LINE</button>
+      <button class="mini-btn">📝 Memo追加</button>
+    </div>
+  </div>
+
+  <!-- ガス屋 -->
+  <div class="contact-card">
+    <div class="star">☆</div>
+    <div class="contact-head">
+      <div class="contact-avatar reform">伊</div>
+      <div>
+        <div class="contact-name">伊藤 ガスマン</div>
+        <div class="contact-title">営業</div>
+        <div class="contact-company">○○プロパン</div>
+        <div class="contact-tags">
+          <span class="tag reform">ガス屋</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-meta">
+      <div class="line"><span class="areas">📍 仙台市・周辺</span><span class="last-contact">📅 3週間前</span></div>
+      <div>💬 給湯器交換・設備持込OK</div>
+    </div>
+    <div class="contact-actions">
+      <button class="mini-btn tel">📞 022-XXX</button>
+      <button class="mini-btn">📝 Memo追加</button>
+    </div>
+  </div>
+
+  <!-- 司法書士 -->
+  <div class="contact-card">
+    <div class="star fav">★</div>
+    <div class="contact-head">
+      <div class="contact-avatar pro">高</div>
+      <div>
+        <div class="contact-name">高橋 先生</div>
+        <div class="contact-title">司法書士</div>
+        <div class="contact-company">高橋司法書士事務所</div>
+        <div class="contact-tags">
+          <span class="tag pro">司法書士</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-meta">
+      <div class="line"><span class="areas">📍 仙台市青葉区</span><span class="last-contact hot">📅 3ヶ月前</span></div>
+      <div>💬 投資家向け・料金明朗・レスポンス早い</div>
+    </div>
+    <div class="contact-actions">
+      <button class="mini-btn tel">📞 事務所</button>
+      <button class="mini-btn mail">✉ メール</button>
+    </div>
+  </div>
+
+  <!-- 売主 / 地主 -->
+  <div class="contact-card">
+    <div class="star">☆</div>
+    <div class="contact-head">
+      <div class="contact-avatar owner">小</div>
+      <div>
+        <div class="contact-name">小林 さん</div>
+        <div class="contact-title">売主（前オーナー）</div>
+        <div class="contact-company">—</div>
+        <div class="contact-tags">
+          <span class="tag owner">売主</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-meta">
+      <div class="line"><span class="areas">📍 仙台市青葉区</span><span class="last-contact">📅 2ヶ月前</span></div>
+      <div>💬 A物件売主・隣地も所有・将来売却可能性</div>
+    </div>
+    <div class="contact-actions">
+      <button class="mini-btn">📝 Memo追加</button>
+    </div>
+  </div>
+
+  <!-- 大家仲間 -->
+  <div class="contact-card">
+    <div class="star fav">★</div>
+    <div class="contact-head">
+      <div class="contact-avatar friend">森</div>
+      <div>
+        <div class="contact-name">森 さん</div>
+        <div class="contact-title">戸建て大家・6棟</div>
+        <div class="contact-company">—</div>
+        <div class="contact-tags">
+          <span class="tag friend">大家仲間</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-meta">
+      <div class="line"><span class="areas">📍 宮城・首都圏</span><span class="last-contact hot">📅 先週</span></div>
+      <div>💬 セミナー知人・情報交換・工務店紹介受けた</div>
+    </div>
+    <div class="contact-actions">
+      <button class="mini-btn line">💚 LINE</button>
+      <button class="mini-btn">📝 Memo追加</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- 編集モーダル（参考表示） -->
+<div class="edit-modal">
+  <h3>📇 連絡先の追加・編集（参考モーダル）</h3>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>名前 <span style="color:var(--red);">*</span></label>
+      <input type="text" placeholder="例: 山田 太郎">
+    </div>
+    <div class="form-group">
+      <label>肩書き</label>
+      <input type="text" placeholder="例: 融資担当・課長">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>会社・組織</label>
+      <input type="text" placeholder="例: ○○銀行">
+    </div>
+    <div class="form-group">
+      <label>支店・部署</label>
+      <input type="text" placeholder="例: 仙台支店">
+    </div>
+  </div>
+
+  <div class="form-row col-1">
+    <div class="form-group">
+      <label>業種タグ（複数選択可・12種類）</label>
+      <div class="tag-select">
+        <label><input type="checkbox">🏦 銀行</label>
+        <label><input type="checkbox">🏦 信金・信組</label>
+        <label><input type="checkbox">🏦 日本政策金融公庫</label>
+        <label><input type="checkbox">🏢 元付け</label>
+        <label><input type="checkbox">🏢 客付け</label>
+        <label><input type="checkbox">🏢 管理会社</label>
+        <label><input type="checkbox">🔨 工務店・リフォーム</label>
+        <label><input type="checkbox">🔨 設備業者</label>
+        <label><input type="checkbox">📜 司法書士系</label>
+        <label><input type="checkbox">📜 税理士</label>
+        <label><input type="checkbox">🏠 オーナー系</label>
+        <label><input type="checkbox">👥 大家仲間・メンター</label>
+        <label><input type="checkbox">・ その他</label>
+      </div>
+      <div class="hint" style="font-size:11px;color:var(--gray3);margin-top:4px;">💡 複数付与可。詳細は肩書き・会社名・メモで補足</div>
+    </div>
+  </div>
+
+  <div class="form-row col-3">
+    <div class="form-group">
+      <label>電話（固定・事務所）</label>
+      <input type="tel" placeholder="022-XXX-XXXX">
+    </div>
+    <div class="form-group">
+      <label>携帯</label>
+      <input type="tel" placeholder="090-XXXX-XXXX">
+    </div>
+    <div class="form-group">
+      <label>メール</label>
+      <input type="email" placeholder="xxx@example.com">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>LINE ID / URL</label>
+      <input type="text" placeholder="@xxxxx or URL">
+    </div>
+    <div class="form-group">
+      <label>WebサイトURL</label>
+      <input type="url" placeholder="https://">
+    </div>
+  </div>
+
+  <div class="form-row col-1">
+    <div class="form-group">
+      <label>担当エリア（複数可）</label>
+      <input type="text" placeholder="例: 仙台市青葉区, 若林区">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>姿勢（不動産系のみ）</label>
+      <select>
+        <option>—</option>
+        <option>前向き</option>
+        <option>普通</option>
+        <option>消極的</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>お気に入り</label>
+      <select>
+        <option>☆ 通常</option>
+        <option>★ お気に入り（上位表示）</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row col-1">
+    <div class="form-group">
+      <label>メモ（強み・特徴・過去のやり取りポイント）</label>
+      <textarea placeholder="例: 戸建て専門・エリア詳しい・繁忙期1-3月・○○物件で世話になった etc"></textarea>
+    </div>
+  </div>
+
+  <div style="padding:10px 12px;background:var(--green-light);border-radius:6px;font-size:12px;color:var(--gray4);margin-top:10px;">
+    💡 <b>自動連動</b>: この連絡先はヒアリング機能・融資モーダル・リフォーム見積モーダルから選択可能に。物件との紐付けも履歴として残る
+  </div>
+</div>
+
+<!-- 相互連携の説明 -->
+<div style="margin-top:24px;padding:14px 18px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);">
+  <h3 style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px;">🔗 他機能との連携イメージ</h3>
+  <ul style="font-size:13px;color:var(--gray4);line-height:1.8;padding-left:20px;">
+    <li><b>ヒアリング作成時</b>: 連絡先リストから担当者を選択（新規の場合はその場で追加）</li>
+    <li><b>融資タブで銀行相談</b>: 銀行担当者を連絡先から選択 → 過去のやり取りも表示</li>
+    <li><b>リフォームの相見積もり</b>: 工務店・ガス屋・DIY関連業者を連絡先から選択</li>
+    <li><b>Memo「人脈づくり」</b>: 関連する連絡先を紐付けて履歴化</li>
+    <li><b>エリア情報ページ</b>: エリアを選ぶと、そのエリアで動いてる連絡先が一覧表示</li>
+    <li><b>物件詳細</b>: 各物件に関わった人が Log/融資/現調タブから自動的に時系列リスト化</li>
+  </ul>
+</div>
+
+</body>
+</html>

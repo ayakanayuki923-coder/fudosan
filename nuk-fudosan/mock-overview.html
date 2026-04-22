@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>モック v2: Overview再設計 · Property Note</title>
+<style>
+:root{
+  --green:#2e7d32;--green-light:#e8f5e9;--green-dark:#1b5e20;
+  --red:#c62828;--red-light:#ffebee;
+  --orange:#e65100;--orange-light:#fff3e0;
+  --gray:#f5f5f5;--gray2:#e0e0e0;--gray3:#9e9e9e;--gray4:#616161;
+  --white:#fff;--black:#212121;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:#fafafa;color:var(--black);padding:24px 32px 80px;max-width:1200px;margin:0 auto;}
+a{color:var(--green);text-decoration:none;}
+
+h2.property-title{font-size:22px;font-weight:700;margin-bottom:4px;}
+.status-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;background:#e3f2fd;color:#1565c0;}
+
+.detail-tabs{display:flex;gap:0;border-bottom:2px solid var(--gray2);margin:16px 0 20px;overflow-x:auto;}
+.detail-tab{padding:10px 18px;font-size:14px;font-weight:600;color:var(--gray3);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;cursor:pointer;}
+.detail-tab.active{color:var(--green);border-bottom-color:var(--green);}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:320px 1fr;gap:14px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;margin-bottom:12px;}
+@media(max-width:899px){.hero{grid-template-columns:1fr;}}
+.hero-left{display:flex;flex-direction:column;gap:8px;}
+.hero-photo{aspect-ratio:3/2;background:var(--gray);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gray3);font-size:13px;overflow:hidden;position:relative;}
+.hero-photo .photo-link{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;padding:4px 10px;border-radius:4px;font-size:11px;}
+
+/* 写真下の購入前必須チェック サマリーピクト */
+.check-pict{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 8px;background:var(--white);border:1px solid var(--gray2);border-radius:8px;}
+.check-pict .pict-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--gray4);line-height:1.1;text-align:center;}
+.check-pict .pict-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;}
+.check-pict .pict-icon.ok{background:var(--green);}
+.check-pict .pict-icon.ng{background:var(--red);}
+.check-pict .pict-icon.warn{background:var(--orange);}
+.check-pict .pict-icon.unknown{background:var(--gray3);}
+
+/* Compact stats bar (横一列) */
+.hero-right{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.stats-bar{display:flex;gap:10px;padding:6px 12px;background:var(--green-light);border-radius:8px;align-items:center;flex-wrap:wrap;}
+.stats-bar .stat{display:flex;flex-direction:column;line-height:1.15;min-width:0;}
+.stats-bar .stat .k{font-size:10px;color:var(--gray4);}
+.stats-bar .stat .v{font-size:16px;font-weight:700;color:var(--green);white-space:nowrap;}
+.stats-bar .stat .v.orange{color:var(--orange);}
+.stats-bar .stat .v.red{color:var(--red);}
+.stats-bar .sep{width:1px;background:var(--gray2);align-self:stretch;margin:2px 0;}
+
+/* Basic info inline (inside hero) — 高密度表示 */
+.hero-info{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-content:start;font-size:12.5px;padding:2px;}
+.hero-info dt{color:var(--gray3);font-size:11px;white-space:nowrap;padding:1px 0;}
+.hero-info dd{color:var(--black);font-weight:500;padding:1px 0;min-width:0;word-break:break-word;line-height:1.4;}
+.hero-info dd a{color:var(--green);}
+
+/* ヒーロー右下: 購入進捗ステップチェーン (7段階) */
+.progress-chain{display:flex;gap:0;padding:8px 8px 10px;background:#fafafa;border:1px solid var(--gray2);border-radius:8px;margin-top:auto;}
+.progress-chain .step{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;color:var(--gray3);line-height:1.1;position:relative;text-align:center;min-width:0;}
+.progress-chain .step .dot{width:20px;height:20px;border-radius:50%;background:var(--gray2);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700;z-index:1;}
+.progress-chain .step.done .dot{background:var(--green);}
+.progress-chain .step.active .dot{background:var(--green);box-shadow:0 0 0 2px var(--green-light);}
+.progress-chain .step.done, .progress-chain .step.active{color:var(--green);font-weight:600;}
+.progress-chain .step:not(:last-child)::after{content:'';position:absolute;top:9px;left:calc(50% + 12px);right:calc(-50% + 12px);height:2px;background:var(--gray2);}
+.progress-chain .step.done:not(:last-child)::after{background:var(--green);}
+.progress-chain .step.next{color:var(--orange);}
+.progress-chain .step.next .dot{background:#fff;border:2px dashed var(--orange);color:var(--orange);}
+
+/* Section headers */
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:700;color:var(--green);margin:14px 0 6px;padding-bottom:4px;border-bottom:2px solid var(--green-light);}
+.section-head.critical{color:var(--red);border-bottom-color:var(--red-light);}
+.section-head .add-btn{font-size:12px;font-weight:600;color:var(--green);padding:3px 9px;background:var(--green-light);border-radius:14px;cursor:pointer;border:none;}
+
+/* Check cards（セクションpair内で使うので1カラム固定） */
+.check-grid{display:grid;grid-template-columns:1fr;gap:8px;}
+.check-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 12px;border-left:4px solid var(--gray2);}
+.check-card.ok{border-left-color:var(--green);}
+.check-card.ng{border-left-color:var(--red);}
+.check-card.warn{border-left-color:var(--orange);}
+.check-card.unknown{border-left-color:var(--gray3);}
+.check-card .ck-label{font-size:12px;color:var(--gray3);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;}
+.check-card .ck-value{font-size:15px;font-weight:700;}
+.check-card .ck-value.ok{color:var(--green);}
+.check-card .ck-value.ng{color:var(--red);}
+.check-card .ck-value.warn{color:var(--orange);}
+.check-card .ck-value.unknown{color:var(--gray3);}
+.check-card .ck-detail{font-size:12px;color:var(--gray4);margin-top:4px;line-height:1.5;}
+.check-card .ck-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-right:6px;}
+.check-card .ck-badge.ok{background:var(--green-light);color:var(--green);}
+.check-card .ck-badge.ng{background:var(--red-light);color:var(--red);}
+.check-card .ck-badge.warn{background:var(--orange-light);color:var(--orange);}
+.check-card .ck-badge.unknown{background:var(--gray);color:var(--gray3);}
+
+/* Structured sub-fields inside check card */
+.sub-fields{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:4px;font-size:12px;}
+.sub-fields .sf-label{color:var(--gray3);}
+.sub-fields .sf-value{font-weight:600;color:var(--black);}
+
+/* Auto determination note */
+.auto-note{background:var(--green-light);border-radius:6px;padding:5px 10px;margin-top:6px;font-size:11.5px;color:var(--gray4);}
+.auto-note.warn{background:var(--orange-light);}
+.auto-note.ng{background:var(--red-light);}
+
+/* 役所・法務局 確認済みチェック */
+.verify-chk{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--gray3);cursor:pointer;margin-top:6px;padding:3px 8px;background:#fafafa;border:1px dashed var(--gray2);border-radius:12px;user-select:none;}
+.verify-chk input{width:auto;margin:0;cursor:pointer;}
+.verify-chk.ok{color:var(--green);font-weight:600;background:var(--green-light);border-style:solid;border-color:var(--green);}
+.verify-chk.ok .verify-date{color:var(--gray4);font-weight:400;font-size:10.5px;margin-left:2px;}
+
+/* Info grid (1カラム) */
+.info-grid{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:4px 14px;}
+
+/* セクション2つを横並び (PC: 2列, モバイル: 1列) */
+.section-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+@media(max-width:899px){.section-pair{grid-template-columns:1fr;gap:0;}}
+.section-pair > .section-col .section-head{margin-top:0;}
+
+.field-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px;gap:8px;}
+.field-row .field-actions{opacity:.35;transition:opacity .15s;flex-shrink:0;}
+.field-row:hover .field-actions{opacity:1;}
+.field-row:last-child{border-bottom:none;}
+.field-label{color:var(--gray3);min-width:100px;}
+.field-value{color:var(--black);font-weight:500;text-align:right;flex:1;}
+.field-actions{display:flex;gap:4px;}
+.field-actions button{padding:2px 6px;font-size:11px;color:var(--gray3);background:none;border:none;cursor:pointer;border-radius:4px;}
+.field-actions button:hover{background:var(--gray);color:var(--gray4);}
+.field-actions button.del:hover{background:var(--red-light);color:var(--red);}
+
+/* Reference chip (near market rate) */
+.ref-chip{display:inline-block;margin-top:4px;padding:3px 8px;background:var(--gray);border-radius:10px;font-size:11px;color:var(--gray4);cursor:pointer;}
+.ref-chip:hover{background:var(--green-light);color:var(--green);}
+
+/* Cost table */
+.cost-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.cost-table th,.cost-table td{padding:6px 14px;text-align:left;border-bottom:1px solid #f0f0f0;font-size:13px;}
+.cost-table th{background:var(--gray);font-weight:600;color:var(--gray4);font-size:12px;}
+.cost-table td.amount{text-align:right;font-weight:500;font-variant-numeric:tabular-nums;}
+.cost-table td.actions{text-align:right;width:80px;}
+.cost-table tr.total{background:var(--green-light);}
+.cost-table tr.total td{font-size:15px;font-weight:700;color:var(--green);border-bottom:none;}
+.cost-table .vendor-tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;margin-left:6px;font-weight:600;}
+.cost-table .vendor-tag.diy{background:#c8e6c9;color:#2e7d32;}
+.cost-table .vendor-tag.kou{background:#ffcdd2;color:#c62828;}
+.cost-table .vendor-tag.gas{background:#bbdefb;color:#1565c0;}
+.cost-table .vendor-tag.other{background:#f5f5f5;color:#616161;}
+.cost-table tr.undecided td.amount{color:var(--gray3);font-style:italic;}
+.cost-table .row-actions{font-size:11px;color:var(--gray3);padding:2px 6px;background:none;border:none;cursor:pointer;border-radius:4px;}
+.cost-table .row-actions:hover{background:var(--gray);}
+.cost-table .row-actions.del:hover{background:var(--red-light);color:var(--red);}
+
+.add-row-btn{display:block;width:100%;margin-top:8px;padding:10px;background:var(--white);border:2px dashed var(--gray2);border-radius:var(--radius);font-size:13px;color:var(--gray4);cursor:pointer;}
+.add-row-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-light);}
+
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px;}
+
+/* Color legend */
+.legend{background:#fff;border-radius:8px;padding:10px 14px;margin-bottom:16px;box-shadow:var(--shadow);display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;}
+.legend-item{display:flex;align-items:center;gap:6px;}
+.legend-dot{width:12px;height:12px;border-radius:50%;}
+.legend-title{font-weight:700;color:var(--gray4);margin-right:8px;}
+
+.mock-banner{background:#fff59d;color:#5d4037;padding:10px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;}
+.mock-banner b{color:#d84315;}
+</style>
+</head>
+<body>
+
+<div class="mock-banner">
+  🧪 <b>Overview再設計モック v2</b>（あやかさんのフィードバック反映版・サンプルデータ入り）<br>
+  v8変更: 進捗チェーン7段階（候補発見→調査→ヒアリング→内見→交渉→融資→買付）、費用内訳のヘッダー削除
+</div>
+
+<!-- 配色凡例 -->
+<div class="legend">
+  <span class="legend-title">配色の意味</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--green);"></span>合格・OK・ポジティブ</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--orange);"></span>要検討・中間・セットバック等</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--red);"></span>NG・不合格・要警戒</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--gray3);"></span>未取得・ニュートラル</span>
+</div>
+
+<h2 class="property-title">○○市△△町 戸建て（例）</h2>
+<div><span class="status-badge">調査中</span></div>
+
+<div class="detail-tabs">
+  <div class="detail-tab active">Overview</div>
+  <div class="detail-tab">調査</div>
+  <div class="detail-tab">ヒアリング</div>
+  <div class="detail-tab">現調/リフォーム</div>
+  <div class="detail-tab">Log</div>
+  <div class="detail-tab">融資</div>
+  <div class="detail-tab">収支</div>
+  <div class="detail-tab">Note</div>
+</div>
+
+<!-- HERO: 写真(+サマリーピクト) + 右側に利回り・基本情報 -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-photo">
+      <span>📷 写真（photoAlbumUrlの1枚目 or プレースホルダ）</span>
+      <a class="photo-link" href="#">アルバムを開く ↗</a>
+    </div>
+    <!-- 購入前必須チェック サマリーピクト -->
+    <div class="check-pict" title="購入前必須チェックの状況">
+      <div class="pict-item"><span class="pict-icon ok">✓</span>再建築</div>
+      <div class="pict-item"><span class="pict-icon ok">✓</span>用途地域</div>
+      <div class="pict-item"><span class="pict-icon unknown">?</span>登記</div>
+      <div class="pict-item"><span class="pict-icon warn">!</span>重要事項</div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <!-- コンパクトな3数字（バッジ削除） -->
+    <div class="stats-bar">
+      <div class="stat"><span class="k">表面利回り (≥25%で合格)</span><span class="v">28.1%</span></div>
+      <div class="sep"></div>
+      <div class="stat"><span class="k">想定家賃</span><span class="v">69.6万/年</span></div>
+      <div class="sep"></div>
+      <div class="stat"><span class="k">総費用</span><span class="v">246.9万</span></div>
+    </div>
+
+    <!-- 基本情報を写真横に収める（高密度・グループ化） -->
+    <dl class="hero-info">
+      <dt>住所</dt><dd>○○市△△町1-2-3</dd>
+      <dt>アクセス</dt><dd>○○線 △△駅 徒歩12分</dd>
+      <dt>種別 / 築 / 構造</dt><dd>戸建て / 38年 / 木造2階建て</dd>
+      <dt>間取り / 方位</dt><dd>3LDK / 南向き</dd>
+      <dt>延床 / 土地</dt><dd>82.5㎡ / 98.2㎡</dd>
+      <dt>駐車場 / 現況</dt><dd>2台 / 空室</dd>
+      <dt>引渡時期</dt><dd>相談（即時可）</dd>
+      <dt>物件登録日</dt><dd>2026-04-15</dd>
+      <dt>リンク</dt><dd><a href="#">掲載URL ↗</a> &nbsp;&nbsp; <a href="#">Maps ↗</a></dd>
+    </dl>
+
+    <!-- 購入進捗ステップチェーン (7段階) -->
+    <div class="progress-chain" title="購入までの進捗">
+      <div class="step done"><span class="dot">✓</span>候補発見</div>
+      <div class="step active"><span class="dot">●</span>調査<br><span style="font-weight:400;color:var(--gray3);font-size:9px;">←今</span></div>
+      <div class="step next"><span class="dot">3</span>ヒアリング</div>
+      <div class="step"><span class="dot">4</span>内見</div>
+      <div class="step"><span class="dot">5</span>交渉</div>
+      <div class="step"><span class="dot">6</span>融資</div>
+      <div class="step"><span class="dot">7</span>買付</div>
+    </div>
+  </div>
+</div>
+
+<!-- 購入前必須チェック + 重要事項を横並び -->
+<div class="section-pair">
+
+  <div class="section-col">
+    <div class="section-head critical">🚨 購入前必須チェック</div>
+    <div class="check-grid">
+      <!-- 接道 → 再建築自動判定 -->
+      <div class="check-card ok">
+        <div class="ck-label">
+          <span>接道状況 → 再建築可否（自動判定）</span>
+          <span style="color:var(--red);font-weight:700;">※最重要</span>
+        </div>
+        <div class="ck-value ok"><span class="ck-badge ok">OK</span>再建築可</div>
+        <div class="sub-fields">
+          <div><span class="sf-label">道路種別:</span> <span class="sf-value">42条1項1号(公道)</span></div>
+          <div><span class="sf-label">幅員:</span> <span class="sf-value">6.0 m</span></div>
+          <div><span class="sf-label">間口:</span> <span class="sf-value">4.0 m</span></div>
+          <div><span class="sf-label">方位:</span> <span class="sf-value">南</span></div>
+        </div>
+        <div class="auto-note">
+          🤖 <b>自動判定</b>: 42条道路・間口≥2m・幅員≥4m なので「再建築可」
+        </div>
+        <label class="verify-chk ok"><input type="checkbox" checked>✓ 役所確認済<span class="verify-date">（2026-04-18 建築指導課）</span></label>
+      </div>
+
+      <div class="check-card ok">
+        <div class="ck-label">用途地域・制限</div>
+        <div class="ck-value">第一種住居地域</div>
+        <div class="ck-detail">建ぺい率 60% / 容積率 200%</div>
+        <label class="verify-chk"><input type="checkbox">□ 役所確認（都市計画課）</label>
+      </div>
+
+      <div class="check-card unknown">
+        <div class="ck-label">登記情報</div>
+        <div class="ck-value unknown"><span class="ck-badge unknown">未取得</span>要取得</div>
+        <div class="ck-detail">所有権・抵当権・差押等の確認必要</div>
+        <label class="verify-chk"><input type="checkbox">□ 法務局確認</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-col">
+    <div class="section-head critical">⚠ 重要事項
+      <button class="add-btn">+ 項目追加</button>
+    </div>
+    <div class="info-grid">
+      <div class="field-row">
+        <span class="field-label">告知事項</span>
+        <span class="field-value">前居住者の自然死の履歴あり</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">近隣問題</span>
+        <span class="field-value">特になし</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">境界</span>
+        <span class="field-value" style="color:var(--orange);">境界未確定（合意書なし）</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">越境物</span>
+        <span class="field-value" style="color:var(--gray3);">未確認</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">私道・共有部</span>
+        <span class="field-value" style="color:var(--gray3);">未確認</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">法令制限</span>
+        <span class="field-value" style="color:var(--gray3);">未確認（文化財・景観・がけ条例等）</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">土壌汚染・地歴</span>
+        <span class="field-value" style="color:var(--gray3);">未確認</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">ハザード</span>
+        <span class="field-value" style="color:var(--gray3);">未確認</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">インフラ</span>
+        <span class="field-value" style="color:var(--gray3);">未確認</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+      <div class="field-row">
+        <span class="field-label">その他</span>
+        <span class="field-value" style="color:var(--gray3);">—</span>
+        <div class="field-actions"><button title="編集">✏</button><button title="非表示">👁</button></div>
+      </div>
+    </div>
+    <details style="margin-top:8px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:8px 12px;">
+      <summary style="cursor:pointer;font-size:12px;color:var(--gray3);font-weight:600;">🙈 非表示中の項目（2件） ▶</summary>
+      <div style="margin-top:6px;">
+        <div class="field-row" style="opacity:.6;">
+          <span class="field-label">耐震性</span>
+          <span class="field-value" style="color:var(--gray3);">（非表示）</span>
+          <div class="field-actions"><button style="color:var(--green);">↩ 表示</button></div>
+        </div>
+        <div class="field-row" style="opacity:.6;">
+          <span class="field-label">アスベスト</span>
+          <span class="field-value" style="color:var(--gray3);">（非表示）</span>
+          <div class="field-actions"><button style="color:var(--green);">↩ 表示</button></div>
+        </div>
+      </div>
+    </details>
+    <div style="margin-top:6px;font-size:11.5px;color:var(--gray3);line-height:1.5;">
+      💡 全項目デフォ表示。該当しないものは「👁」で非表示（後で復活可）
+    </div>
+  </div>
+
+</div><!-- /.section-pair -->
+
+<!-- 基本情報セクションはヒーロー内に統合したため削除 -->
+
+<!-- 費用内訳 + 収支見込み を横並び -->
+<div class="section-pair">
+
+  <div class="section-col">
+    <div class="section-head">💴 費用内訳
+      <button class="add-btn">+ 項目追加</button>
+    </div>
+    <table class="cost-table">
+      <tbody>
+        <tr><td>物件価格</td><td class="amount">600,000 円</td><td class="actions"><button class="row-actions">✏</button><button class="row-actions del">×</button></td></tr>
+        <tr><td>工務店さん工事費用 <span class="vendor-tag kou">工務店</span></td><td class="amount">1,390,800 円</td><td class="actions"><button class="row-actions">✏</button><button class="row-actions del">×</button></td></tr>
+        <tr><td>プロパンガス屋さん <span class="vendor-tag gas">ガス屋</span></td><td class="amount">110,000 円</td><td class="actions"><button class="row-actions">✏</button><button class="row-actions del">×</button></td></tr>
+        <tr><td>施主支給品 <span class="vendor-tag diy">DIY</span></td><td class="amount">255,003 円</td><td class="actions"><button class="row-actions">✏</button><button class="row-actions del">×</button></td></tr>
+        <tr><td>仲介手数料</td><td class="amount">33,000 円</td><td class="actions"><button class="row-actions">✏</button><button class="row-actions del">×</button></td></tr>
+        <tr><td>司法書士手数料</td><td class="amount">80,000 円</td><td class="actions"><button class="row-actions">✏</button><button class="row-actions del">×</button></td></tr>
+        <tr class="undecided"><td>不動産取得税</td><td class="amount">※未定</td><td class="actions"><button class="row-actions">✏</button><button class="row-actions del">×</button></td></tr>
+        <tr><td>印紙代</td><td class="amount">500 円</td><td class="actions"><button class="row-actions">✏</button><button class="row-actions del">×</button></td></tr>
+        <tr class="total"><td>合計</td><td class="amount">2,469,303 円</td><td></td></tr>
+      </tbody>
+    </table>
+    <button class="add-row-btn">+ 費用項目を追加</button>
+    <div style="margin-top:6px;font-size:11.5px;color:var(--gray3);line-height:1.5;">
+      💡 工事費用はリフォームプラン確定後に自動連動
+    </div>
+  </div>
+
+  <div class="section-col">
+    <div class="section-head">📈 収支見込み</div>
+    <div class="info-grid">
+      <div class="field-row">
+        <span class="field-label">想定家賃</span>
+        <span class="field-value">58,000 円 / 月</span>
+      </div>
+      <div class="field-row" style="flex-wrap:wrap;">
+        <span class="field-label">近隣相場</span>
+        <span class="field-value">55,000 〜 62,000 円 / 月</span>
+        <div style="width:100%;text-align:right;margin-top:2px;">
+          <span class="ref-chip">📎 相場調査Memo 3件 ▼</span>
+          <span class="ref-chip">📎 ヒアリング 2件 ▼</span>
+        </div>
+      </div>
+      <div class="field-row"><span class="field-label">年間家賃収入</span><span class="field-value">696,000 円</span></div>
+      <div class="field-row"><span class="field-label">総費用</span><span class="field-value">2,469,303 円</span></div>
+      <div class="field-row"><span class="field-label">表面利回り</span><span class="field-value" style="color:var(--green);font-weight:700;">28.1 % ✓</span></div>
+      <div class="field-row"><span class="field-label">パターン比較</span><span class="field-value"><a href="#">収支タブで確認 ↗</a></span></div>
+    </div>
+    <button class="add-row-btn">+ 収支項目を追加</button>
+  </div>
+
+</div><!-- /.section-pair -->
+
+<!-- 出口戦略 -->
+<div class="section-head">🚪 出口戦略
+  <button class="add-btn">+ 項目追加</button>
+</div>
+<div class="info-grid">
+  <div class="field-row"><span class="field-label">方針</span><span class="field-value">10年保有 → 売却</span><div class="field-actions"><button>✏</button><button class="del">×</button></div></div>
+  <div class="field-row"><span class="field-label">想定売却価格</span><span class="field-value">400 万円</span><div class="field-actions"><button>✏</button><button class="del">×</button></div></div>
+</div>
+
+<!-- メモ -->
+<div class="section-head">📝 メモ</div>
+<div class="card" style="font-size:13px;color:var(--gray4);white-space:pre-wrap;">（自由記述）</div>
+
+<!-- Settings hint -->
+<div style="margin-top:32px;padding:12px 16px;background:var(--gray);border-radius:var(--radius);font-size:12px;color:var(--gray4);">
+  ⚙ <b>Settings で変更可能な項目（予定）</b>: 利回り閾値（合格/要検討/不合格ライン）、費用項目のデフォルトテンプレ、重要事項のデフォルト項目
+</div>
+
+</body>
+</html>

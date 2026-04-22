@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>モック: 物件の編集 · Property Note</title>
+<style>
+:root{
+  --green:#2e7d32;--green-light:#e8f5e9;--green-dark:#1b5e20;
+  --red:#c62828;--red-light:#ffebee;
+  --orange:#e65100;--orange-light:#fff3e0;
+  --gray:#f5f5f5;--gray2:#e0e0e0;--gray3:#9e9e9e;--gray4:#616161;
+  --white:#fff;--black:#212121;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:#fafafa;color:var(--black);padding:24px 32px 80px;max-width:1100px;margin:0 auto;}
+a{color:var(--green);text-decoration:none;}
+input,select,textarea{font-family:inherit;font-size:13px;border:1px solid var(--gray2);border-radius:6px;padding:6px 10px;width:100%;background:var(--white);}
+textarea{resize:vertical;min-height:60px;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:13px;}
+
+.modal-shell{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+
+/* ヘッダー (固定風) */
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--white);border-bottom:1px solid var(--gray2);position:sticky;top:0;z-index:10;}
+.modal-head h1{font-size:17px;font-weight:700;}
+.modal-head .sub{font-size:12px;color:var(--gray3);margin-top:2px;}
+.modal-head .actions{display:flex;gap:8px;}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;}
+.btn-primary{background:var(--green);color:#fff;}
+.btn-secondary{background:var(--gray);color:var(--gray4);border:1px solid var(--gray2);}
+.btn-danger{background:var(--red-light);color:var(--red);}
+.btn-ghost{background:none;color:var(--gray3);}
+
+/* タブ */
+.edit-tabs{display:flex;gap:0;border-bottom:2px solid var(--gray2);padding:0 20px;background:var(--white);position:sticky;top:57px;z-index:9;overflow-x:auto;}
+.edit-tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--gray3);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;cursor:pointer;}
+.edit-tab.active{color:var(--green);border-bottom-color:var(--green);}
+.edit-tab .req{color:var(--red);font-size:10px;margin-left:2px;}
+
+/* 本体 */
+.modal-body{padding:20px;}
+.form-section{background:var(--white);border:1px solid var(--gray2);border-radius:var(--radius);padding:14px 18px;margin-bottom:14px;}
+.form-section h3{font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--gray2);display:flex;justify-content:space-between;align-items:center;}
+.form-section h3.critical{color:var(--red);border-bottom-color:var(--red-light);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-bottom:10px;}
+.form-row.col-3{grid-template-columns:1fr 1fr 1fr;}
+.form-row.col-1{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:3px;}
+.form-group label{font-size:11.5px;font-weight:600;color:var(--gray4);}
+.form-group .hint{font-size:11px;color:var(--gray3);margin-top:2px;}
+.form-group.inline{flex-direction:row;align-items:center;gap:8px;}
+.form-group.inline label{margin:0;}
+
+/* 接道3項目→自動判定表示 */
+.auto-result{padding:8px 12px;background:var(--green-light);border-radius:6px;font-size:12.5px;color:var(--gray4);margin-top:6px;display:flex;align-items:center;gap:8px;}
+.auto-result.warn{background:var(--orange-light);}
+.auto-result.ng{background:var(--red-light);}
+.auto-result b{color:var(--green);}
+.auto-result.warn b{color:var(--orange);}
+.auto-result.ng b{color:var(--red);}
+
+/* 配列編集行（重要事項・費用・収支） */
+.array-row{display:grid;grid-template-columns:140px 1fr auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0;}
+.array-row:last-child{border-bottom:none;}
+.array-row.cost{grid-template-columns:1fr 130px 110px auto;}
+.array-row .del{padding:4px 8px;font-size:12px;color:var(--gray3);border-radius:4px;}
+.array-row .del:hover{background:var(--red-light);color:var(--red);}
+.array-row .hide{padding:4px 8px;font-size:12px;color:var(--gray3);border-radius:4px;}
+.array-row .hide:hover{background:var(--gray);color:var(--gray4);}
+.add-row-btn{display:block;width:100%;margin-top:8px;padding:8px;background:var(--white);border:2px dashed var(--gray2);border-radius:8px;font-size:12px;color:var(--gray4);cursor:pointer;}
+.add-row-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-light);}
+
+.tag-select{display:inline-flex;gap:4px;flex-wrap:wrap;}
+.tag-select label{padding:3px 9px;border:1px solid var(--gray2);border-radius:12px;font-size:11px;color:var(--gray4);cursor:pointer;}
+.tag-select label.active{background:var(--green-light);color:var(--green);border-color:var(--green);font-weight:600;}
+.tag-select input{display:none;}
+
+/* 非表示項目 折りたたみ */
+.hidden-block{margin-top:10px;padding:10px 12px;background:#fafafa;border:1px solid var(--gray2);border-radius:8px;}
+
+/* 確認済みチェック */
+.verify-chk{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--gray3);cursor:pointer;margin-top:6px;padding:3px 10px;background:#fafafa;border:1px dashed var(--gray2);border-radius:12px;user-select:none;}
+.verify-chk input{width:auto;margin:0;cursor:pointer;}
+.verify-chk.ok{color:var(--green);font-weight:600;background:var(--green-light);border-style:solid;border-color:var(--green);}
+
+/* フッター */
+.modal-foot{display:flex;justify-content:space-between;padding:14px 20px;background:var(--white);border-top:1px solid var(--gray2);position:sticky;bottom:0;}
+.modal-foot .actions{display:flex;gap:8px;}
+
+.mock-banner{background:#fff59d;color:#5d4037;padding:10px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;}
+.mock-banner b{color:#d84315;}
+
+.required{color:var(--red);}
+</style>
+</head>
+<body>
+
+<div class="mock-banner">
+  🧪 <b>物件 加筆・修正モック</b>（編集モーダルの中身）<br>
+  Overviewで表示される全項目をここで編集可能。タブ構成・セクション分け・入力UIの検討用。
+</div>
+
+<div class="modal-shell">
+
+  <!-- ヘッダー -->
+  <div class="modal-head">
+    <div>
+      <h1>物件の編集</h1>
+      <div class="sub">○○市△△町 戸建て（例）</div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-ghost">✕ キャンセル</button>
+      <button class="btn btn-primary">💾 保存</button>
+    </div>
+  </div>
+
+  <!-- タブ -->
+  <div class="edit-tabs">
+    <div class="edit-tab active">📋 基本情報</div>
+    <div class="edit-tab">🚨 購入前必須<span class="req">*</span></div>
+    <div class="edit-tab">⚠ 重要事項</div>
+    <div class="edit-tab">💴 費用内訳</div>
+    <div class="edit-tab">📈 収支・出口</div>
+    <div class="edit-tab">📸 写真・メモ</div>
+    <div class="edit-tab">❌ 見送り</div>
+  </div>
+
+  <!-- 本体 -->
+  <div class="modal-body">
+
+    <!-- 基本情報 -->
+    <div class="form-section">
+      <h3>📋 基本情報</h3>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>物件名 <span class="required">*</span></label>
+          <input type="text" value="○○市△△町 戸建て">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>ステータス</label>
+          <select>
+            <option>候補発見</option>
+            <option selected>調査中</option>
+            <option>内覧予定</option>
+            <option>内覧済</option>
+            <option>交渉中</option>
+            <option>買付済</option>
+            <option>契約済</option>
+            <option>修繕中</option>
+            <option>募集中</option>
+            <option>運用中</option>
+            <option>売却検討中</option>
+            <option>売却済</option>
+            <option>見送り</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>物件登録日</label>
+          <input type="date" value="2026-04-15">
+        </div>
+      </div>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>住所</label>
+          <input type="text" value="○○市△△町1-2-3">
+          <div class="hint">住所を入力すると Google Maps URL は自動生成可能</div>
+        </div>
+      </div>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>アクセス</label>
+          <input type="text" value="○○線 △△駅 徒歩12分">
+        </div>
+      </div>
+
+      <div class="form-row col-3">
+        <div class="form-group">
+          <label>種別</label>
+          <select>
+            <option selected>戸建て</option>
+            <option>アパート</option>
+            <option>マンション</option>
+            <option>土地</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>築年数</label>
+          <input type="number" value="38">
+        </div>
+        <div class="form-group">
+          <label>構造</label>
+          <select>
+            <option selected>木造2階建て</option>
+            <option>木造平屋</option>
+            <option>木造3階建て</option>
+            <option>軽量鉄骨</option>
+            <option>重量鉄骨</option>
+            <option>RC造</option>
+            <option>その他</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row col-3">
+        <div class="form-group">
+          <label>間取り</label>
+          <input type="text" value="3LDK">
+        </div>
+        <div class="form-group">
+          <label>方位</label>
+          <select>
+            <option>東</option>
+            <option>西</option>
+            <option selected>南</option>
+            <option>北</option>
+            <option>南東</option>
+            <option>南西</option>
+            <option>北東</option>
+            <option>北西</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>駐車場台数</label>
+          <input type="number" value="2">
+        </div>
+      </div>
+
+      <div class="form-row col-3">
+        <div class="form-group">
+          <label>延床面積 (㎡)</label>
+          <input type="number" value="82.5" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>土地面積 (㎡)</label>
+          <input type="number" value="98.2" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>現況</label>
+          <select>
+            <option selected>空室</option>
+            <option>居住中</option>
+            <option>賃貸中</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>引渡時期</label>
+          <input type="text" value="相談（即時可）" placeholder="例: 即時 / 2026年6月 / 居住者退去後">
+        </div>
+        <div class="form-group">
+          <label>掲載URL</label>
+          <input type="url" value="https://suumo.jp/..." placeholder="ポータルサイトのURL">
+        </div>
+      </div>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>Google Maps URL</label>
+          <input type="url" value="https://maps.google.com/..." placeholder="位置情報へのリンク">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 購入前必須チェック -->
+    <div class="form-section">
+      <h3 class="critical">🚨 購入前必須チェック <span style="font-size:11px;color:var(--gray3);font-weight:400;">（接道3項目で再建築可否を自動判定）</span></h3>
+
+      <h4 style="font-size:12.5px;color:var(--gray4);margin:6px 0 6px;">接道状況 <span style="color:var(--red);">※最重要</span></h4>
+      <div class="form-row col-3">
+        <div class="form-group">
+          <label>道路種別</label>
+          <select>
+            <option selected>42条1項1号 (公道)</option>
+            <option>42条1項2号 (開発道路)</option>
+            <option>42条1項3号 (既存道路)</option>
+            <option>42条1項5号 (位置指定道路)</option>
+            <option>42条2項 (みなし道路)</option>
+            <option>43条但し書き</option>
+            <option>未接道 / その他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>幅員 (m)</label>
+          <input type="number" value="6.0" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>間口 (m) - 敷地と道路の接する長さ</label>
+          <input type="number" value="4.0" step="0.1">
+        </div>
+      </div>
+      <div class="form-row col-3">
+        <div class="form-group">
+          <label>方位</label>
+          <select>
+            <option>東</option><option>西</option><option selected>南</option><option>北</option>
+          </select>
+        </div>
+      </div>
+      <div class="auto-result">
+        🤖 自動判定: 42条道路・間口≥2m・幅員≥4m → <b>再建築可</b>
+      </div>
+      <label class="verify-chk ok" style="margin-top:8px;">
+        <input type="checkbox" checked>✓ 確認済
+        <input type="date" value="2026-04-18" style="width:130px;margin-left:6px;padding:2px 6px;font-size:11px;">
+        <input type="text" value="建築指導課" placeholder="確認先" style="width:140px;margin-left:4px;padding:2px 6px;font-size:11px;">
+      </label>
+
+      <h4 style="font-size:12.5px;color:var(--gray4);margin:16px 0 6px;">用途地域・建築制限</h4>
+      <div class="form-row col-3">
+        <div class="form-group">
+          <label>用途地域</label>
+          <input type="text" value="第一種住居地域">
+        </div>
+        <div class="form-group">
+          <label>建ぺい率 (%)</label>
+          <input type="number" value="60">
+        </div>
+        <div class="form-group">
+          <label>容積率 (%)</label>
+          <input type="number" value="200">
+        </div>
+      </div>
+      <label class="verify-chk" style="margin-top:6px;">
+        <input type="checkbox">□ 確認
+        <input type="date" style="width:130px;margin-left:6px;padding:2px 6px;font-size:11px;">
+        <input type="text" value="都市計画課" placeholder="確認先" style="width:140px;margin-left:4px;padding:2px 6px;font-size:11px;">
+      </label>
+
+      <h4 style="font-size:12.5px;color:var(--gray4);margin:16px 0 6px;">登記情報</h4>
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>所有権・抵当権・差押等の状況</label>
+          <textarea placeholder="例: 所有権OK / 抵当権なし / 差押なし / 共有者なし">未取得</textarea>
+        </div>
+      </div>
+      <label class="verify-chk" style="margin-top:6px;">
+        <input type="checkbox">□ 確認
+        <input type="date" style="width:130px;margin-left:6px;padding:2px 6px;font-size:11px;">
+        <input type="text" value="法務局" placeholder="確認先" style="width:140px;margin-left:4px;padding:2px 6px;font-size:11px;">
+      </label>
+    </div>
+
+    <!-- 重要事項 -->
+    <div class="form-section">
+      <h3 class="critical">⚠ 重要事項 <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;">+ 項目追加</button></h3>
+
+      <div class="array-row"><span>告知事項</span><input type="text" value="前居住者の自然死の履歴あり（告知期間内）"><button class="hide" title="非表示">👁</button></div>
+      <div class="array-row"><span>近隣問題</span><input type="text" value="特になし（仲介ヒアリング時点）"><button class="hide">👁</button></div>
+      <div class="array-row"><span>境界</span><input type="text" value="境界未確定（隣地との合意書なし）"><button class="hide">👁</button></div>
+      <div class="array-row"><span>越境物</span><input type="text" placeholder="未確認"><button class="hide">👁</button></div>
+      <div class="array-row"><span>私道・共有部</span><input type="text" placeholder="未確認"><button class="hide">👁</button></div>
+      <div class="array-row"><span>法令制限</span><input type="text" placeholder="未確認（文化財・景観・がけ条例等）"><button class="hide">👁</button></div>
+      <div class="array-row"><span>土壌汚染・地歴</span><input type="text" placeholder="未確認"><button class="hide">👁</button></div>
+      <div class="array-row"><span>ハザード</span><input type="text" placeholder="未確認（洪水/津波/土砂/液状化）"><button class="hide">👁</button></div>
+      <div class="array-row"><span>インフラ</span><input type="text" placeholder="未確認（上下水・ガス・電気）"><button class="hide">👁</button></div>
+      <div class="array-row"><span>その他</span><input type="text" placeholder="—"><button class="hide">👁</button></div>
+
+      <div class="hidden-block">
+        <div style="font-size:12px;color:var(--gray4);margin-bottom:6px;font-weight:600;">🙈 非表示中の項目（2件）</div>
+        <div class="array-row" style="opacity:.6;"><span>耐震性</span><input type="text" value="（非表示）" disabled><button class="hide" style="color:var(--green);">↩ 表示</button></div>
+        <div class="array-row" style="opacity:.6;"><span>アスベスト</span><input type="text" value="（非表示）" disabled><button class="hide" style="color:var(--green);">↩ 表示</button></div>
+      </div>
+    </div>
+
+    <!-- 費用内訳 -->
+    <div class="form-section">
+      <h3>💴 費用内訳 <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;">+ 項目追加</button></h3>
+
+      <div class="array-row cost">
+        <input type="text" value="物件価格">
+        <input type="number" value="600000">
+        <div class="tag-select">
+          <label class="active"><input type="radio" name="v1" checked>—</label>
+          <label><input type="radio" name="v1">工務店</label>
+          <label><input type="radio" name="v1">ガス屋</label>
+          <label><input type="radio" name="v1">DIY</label>
+        </div>
+        <button class="del">×</button>
+      </div>
+
+      <div class="array-row cost">
+        <input type="text" value="工務店さん工事費用">
+        <input type="number" value="1390800">
+        <div class="tag-select">
+          <label><input type="radio" name="v2">—</label>
+          <label class="active"><input type="radio" name="v2" checked>工務店</label>
+          <label><input type="radio" name="v2">ガス屋</label>
+          <label><input type="radio" name="v2">DIY</label>
+        </div>
+        <button class="del">×</button>
+      </div>
+
+      <div class="array-row cost">
+        <input type="text" value="プロパンガス屋さん">
+        <input type="number" value="110000">
+        <div class="tag-select">
+          <label><input type="radio" name="v3">—</label>
+          <label><input type="radio" name="v3">工務店</label>
+          <label class="active"><input type="radio" name="v3" checked>ガス屋</label>
+          <label><input type="radio" name="v3">DIY</label>
+        </div>
+        <button class="del">×</button>
+      </div>
+
+      <div class="array-row cost">
+        <input type="text" value="施主支給品">
+        <input type="number" value="255003">
+        <div class="tag-select">
+          <label><input type="radio" name="v4">—</label>
+          <label><input type="radio" name="v4">工務店</label>
+          <label><input type="radio" name="v4">ガス屋</label>
+          <label class="active"><input type="radio" name="v4" checked>DIY</label>
+        </div>
+        <button class="del">×</button>
+      </div>
+
+      <div class="array-row cost">
+        <input type="text" value="仲介手数料">
+        <input type="number" value="33000">
+        <div></div>
+        <button class="del">×</button>
+      </div>
+
+      <div class="array-row cost">
+        <input type="text" value="司法書士手数料">
+        <input type="number" value="80000">
+        <div></div>
+        <button class="del">×</button>
+      </div>
+
+      <div class="array-row cost">
+        <input type="text" value="不動産取得税">
+        <input type="text" value="※未定" style="color:var(--gray3);font-style:italic;">
+        <div></div>
+        <button class="del">×</button>
+      </div>
+
+      <div class="array-row cost">
+        <input type="text" value="印紙代">
+        <input type="number" value="500">
+        <div></div>
+        <button class="del">×</button>
+      </div>
+
+      <button class="add-row-btn">+ 費用項目を追加</button>
+
+      <div style="margin-top:10px;padding:8px 12px;background:var(--green-light);border-radius:6px;font-size:12px;color:var(--gray4);">
+        💡 工事費用は<b>リフォームプラン確定後に自動連動</b>（現調/リフォームタブで項目別入力）
+      </div>
+    </div>
+
+    <!-- 収支・出口 -->
+    <div class="form-section">
+      <h3>📈 収支見込み</h3>
+
+      <div class="form-row col-3">
+        <div class="form-group">
+          <label>想定家賃 (円/月)</label>
+          <input type="number" value="58000">
+        </div>
+        <div class="form-group">
+          <label>近隣相場 下限 (円/月)</label>
+          <input type="number" value="55000">
+        </div>
+        <div class="form-group">
+          <label>近隣相場 上限 (円/月)</label>
+          <input type="number" value="62000">
+        </div>
+      </div>
+      <div class="hint" style="font-size:11px;color:var(--gray3);margin-top:-6px;margin-bottom:8px;">📎 参照: 相場調査Memo 3件 / ヒアリング 2件（自動集計・タップで展開）</div>
+
+      <h3 style="margin-top:20px;">🚪 出口戦略 <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;">+ 項目追加</button></h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>方針</label>
+          <input type="text" value="10年保有 → 売却">
+        </div>
+        <div class="form-group">
+          <label>想定売却価格 (万円)</label>
+          <input type="number" value="400">
+        </div>
+      </div>
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>想定保有年数 / 理由</label>
+          <textarea placeholder="出口の根拠・理由"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 見送り情報（肉付け：ノウハウ蓄積） -->
+    <div class="form-section" style="border-color:var(--red-light);">
+      <h3 class="critical">❌ 見送り情報 <span style="font-size:11px;color:var(--gray3);font-weight:400;">（次回に活かすためのノウハウ蓄積）</span></h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>見送り日</label>
+          <input type="date" value="2026-04-25">
+        </div>
+        <div class="form-group">
+          <label>見送りを決めたフェーズ</label>
+          <select>
+            <option>候補発見時</option>
+            <option selected>デスクトップ調査後</option>
+            <option>ヒアリング後</option>
+            <option>内見前準備で</option>
+            <option>内見後</option>
+            <option>交渉中に</option>
+            <option>融資否決で</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>主な見送り理由（複数選択可）</label>
+          <div class="tag-select" style="flex-wrap:wrap;gap:6px;">
+            <label><input type="checkbox">利回り不足</label>
+            <label><input type="checkbox">価格が合わない</label>
+            <label class="active"><input type="checkbox" checked>立地・エリア判断</label>
+            <label><input type="checkbox">再建築不可</label>
+            <label class="active"><input type="checkbox" checked>告知事項NG</label>
+            <label><input type="checkbox">境界・越境</label>
+            <label><input type="checkbox">近隣トラブル</label>
+            <label><input type="checkbox">ハザードリスク</label>
+            <label><input type="checkbox">ヒアリング結果不振</label>
+            <label><input type="checkbox">修繕費が膨らんだ</label>
+            <label><input type="checkbox">融資否決</label>
+            <label><input type="checkbox">他物件を優先</label>
+            <label><input type="checkbox">その他</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>💡 この物件から得た学び・気づき <span class="hint">(次回に活かす)</span></label>
+          <textarea placeholder="例: 立地は○○駅徒歩20分以内に絞るべきだった。告知期間内は避けるほうが客付けしやすい。等" style="min-height:80px;"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>🎯 類似物件に出会った時の注意点</label>
+          <textarea placeholder="例: 同エリアで築30年超の物件はリフォーム費が○万以上見込むべき、など" style="min-height:60px;"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>当時の仲介への伝え方</label>
+          <textarea placeholder="例: &quot;利回りが当方基準に合わない旨、丁寧に辞退&quot;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>仲介の反応・関係維持メモ</label>
+          <textarea placeholder="例: 別物件の紹介依頼を伝えた。担当の田中さんとは継続。"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>他の候補者の有無</label>
+          <select>
+            <option>不明</option>
+            <option>あり（先着順で負けた）</option>
+            <option>あり（買付競合中）</option>
+            <option>なし（売れ残り）</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>★ 物件評価（5段階）</label>
+          <select>
+            <option>★★★★★ 見送ったが優良</option>
+            <option>★★★★☆ 良物件</option>
+            <option selected>★★★☆☆ 普通</option>
+            <option>★★☆☆☆ いまいち</option>
+            <option>★☆☆☆☆ 完全NG</option>
+          </select>
+          <div class="hint">エリア傾向を掴むための主観評価</div>
+        </div>
+      </div>
+
+      <h4 style="font-size:12.5px;color:var(--gray4);margin:16px 0 6px;">📊 追跡情報（見送り後の動向）</h4>
+      <div class="form-row col-3">
+        <div class="form-group">
+          <label>掲載終了日</label>
+          <input type="date">
+        </div>
+        <div class="form-group">
+          <label>最終販売価格 (万円)</label>
+          <input type="number" placeholder="値下げ幅を追う">
+        </div>
+        <div class="form-group">
+          <label>状態</label>
+          <select>
+            <option selected>継続掲載中</option>
+            <option>売約済</option>
+            <option>取り下げ</option>
+            <option>価格改定（継続）</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint" style="font-size:11px;color:var(--gray3);">💡 この情報でエリア相場・値下げ動向がわかる → 次回の判断材料に</div>
+
+      <div class="form-row col-1" style="margin-top:14px;">
+        <div class="form-group">
+          <label>関連する類似物件（リンク）</label>
+          <input type="text" placeholder="同エリア・類似条件の他物件IDまたはURL">
+          <div class="hint">クリックで該当物件の学びと比較できるようにする予定</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 写真・メモ -->
+    <div class="form-section">
+      <h3>📸 写真・メモ</h3>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>写真アルバムURL <span class="hint">(Amazonフォト等の共有リンク)</span></label>
+          <input type="url" placeholder="https://www.amazon.co.jp/photos/...">
+        </div>
+      </div>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>写真メモ</label>
+          <textarea placeholder="写真についての補足メモ"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row col-1">
+        <div class="form-group">
+          <label>フリーメモ</label>
+          <textarea placeholder="この物件について自由に記述" style="min-height:100px;"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- フッター -->
+  <div class="modal-foot">
+    <button class="btn btn-danger">🗑 物件を削除</button>
+    <div class="actions">
+      <button class="btn btn-secondary">✕ キャンセル</button>
+      <button class="btn btn-primary">💾 保存</button>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:20px;font-size:12px;color:var(--gray3);">
+  📝 <b>実装方針メモ</b>: タブ(📋🚨⚠💴📈📸)でセクション切替を想定。モックでは全タブを縦並びで表示して全体像を見せている。実装時はタブクリックで該当セクションのみ表示。
+</div>
+
+</body>
+</html>

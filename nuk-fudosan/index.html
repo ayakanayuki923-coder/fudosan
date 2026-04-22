@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Ver 2.1 · Property Note</title>
+<title>Ver 3.0 · Property Note</title>
 <style>
 :root{
   --green:#2e7d32;--green-light:#e8f5e9;--green-dark:#1b5e20;
@@ -164,6 +164,405 @@ select{appearance:auto;}
 /* Empty state */
 .empty{text-align:center;padding:40px 20px;color:var(--gray3);}
 .empty .icon{font-size:40px;margin-bottom:8px;}
+
+/* ===== Overview v3 (Ver 3.0 Step 1) — 業務ダッシュボード調 ===== */
+.ov-hero{display:grid;grid-template-columns:300px 1fr;gap:14px;background:var(--white);border:1px solid var(--gray2);border-radius:4px;padding:12px;margin-bottom:10px;}
+@media(max-width:899px){.ov-hero{grid-template-columns:1fr;}}
+.ov-left{display:flex;flex-direction:column;gap:6px;}
+.ov-photo{aspect-ratio:3/2;background:#f0f0f0;border-radius:3px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--gray2);}
+.ov-photo-ph{color:var(--gray3);font-size:12px;}
+.ov-photo-link{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.7);color:#fff;padding:3px 9px;border-radius:3px;font-size:11px;text-decoration:none;}
+.ov-pict{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:4px 6px;background:var(--white);border:1px solid var(--gray2);border-radius:3px;}
+.ov-pict .pict-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--gray4);line-height:1.1;text-align:center;padding:2px;}
+.ov-pict .pict-dot{width:10px;height:10px;border-radius:50%;background:var(--gray2);}
+.ov-pict .pict-dot.ok{background:var(--green);}
+.ov-pict .pict-dot.ng{background:var(--red);}
+.ov-pict .pict-dot.warn{background:#c77800;}
+.ov-pict .pict-dot.unknown{background:var(--gray3);}
+
+.ov-right{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.ov-stats{display:flex;gap:12px;padding:6px 12px;background:#f5f7f4;border:1px solid var(--gray2);border-radius:3px;align-items:center;flex-wrap:wrap;}
+.ov-stats .stat{display:flex;flex-direction:column;line-height:1.15;min-width:0;}
+.ov-stats .stat .k{font-size:10px;color:var(--gray4);letter-spacing:.02em;}
+.ov-stats .stat .v{font-size:17px;font-weight:700;color:#1f3d1f;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.ov-stats .stat .v.orange{color:#c77800;}
+.ov-stats .stat .v.red{color:var(--red);}
+.ov-sep{width:1px;background:var(--gray2);align-self:stretch;margin:3px 0;}
+
+.ov-info{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-content:start;font-size:12.5px;padding:2px;}
+.ov-info dt{color:var(--gray3);font-size:11px;white-space:nowrap;padding:1px 0;font-weight:500;}
+.ov-info dd{color:var(--black);font-weight:500;padding:1px 0;min-width:0;word-break:break-word;line-height:1.45;}
+.ov-info dd a{color:#1f3d1f;text-decoration:underline;text-underline-offset:2px;}
+
+.ov-progress{display:flex;gap:0;padding:7px 6px 8px;background:#fafafa;border:1px solid var(--gray2);border-radius:3px;margin-top:auto;}
+.ov-progress .pstep{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;color:var(--gray3);line-height:1.1;position:relative;text-align:center;min-width:0;}
+.ov-progress .pstep .pdot{width:18px;height:18px;border-radius:50%;background:var(--gray2);display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#fff;font-weight:700;z-index:1;}
+.ov-progress .pstep.done .pdot{background:#1f3d1f;}
+.ov-progress .pstep.active .pdot{background:#1f3d1f;box-shadow:0 0 0 2px #d7e4d7;}
+.ov-progress .pstep.done, .ov-progress .pstep.active{color:#1f3d1f;font-weight:600;}
+.ov-progress .pstep:not(:last-child)::after{content:'';position:absolute;top:8px;left:calc(50% + 11px);right:calc(-50% + 11px);height:1px;background:var(--gray2);}
+.ov-progress .pstep.done:not(:last-child)::after{background:#1f3d1f;}
+.ov-progress .pstep.next{color:var(--gray4);}
+.ov-progress .pstep.next .pdot{background:#fff;border:1.5px dashed var(--gray3);color:var(--gray3);}
+
+.ov-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;margin-bottom:10px;}
+@media(max-width:899px){.ov-pair{grid-template-columns:1fr;gap:0;}}
+.ov-pair > .ov-col{align-self:start;height:auto;min-height:0;}
+.ov-pair > .ov-col > .ov-info-box{align-self:start;height:auto;min-height:0;}
+.ov-pair > .ov-col > .ov-info-box > .ov-row{height:auto !important;min-height:0 !important;flex:0 0 auto;}
+
+.ov-sh{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:700;color:#1f3d1f;margin:14px 0 5px;padding:4px 8px;background:#eef2ed;border-left:3px solid #4a6a4a;letter-spacing:.03em;}
+.ov-sh.critical{color:#7a2020;background:#f5ecec;border-left-color:#7a2020;}
+.ov-pair .ov-col .ov-sh{margin-top:0;}
+
+.ov-cards{display:grid;grid-template-columns:1fr;gap:6px;}
+.ov-card{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:9px 12px;border-left:3px solid var(--gray2);}
+.ov-card.ok{border-left-color:#4a6a4a;}
+.ov-card.ng{border-left-color:var(--red);}
+.ov-card.warn{border-left-color:#c77800;}
+.ov-card.unknown{border-left-color:var(--gray3);}
+.ov-clabel{font-size:11px;color:var(--gray3);margin-bottom:3px;display:flex;justify-content:space-between;align-items:center;letter-spacing:.02em;}
+.ov-cvalue{font-size:14px;font-weight:700;}
+.ov-cvalue.ok{color:#1f3d1f;}
+.ov-cvalue.ng{color:var(--red);}
+.ov-cvalue.warn{color:#c77800;}
+.ov-cvalue.unknown{color:var(--gray3);}
+.ov-cbadge{display:inline-block;padding:1px 7px;border-radius:2px;font-size:10.5px;font-weight:700;margin-right:6px;letter-spacing:.04em;}
+.ov-cbadge.ok{background:#eef2ed;color:#1f3d1f;border:1px solid #4a6a4a;}
+.ov-cbadge.ng{background:#f5ecec;color:var(--red);border:1px solid var(--red);}
+.ov-cbadge.warn{background:#fff3e0;color:#c77800;border:1px solid #c77800;}
+.ov-cbadge.unknown{background:#f0f0f0;color:var(--gray3);border:1px solid var(--gray2);}
+.ov-cdetail{font-size:12px;color:var(--gray4);margin-top:3px;line-height:1.5;}
+.ov-subs{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;margin-top:4px;font-size:11.5px;color:var(--gray4);}
+.ov-subs b{color:var(--black);font-weight:600;}
+.ov-autonote{background:#f5f7f4;border:1px solid var(--gray2);border-radius:2px;padding:4px 9px;margin-top:5px;font-size:11px;color:var(--gray4);line-height:1.5;}
+.ov-autonote.warn{background:#faf4ea;}
+.ov-autonote.ng{background:#f7eeee;}
+.ov-autonote.unknown{background:#f0f0f0;}
+
+.ov-verify{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--gray3);margin-top:5px;padding:2px 8px;background:#fafafa;border:1px dashed var(--gray2);border-radius:2px;user-select:none;}
+.ov-verify input{width:auto;margin:0;}
+.ov-verify.ok{color:#1f3d1f;font-weight:600;background:#eef2ed;border-style:solid;border-color:#4a6a4a;}
+.ov-verify .ov-vd{color:var(--gray4);font-weight:400;font-size:10.5px;margin-left:2px;}
+
+.ov-info-box{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:2px 12px;height:auto;display:block;}
+.ov-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12.5px;gap:8px;line-height:1.45;min-height:auto;height:auto;}
+.ov-row:last-child{border-bottom:none;}
+.ov-rl{color:var(--gray4);min-width:100px;font-size:11.5px;font-weight:500;flex-shrink:0;line-height:1.45;}
+.ov-rv{color:var(--black);font-weight:500;text-align:right;flex:1;line-height:1.45;padding:0;}
+.ov-rv.empty{color:var(--gray3);font-style:italic;font-weight:400;padding:0 !important;text-align:right !important;}
+
+.ov-hidden-box{margin-top:6px;background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:6px 12px;}
+.ov-hidden-box summary{cursor:pointer;font-size:11.5px;color:var(--gray3);font-weight:500;}
+
+.ov-note{margin-top:5px;font-size:11px;color:var(--gray3);line-height:1.5;}
+
+.ov-cost{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--gray2);border-radius:3px;overflow:hidden;}
+.ov-cost td{padding:5px 12px;border-bottom:1px solid #f0f0f0;font-size:12.5px;}
+.ov-cost td.amt{text-align:right;font-weight:500;font-variant-numeric:tabular-nums;}
+.ov-cost tr.total td{background:#eef2ed;font-size:13.5px;font-weight:700;color:#1f3d1f;border-bottom:none;border-top:1.5px solid #4a6a4a;}
+.ov-cost .ov-ud{color:var(--gray3);font-style:italic;}
+.ov-cost .ov-vtag{display:inline-block;padding:0 6px;border-radius:2px;font-size:10px;margin-left:6px;font-weight:600;border:1px solid;}
+.ov-cost .ov-vtag.kou{background:#f7eeee;color:#7a2020;border-color:#c08080;}
+.ov-cost .ov-vtag.gas{background:#e9eef7;color:#1a3a6a;border-color:#7a92b5;}
+.ov-cost .ov-vtag.diy{background:#eef2ed;color:#1f3d1f;border-color:#80a080;}
+
+/* ===== モーダル内の動的フィールド (Step 1.5) ===== */
+.imp-row{display:grid;grid-template-columns:110px 1fr auto;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #f5f5f5;}
+.imp-row.imp-custom{grid-template-columns:110px 1fr auto;}
+.imp-row.imp-hidden{opacity:.5;}
+.imp-row.imp-hidden .imp-value{background:#fafafa;color:var(--gray3);}
+.imp-label{font-size:12px;color:var(--gray4);font-weight:600;}
+.imp-value{font-size:13px;padding:5px 8px;}
+.imp-label-input{font-size:12px;padding:5px 8px;}
+.imp-toggle,.imp-delete{font-size:11px;color:var(--gray3);padding:3px 8px;background:none;border:1px solid var(--gray2);border-radius:3px;cursor:pointer;white-space:nowrap;}
+.imp-toggle:hover{color:var(--gray4);background:var(--gray);}
+.imp-delete:hover{color:var(--red);border-color:var(--red);background:var(--red-light);}
+
+.cost-row{display:grid;grid-template-columns:1fr 120px 100px auto auto;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #f5f5f5;}
+@media(max-width:700px){.cost-row{grid-template-columns:1fr 1fr;gap:4px;}}
+.cost-label,.cost-amount,.cost-vendor{font-size:13px;padding:5px 8px;}
+.cost-row label{font-size:11px;color:var(--gray4);display:flex;align-items:center;gap:3px;white-space:nowrap;}
+.cost-row label input[type=checkbox]{width:auto;margin:0;}
+.cost-delete{font-size:12px;color:var(--gray3);padding:3px 8px;background:none;border:1px solid var(--gray2);border-radius:3px;cursor:pointer;}
+.cost-delete:hover{color:var(--red);border-color:var(--red);background:var(--red-light);}
+
+.verify-row{display:flex;gap:8px;align-items:center;padding:6px 0;font-size:12px;flex-wrap:wrap;}
+.verify-row label{display:flex;align-items:center;gap:4px;color:var(--gray4);white-space:nowrap;}
+.verify-row label input[type=checkbox]{width:auto;margin:0;}
+.verify-row input[type=text]{padding:4px 8px;font-size:12px;flex:1;min-width:100px;}
+
+.auto-judge{margin-top:6px;padding:6px 10px;background:var(--green-light);border-radius:3px;font-size:12px;color:#1f3d1f;}
+.auto-judge.warn{background:#fff3e0;color:#c77800;}
+.auto-judge.ng{background:var(--red-light);color:var(--red);}
+.auto-judge.unknown{background:var(--gray);color:var(--gray4);}
+
+.sub-section{font-size:12px;color:var(--gray4);margin:10px 0 4px;padding-top:4px;border-top:1px dashed var(--gray2);font-weight:600;}
+.sub-section:first-child{border-top:none;padding-top:0;margin-top:0;}
+
+.ov-edit-btn{font-size:10.5px;font-weight:500;color:var(--gray4);padding:2px 8px;background:var(--white);border:1px solid var(--gray2);border-radius:3px;cursor:pointer;letter-spacing:normal;}
+.ov-edit-btn:hover{color:var(--green);border-color:#4a6a4a;background:var(--green-light);}
+
+/* ===== 調査タブ (Step 2) ===== */
+.rs-intro{background:#f5f7f4;border:1px solid var(--gray2);border-radius:3px;padding:10px 14px;margin-bottom:12px;font-size:12.5px;color:var(--gray4);line-height:1.6;}
+.rs-intro b{color:#1f3d1f;}
+.rs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+@media(max-width:899px){.rs-grid{grid-template-columns:1fr;}}
+.rs-card{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:12px 14px;border-left:3px solid var(--gray2);display:flex;flex-direction:column;}
+.rs-card.done{border-left-color:#4a6a4a;background:#fafdf9;}
+.rs-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.rs-num{width:22px;height:22px;border-radius:50%;background:var(--gray2);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rs-card.done .rs-num{background:#4a6a4a;}
+.rs-title{font-size:13.5px;font-weight:700;color:#1f3d1f;flex:1;}
+.rs-done-chk{font-size:11px;color:var(--gray4);display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none;white-space:nowrap;}
+.rs-done-chk input{width:auto;margin:0;}
+.rs-desc{font-size:11.5px;color:var(--gray4);line-height:1.5;margin-bottom:8px;padding:4px 8px;background:#fafafa;border-radius:3px;border-left:2px solid var(--gray2);}
+.rs-desc b{color:#c77800;}
+.rs-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.rs-link{display:inline-flex;align-items:center;gap:3px;padding:5px 10px;background:#eef2ed;color:#1f3d1f;border:1px solid #4a6a4a;border-radius:3px;font-size:11.5px;font-weight:600;text-decoration:none;}
+.rs-link:hover{background:#1f3d1f;color:#fff;}
+.rs-link.secondary{background:var(--white);color:var(--gray4);border-color:var(--gray2);}
+.rs-link.secondary:hover{background:var(--gray);color:var(--gray4);}
+.rs-url-input{flex:1;min-width:200px;padding:4px 8px;font-size:11px;border:1px dashed var(--gray2);border-radius:3px;color:var(--gray4);background:#fafafa;}
+.rs-url-input:focus{background:var(--white);border-style:solid;color:var(--black);}
+.rs-memo{width:100%;font-size:12.5px;padding:6px 10px;border:1px solid var(--gray2);border-radius:3px;resize:vertical;min-height:60px;line-height:1.5;}
+.rs-memo:focus{border-color:#4a6a4a;outline:none;}
+.rs-updated{font-size:10px;color:var(--gray3);margin-top:6px;text-align:right;}
+.rs-budget{background:#f5f7f4;border-radius:3px;padding:10px 12px;margin-top:8px;font-size:12.5px;color:var(--gray4);}
+.rs-budget-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #e8e8e8;}
+.rs-budget-row:last-child{border-bottom:none;font-weight:700;color:#1f3d1f;padding-top:6px;border-top:1.5px solid #4a6a4a;}
+.rs-budget-row .rb-v{font-variant-numeric:tabular-nums;}
+.rs-budget-input{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.rs-budget-input label{font-size:12px;color:var(--gray4);flex-shrink:0;}
+.rs-budget-input input{width:80px;padding:4px 8px;font-size:12.5px;text-align:right;}
+
+/* ===== 連絡先・ヒアリング・エリア横断 (Step 3) ===== */
+/* 連絡先一覧 */
+.ct-toolbar{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:10px 12px;margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.ct-toolbar input[type=search]{flex:1;min-width:180px;padding:6px 10px;font-size:13px;}
+.ct-toolbar select{padding:6px 10px;font-size:12px;min-width:120px;}
+.ct-filter{display:flex;gap:4px;margin-bottom:10px;overflow-x:auto;padding:4px 0;flex-wrap:wrap;}
+.ct-chip{padding:4px 10px;border-radius:14px;font-size:11.5px;font-weight:500;background:var(--white);color:var(--gray4);white-space:nowrap;border:1px solid var(--gray2);cursor:pointer;}
+.ct-chip.active{background:#1f3d1f;color:#fff;border-color:#1f3d1f;font-weight:700;}
+.ct-chip .ct-count{opacity:.75;margin-left:4px;font-size:10.5px;}
+
+.ct-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+@media(max-width:700px){.ct-stats{grid-template-columns:repeat(2,1fr);}}
+.ct-stat{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:6px 12px;}
+.ct-stat .cs-num{font-size:18px;font-weight:700;color:#1f3d1f;font-variant-numeric:tabular-nums;}
+.ct-stat .cs-lbl{font-size:10.5px;color:var(--gray4);}
+
+.ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;}
+.ct-card{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:10px 12px;position:relative;transition:transform .1s, border-color .1s;cursor:pointer;}
+.ct-card:hover{border-color:#4a6a4a;}
+.ct-card .ct-star{position:absolute;top:8px;right:10px;font-size:14px;color:var(--gray2);cursor:pointer;user-select:none;}
+.ct-card .ct-star.fav{color:#e0a800;}
+.ct-head{display:flex;gap:8px;align-items:flex-start;margin-bottom:4px;padding-right:20px;}
+.ct-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;flex-shrink:0;background:var(--gray3);}
+.ct-avatar.t-bank{background:#1a3a6a;}
+.ct-avatar.t-estate{background:#1f3d1f;}
+.ct-avatar.t-reform{background:#c77800;}
+.ct-avatar.t-pro{background:#5a3a6a;}
+.ct-avatar.t-owner{background:#5a3a1f;}
+.ct-avatar.t-friend{background:#1a6060;}
+.ct-nm{font-size:13.5px;font-weight:700;line-height:1.2;}
+.ct-sub{font-size:11px;color:var(--gray3);margin-top:1px;}
+.ct-co{font-size:11.5px;color:var(--gray4);margin-top:1px;}
+.ct-tags{margin-top:3px;display:flex;flex-wrap:wrap;gap:3px;}
+.ct-tag{display:inline-block;padding:1px 6px;border-radius:2px;font-size:9.5px;font-weight:600;border:1px solid;}
+.ct-tag.t-bank{background:#e9eef7;color:#1a3a6a;border-color:#7a92b5;}
+.ct-tag.t-estate{background:#eef2ed;color:#1f3d1f;border-color:#80a080;}
+.ct-tag.t-reform{background:#faf4ea;color:#c77800;border-color:#d4a07a;}
+.ct-tag.t-pro{background:#f2edf5;color:#5a3a6a;border-color:#a080b5;}
+.ct-tag.t-owner{background:#f2eeea;color:#5a3a1f;border-color:#b58a70;}
+.ct-tag.t-friend{background:#e6f2f0;color:#1a6060;border-color:#70a8a0;}
+.ct-tag.t-other{background:#f0f0f0;color:var(--gray4);border-color:var(--gray2);}
+.ct-meta{margin-top:6px;padding-top:6px;border-top:1px solid #f0f0f0;font-size:11px;color:var(--gray3);line-height:1.5;}
+.ct-meta .ct-line{display:flex;justify-content:space-between;gap:6px;}
+.ct-last{font-weight:600;}
+.ct-last.hot{color:#1f3d1f;}
+.ct-last.cold{color:#c77800;}
+.ct-memo{font-size:11.5px;color:var(--gray4);margin-top:4px;line-height:1.4;}
+.ct-actions{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;}
+.ct-mini-btn{padding:3px 8px;font-size:10.5px;border-radius:2px;background:var(--gray);color:var(--gray4);text-decoration:none;border:1px solid var(--gray2);}
+.ct-mini-btn:hover{background:var(--green-light);color:#1f3d1f;border-color:#4a6a4a;}
+
+/* 連絡先ピッカー（ヒアリング等から呼び出し） */
+.picker{position:relative;}
+.picker-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--gray2);border-top:none;border-radius:0 0 3px 3px;max-height:260px;overflow-y:auto;z-index:10;box-shadow:0 4px 8px rgba(0,0,0,.1);}
+.picker-item{padding:6px 12px;display:flex;gap:8px;align-items:center;cursor:pointer;border-bottom:1px solid #f0f0f0;}
+.picker-item:hover{background:#eef2ed;}
+.picker-item:last-child{border-bottom:none;}
+.picker-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:11px;flex-shrink:0;background:var(--gray3);}
+.picker-info{flex:1;min-width:0;}
+.picker-nm{font-size:12px;font-weight:700;}
+.picker-co{font-size:10px;color:var(--gray3);}
+.picker-add{background:#fafdf9;padding:8px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;border-top:2px dashed #4a6a4a;color:#1f3d1f;font-weight:600;font-size:11.5px;}
+.picker-add:hover{background:#eef2ed;}
+.picked-contact{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#eef2ed;border:1px solid #4a6a4a;border-radius:3px;}
+.picked-contact .pc-nm{font-size:12.5px;font-weight:700;color:#1f3d1f;}
+.picked-contact .pc-co{font-size:10.5px;color:var(--gray4);}
+.picked-contact .pc-clear{margin-left:auto;font-size:11px;color:#1f3d1f;padding:3px 8px;border:1px solid #4a6a4a;border-radius:2px;background:var(--white);cursor:pointer;}
+
+/* ヒアリング項目 */
+.hr-intro{background:#f5f7f4;border:1px solid var(--gray2);border-radius:3px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--gray4);line-height:1.5;}
+.hr-list{display:flex;flex-direction:column;gap:8px;}
+.hr-card{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:10px 12px;border-left:3px solid #1a6060;}
+.hr-card-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;}
+.hr-date{font-size:11px;color:var(--gray3);font-weight:600;}
+.hr-agent{font-size:12.5px;font-weight:700;color:#1f3d1f;flex:1;min-width:0;}
+.hr-actions{display:flex;gap:4px;}
+.hr-item{padding:4px 0;border-bottom:1px dotted #f0f0f0;font-size:12px;display:grid;grid-template-columns:140px 1fr;gap:8px;}
+.hr-item:last-child{border-bottom:none;}
+.hr-item .hi-k{color:var(--gray3);font-weight:600;font-size:11px;}
+.hr-item .hi-v{color:var(--black);white-space:pre-wrap;}
+.hr-item .hi-v.empty{color:var(--gray3);font-style:italic;}
+
+.hr-form-row{display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start;margin-bottom:6px;}
+.hr-form-row label{font-size:11.5px;color:var(--gray4);font-weight:600;padding-top:6px;}
+.hr-form-row textarea{min-height:40px;font-size:12.5px;}
+.hr-form-hint{font-size:10.5px;color:var(--gray3);margin:0 0 4px 148px;line-height:1.4;}
+
+/* 小さいプロパティ選択 */
+.prop-select-chips{display:flex;gap:4px;flex-wrap:wrap;}
+.prop-select-chips label{padding:3px 9px;border:1px solid var(--gray2);border-radius:12px;font-size:11px;color:var(--gray4);cursor:pointer;background:var(--white);}
+.prop-select-chips label.active{background:#eef2ed;color:#1f3d1f;border-color:#4a6a4a;font-weight:600;}
+.prop-select-chips input{display:none;}
+
+/* エリア情報ページ */
+.area-select{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:10px 14px;margin-bottom:12px;}
+.area-select-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.area-select select{flex:1;min-width:200px;font-size:13px;padding:6px 10px;}
+.area-section{margin-top:14px;}
+.area-section-title{font-size:13px;font-weight:700;color:#1f3d1f;background:#eef2ed;padding:6px 12px;border-left:3px solid #4a6a4a;margin-bottom:6px;}
+.area-empty{padding:20px;text-align:center;color:var(--gray3);background:var(--white);border:1px dashed var(--gray2);border-radius:3px;font-size:12px;}
+
+/* ヒアリング参照チップ（Overview収支内の参照リンク） */
+.ref-chip{display:inline-block;margin-top:4px;padding:3px 8px;background:var(--gray);border-radius:2px;font-size:10.5px;color:var(--gray4);cursor:pointer;text-decoration:none;border:1px solid var(--gray2);}
+.ref-chip:hover{background:#eef2ed;color:#1f3d1f;border-color:#4a6a4a;}
+
+/* ===== リフォームプラン (Step 4) ===== */
+.rf-intro{background:#f5f7f4;border:1px solid var(--gray2);border-radius:3px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--gray4);line-height:1.5;}
+.rf-intro b{color:#1f3d1f;}
+.rf-stages{display:flex;gap:4px;margin-bottom:10px;background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:4px;}
+.rf-stage-btn{flex:1;padding:7px 8px;font-size:11.5px;font-weight:600;color:var(--gray4);background:var(--white);border:1px solid transparent;border-radius:2px;cursor:pointer;text-align:center;}
+.rf-stage-btn.active{background:#1f3d1f;color:#fff;border-color:#1f3d1f;}
+.rf-stage-btn:hover:not(.active){background:#eef2ed;}
+
+.rf-toolbar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.rf-toolbar .right{margin-left:auto;display:flex;gap:6px;}
+
+.rf-summary{background:#eef2ed;border:1px solid #4a6a4a;border-radius:3px;padding:10px 14px;margin-bottom:10px;}
+.rf-summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+@media(max-width:700px){.rf-summary-grid{grid-template-columns:repeat(2,1fr);}}
+.rf-sum-item{text-align:center;padding:4px;}
+.rf-sum-item .rsi-v{font-size:15px;font-weight:700;color:#1f3d1f;font-variant-numeric:tabular-nums;line-height:1.2;}
+.rf-sum-item .rsi-l{font-size:10px;color:var(--gray4);margin-top:2px;}
+.rf-sum-item.kou .rsi-v{color:var(--red);}
+.rf-sum-item.gas .rsi-v{color:#1565c0;}
+.rf-sum-item.diy .rsi-v{color:#1f3d1f;}
+.rf-sum-item.other .rsi-v{color:var(--gray4);}
+
+.rf-room{background:var(--white);border:1px solid var(--gray2);border-radius:3px;margin-bottom:8px;overflow:hidden;}
+.rf-room-head{padding:8px 12px;background:#fafafa;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.rf-room-head:hover{background:#eef2ed;}
+.rf-room-name-input{flex:1;font-weight:700;font-size:13px;color:#1f3d1f;padding:3px 6px;border:1px solid transparent;background:transparent;border-radius:2px;}
+.rf-room-name-input:hover,.rf-room-name-input:focus{background:var(--white);border-color:var(--gray2);}
+.rf-room-memo-input{flex:1;font-size:11px;color:var(--gray3);padding:3px 6px;border:1px solid transparent;background:transparent;border-radius:2px;max-width:200px;}
+.rf-room-memo-input:hover,.rf-room-memo-input:focus{background:var(--white);border-color:var(--gray2);color:var(--black);}
+.rf-room-total{font-size:12px;font-weight:700;color:#1f3d1f;font-variant-numeric:tabular-nums;margin-right:4px;}
+.rf-room-toggle{font-size:10px;color:var(--gray4);padding:2px 6px;}
+.rf-room-delete{font-size:11px;color:var(--gray3);padding:3px 8px;border:1px solid var(--gray2);border-radius:2px;background:var(--white);cursor:pointer;}
+.rf-room-delete:hover{color:var(--red);border-color:var(--red);background:var(--red-light);}
+.rf-room-body{padding:8px 12px;border-top:1px solid var(--gray2);display:none;}
+.rf-room-body.open{display:block;}
+
+.rf-item-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rf-item-table th{background:var(--gray);color:var(--gray4);font-size:10px;font-weight:600;padding:4px 6px;text-align:left;border-bottom:1px solid var(--gray2);}
+.rf-item-table td{padding:3px 4px;border-bottom:1px solid #f0f0f0;}
+.rf-item-table input,.rf-item-table select{font-size:11.5px;padding:3px 6px;width:100%;}
+.rf-item-table input[type=number]{text-align:right;font-variant-numeric:tabular-nums;}
+.rf-item-table .it-del{padding:3px 6px;font-size:12px;color:var(--gray3);border:none;background:none;cursor:pointer;border-radius:2px;}
+.rf-item-table .it-del:hover{color:var(--red);background:var(--red-light);}
+.rf-item-table tr.done td{opacity:.6;text-decoration:line-through;}
+
+.rf-exec-tag{display:inline-block;padding:0 6px;border-radius:2px;font-size:9.5px;font-weight:700;border:1px solid;}
+.rf-exec-tag.kou{background:#f7eeee;color:var(--red);border-color:#c08080;}
+.rf-exec-tag.gas{background:#e9eef7;color:#1565c0;border-color:#7a92b5;}
+.rf-exec-tag.diy{background:#eef2ed;color:#1f3d1f;border-color:#80a080;}
+.rf-exec-tag.other{background:#f0f0f0;color:var(--gray4);border-color:var(--gray2);}
+
+.rf-add-room-btn{width:100%;padding:10px;background:var(--white);border:2px dashed var(--gray2);border-radius:3px;font-size:12.5px;color:var(--gray4);cursor:pointer;margin-top:4px;}
+.rf-add-room-btn:hover{border-color:#4a6a4a;color:#1f3d1f;background:#fafdf9;}
+.rf-add-item-btn{padding:4px 10px;font-size:11px;color:var(--gray4);background:var(--white);border:1px dashed var(--gray2);border-radius:2px;cursor:pointer;margin-top:6px;}
+.rf-add-item-btn:hover{border-color:#4a6a4a;color:#1f3d1f;}
+
+.rf-quotes{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:10px 12px;margin-top:14px;}
+.rf-quotes h4{font-size:13px;font-weight:700;color:#1f3d1f;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--gray2);}
+.rf-quote-row{display:grid;grid-template-columns:auto 1fr 120px 120px auto;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;}
+.rf-quote-row.selected{background:#eef2ed;border-radius:2px;}
+.rf-quote-row label{font-size:11px;color:var(--gray4);display:flex;align-items:center;gap:3px;white-space:nowrap;}
+.rf-quote-row input[type=checkbox]{width:auto;margin:0;cursor:pointer;}
+.rf-quote-row input[type=text],.rf-quote-row input[type=number]{font-size:11.5px;padding:3px 8px;}
+.rf-quote-row input[type=number]{text-align:right;font-variant-numeric:tabular-nums;}
+.rf-quote-del{padding:3px 8px;font-size:12px;color:var(--gray3);border:none;background:none;cursor:pointer;border-radius:2px;}
+.rf-quote-del:hover{color:var(--red);background:var(--red-light);}
+
+/* ===== シミュレーション (Step 5) ===== */
+.sim-block{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:12px 14px;margin-bottom:12px;}
+.sim-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--gray2);}
+.sim-head h3{font-size:14px;font-weight:700;color:#1f3d1f;flex:1;}
+.sim-intro{font-size:11.5px;color:var(--gray4);line-height:1.5;margin-bottom:10px;}
+.sim-tabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
+.sim-tab{padding:5px 12px;font-size:11.5px;font-weight:600;color:var(--gray4);background:var(--white);border:1px solid var(--gray2);border-radius:14px;cursor:pointer;}
+.sim-tab.active{background:#1f3d1f;color:#fff;border-color:#1f3d1f;}
+.sim-tab:hover:not(.active){background:#eef2ed;}
+.sim-tab.add{border-style:dashed;color:#1f3d1f;}
+
+.sim-form{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-bottom:10px;}
+@media(max-width:700px){.sim-form{grid-template-columns:1fr;}}
+.sim-group{display:flex;flex-direction:column;gap:3px;}
+.sim-group label{font-size:11px;color:var(--gray4);font-weight:600;display:flex;align-items:center;gap:4px;}
+.sim-group .src-tag{font-size:9px;color:var(--gray3);background:var(--gray);padding:1px 5px;border-radius:2px;font-weight:400;}
+.sim-group .src-tag.prop{background:#eef2ed;color:#1f3d1f;}
+.sim-group input,.sim-group select{font-size:12.5px;padding:5px 8px;}
+.sim-group input[type=number]{text-align:right;font-variant-numeric:tabular-nums;}
+.sim-subtitle{grid-column:1/-1;font-size:11px;color:var(--gray3);font-weight:700;padding:4px 0 2px;border-bottom:1px dashed var(--gray2);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+
+.sim-result{background:#eef2ed;border:1px solid #4a6a4a;border-radius:3px;padding:10px 14px;margin-top:10px;}
+.sim-result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:700px){.sim-result-grid{grid-template-columns:repeat(2,1fr);}}
+.sim-result-item{text-align:center;}
+.sim-result-item .srv{font-size:18px;font-weight:700;color:#1f3d1f;font-variant-numeric:tabular-nums;line-height:1.2;}
+.sim-result-item .srv.red{color:var(--red);}
+.sim-result-item .srv.orange{color:#c77800;}
+.sim-result-item .srl{font-size:10.5px;color:var(--gray4);margin-top:2px;}
+
+.sim-compare{margin-top:14px;overflow-x:auto;}
+.sim-compare-table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px;}
+.sim-compare-table th,.sim-compare-table td{padding:6px 10px;border-bottom:1px solid #f0f0f0;text-align:right;}
+.sim-compare-table th:first-child,.sim-compare-table td:first-child{text-align:left;}
+.sim-compare-table th{background:var(--gray);font-size:11px;color:var(--gray4);font-weight:600;}
+.sim-compare-table td.num{font-variant-numeric:tabular-nums;}
+.sim-compare-table tr.hilight td{background:#eef2ed;font-weight:700;}
+
+.sim-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.sim-load-btn{font-size:11px;color:#1f3d1f;background:#eef2ed;border:1px solid #4a6a4a;padding:3px 10px;border-radius:2px;cursor:pointer;}
+.sim-load-btn:hover{background:#1f3d1f;color:#fff;}
+
+/* PDF印刷用 */
+@media print {
+  body { padding: 20px; }
+  .sidebar, .topbar, .tabbar, .detail-tabs, .action-bar, #toast, .rf-stages, .rf-toolbar, .rf-quotes .rf-quote-del, .rf-add-room-btn, .rf-add-item-btn, .rf-room-delete, .rf-room-toggle, .it-del, .rf-quote-row input[type=checkbox] { display: none !important; }
+  .main { margin-left: 0 !important; padding: 0 !important; }
+  .detail-pane { display: block !important; page-break-before: always; }
+  .detail-pane:first-of-type { page-break-before: avoid; }
+  #dtab-0, #dtab-1, #dtab-2, #dtab-4, #dtab-5, #dtab-6, #dtab-7 { display: none !important; }
+  #dtab-3 { display: block !important; }
+  .rf-room-body { display: block !important; }
+  .rf-room { page-break-inside: avoid; }
+  .rf-item-table input, .rf-item-table select { border: none !important; padding: 2px 4px !important; background: transparent !important; }
+}
 </style>
 </head>
 <body>
@@ -174,12 +573,14 @@ select{appearance:auto;}
   <nav>
     <a href="#" data-page="home" class="active"><span>🏠</span> Home</a>
     <a href="#" data-page="property"><span>🏢</span> 物件</a>
+    <a href="#" data-page="contacts"><span>📇</span> 連絡先</a>
+    <a href="#" data-page="area"><span>🗾</span> エリア情報</a>
     <a href="#" data-page="memo"><span>📝</span> Memo</a>
     <a href="#" data-page="learn"><span>📚</span> Learn</a>
     <a href="#" data-page="calendar"><span>📅</span> カレンダー</a>
     <a href="#" data-page="settings"><span>⚙</span> Settings</a>
   </nav>
-  <div class="ver">Ver 2.1</div>
+  <div class="ver">Ver 3.0</div>
 </aside>
 
 <!-- Top bar (Mobile) -->
@@ -190,7 +591,7 @@ select{appearance:auto;}
     <span class="icon-btn" onclick="refreshCurrentPage()" title="更新">🔄</span>
     <span class="icon-btn" onclick="showPage('settings')" title="設定">⚙</span>
   </div>
-  <span class="ver">Ver 2.1</span>
+  <span class="ver">Ver 3.0</span>
 </header>
 
 <!-- Toast -->
@@ -276,8 +677,51 @@ select{appearance:auto;}
   <div id="calendar-records" style="margin-top:20px;"></div>
 </div>
 
+<!-- CONTACTS -->
+<div class="page" id="page-contacts">
+  <div class="action-bar">
+    <button class="btn btn-primary" onclick="openContactModal()">+ 連絡先を追加</button>
+    <button class="btn btn-secondary" onclick="toggleContactFavOnly()"><span id="ct-fav-toggle-label">☆ お気に入りのみ</span></button>
+  </div>
+  <div id="ct-stats" class="ct-stats"></div>
+  <div class="ct-toolbar">
+    <input type="search" id="ct-search" placeholder="🔍 名前・会社・メモで検索..." oninput="renderContactsList()">
+    <select id="ct-area-filter" onchange="renderContactsList()">
+      <option value="">全エリア</option>
+    </select>
+  </div>
+  <div id="ct-filter" class="ct-filter"></div>
+  <div id="ct-grid" class="ct-grid"></div>
+</div>
+
+<!-- AREA -->
+<div class="page" id="page-area">
+  <h2 style="font-size:18px;margin-bottom:6px;">🗾 エリア情報（横断閲覧）</h2>
+  <div style="font-size:12px;color:var(--gray4);margin-bottom:12px;line-height:1.6;">
+    エリアを選ぶと、そのエリアに紐づく<b>物件・連絡先・ヒアリング記録・Memo</b>を一覧表示します。
+    「このエリア、過去にヒアリング済みじゃん！」と気づけます。
+  </div>
+  <div class="area-select">
+    <div class="area-select-row">
+      <label style="font-size:12px;color:var(--gray4);font-weight:600;">エリア:</label>
+      <select id="area-select" onchange="renderAreaPage()"><option value="">-- エリアを選択 --</option></select>
+    </div>
+  </div>
+  <div id="area-content"></div>
+</div>
+
 <!-- SETTINGS -->
 <div class="page" id="page-settings">
+  <div class="card">
+    <h2 style="font-size:16px;margin-bottom:16px;">データバックアップ・移行</h2>
+    <div style="font-size:12px;color:var(--gray4);margin-bottom:12px;line-height:1.6;">
+      全データをJSONファイルとしてエクスポート/インポートできます。ブラウザを変える時・PCを買い替える時のバックアップに。
+    </div>
+    <button class="btn btn-primary" onclick="exportAllData()" style="width:100%;justify-content:center;margin-bottom:8px;">📤 全データをJSONでエクスポート</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" style="width:100%;justify-content:center;">📥 JSONインポート（データ上書き）</button>
+    <input type="file" id="import-file" accept=".json,application/json" style="display:none;" onchange="importAllData(event)">
+  </div>
+
   <div class="card">
     <h2 style="font-size:16px;margin-bottom:16px;">GAS Sync Settings</h2>
     <div class="form-group">
@@ -310,6 +754,172 @@ select{appearance:auto;}
 
 <!-- ===== MODALS ===== -->
 
+<!-- Contact Modal -->
+<div class="modal-overlay" id="modal-contact">
+<div class="modal">
+  <div class="modal-header">
+    <h2 id="contact-modal-title">連絡先を追加</h2>
+    <button class="modal-close" onclick="closeModal('modal-contact')">&times;</button>
+  </div>
+  <form onsubmit="saveContact(event)">
+    <input type="hidden" id="ct-id">
+    <div class="form-section">基本</div>
+    <div class="form-row">
+      <div class="form-group"><label>名前 *</label><input type="text" id="ct-name" required></div>
+      <div class="form-group"><label>ふりがな</label><input type="text" id="ct-name-kana" placeholder="例: さとう はなこ"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>肩書き</label><input type="text" id="ct-title"></div>
+      <div class="form-group"><label>会社・組織</label><input type="text" id="ct-company"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>会社のふりがな</label><input type="text" id="ct-company-kana" placeholder="例: まるまるふどうさん"></div>
+      <div class="form-group"><label>支店・部署</label><input type="text" id="ct-branch"></div>
+    </div>
+    <div class="form-group">
+      <label>業種タグ（複数選択可・12種類）</label>
+      <div id="ct-types-select" class="prop-select-chips" style="margin-top:4px;"></div>
+    </div>
+
+    <div class="form-section">連絡先</div>
+    <div class="form-row">
+      <div class="form-group"><label>電話（事務所）</label><input type="tel" id="ct-phone"></div>
+      <div class="form-group"><label>携帯</label><input type="tel" id="ct-mobile"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>メール</label><input type="email" id="ct-email"></div>
+      <div class="form-group"><label>LINE ID / URL</label><input type="text" id="ct-line"></div>
+    </div>
+    <div class="form-group"><label>WebサイトURL</label><input type="url" id="ct-website"></div>
+
+    <div class="form-section">属性・メモ</div>
+    <div class="form-group"><label>担当エリア（複数はカンマ区切り）</label><input type="text" id="ct-areas" placeholder="例: 仙台市青葉区, 仙台市太白区"></div>
+    <div class="form-row">
+      <div class="form-group"><label>姿勢（不動産系）</label>
+        <select id="ct-stance"><option value="">--</option><option>前向き</option><option>普通</option><option>消極的</option></select>
+      </div>
+      <div class="form-group"><label>お気に入り</label>
+        <select id="ct-favorite"><option value="false">☆ 通常</option><option value="true">★ お気に入り（上位表示）</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label>メモ（強み・特徴・やり取り等）</label><textarea id="ct-memo" rows="3" placeholder="例: 戸建て専門・エリア詳しい・反応良い、etc"></textarea></div>
+
+    <div style="margin-top:20px;display:flex;gap:8px;">
+      <button type="button" class="btn btn-danger" onclick="deleteContact()">🗑 削除</button>
+      <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">保存</button>
+    </div>
+  </form>
+</div>
+</div>
+
+<!-- Hearing Modal -->
+<div class="modal-overlay" id="modal-hearing">
+<div class="modal">
+  <div class="modal-header">
+    <h2 id="hearing-modal-title">ヒアリング記録</h2>
+    <button class="modal-close" onclick="closeModal('modal-hearing')">&times;</button>
+  </div>
+  <form onsubmit="saveHearing(event)">
+    <input type="hidden" id="hr-id">
+    <input type="hidden" id="hr-prop-context">
+    <div class="form-row">
+      <div class="form-group"><label>日付</label><input type="text" id="hr-date" placeholder="YYYY-MM-DD"></div>
+      <div class="form-group"><label>対象エリア（任意）</label><input type="text" id="hr-area" placeholder="例: 仙台市青葉区"></div>
+    </div>
+    <div class="form-group">
+      <label>対象物件（複数可・物件特定なしも可）</label>
+      <div id="hr-properties-select" class="prop-select-chips" style="margin-top:4px;"></div>
+    </div>
+    <div class="form-section">担当者</div>
+    <div id="hr-contact-wrap">
+      <div class="picker" id="hr-contact-picker">
+        <input type="text" id="hr-contact-search" placeholder="🔍 名前・会社で検索..." style="padding:6px 10px;" oninput="searchHearingContact(this.value)">
+        <div id="hr-contact-dropdown" class="picker-dropdown" style="display:none;"></div>
+      </div>
+      <div id="hr-contact-inline-form" style="display:none;background:#fafdf9;border:2px solid #4a6a4a;border-radius:3px;padding:10px 12px;margin-top:6px;">
+        <div style="font-size:12px;color:#1f3d1f;font-weight:700;margin-bottom:6px;">+ 新規連絡先を登録（最小項目でOK・後で編集可）</div>
+        <div class="form-row">
+          <div class="form-group"><label>名前 *</label><input type="text" id="hr-ic-name"></div>
+          <div class="form-group"><label>会社</label><input type="text" id="hr-ic-company"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>業種タグ（複数可）</label><div id="hr-ic-types" class="prop-select-chips"></div></div>
+          <div class="form-group"><label>電話 or メール</label><input type="text" id="hr-ic-contact" placeholder="どちらか任意"></div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button type="button" class="btn btn-primary btn-sm" onclick="saveInlineContact()">✓ 登録して担当者に設定</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="cancelInlineContact()">キャンセル</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">📥 PLAUD等の要約から自動取込</div>
+    <div class="form-group" style="background:#fafdf9;border:1px solid #4a6a4a;border-radius:3px;padding:8px 10px;">
+      <label style="font-size:11.5px;color:#1f3d1f;font-weight:700;">要約テキストを貼り付け → 取り込みで10項目に自動振り分け</label>
+      <textarea id="hr-plaud-input" rows="3" placeholder="PLAUDの「客付け会社ヒアリング」タブの内容をコピペ（## ① 募集条件... の形式）" style="font-size:11.5px;font-family:monospace;"></textarea>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <button type="button" class="btn btn-primary btn-sm" onclick="importFromPlaud()">📥 取り込み</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="pasteFromClipboard('hr-plaud-input')">📋 クリップボードから</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('hr-plaud-input').value='';">クリア</button>
+        <span style="font-size:10.5px;color:var(--gray3);align-self:center;">※ ペースト後「取り込み」で10項目に自動投入</span>
+      </div>
+    </div>
+
+    <div class="form-section">ヒアリング内容（10項目）</div>
+
+    <div class="hr-form-row"><label>① 募集条件</label><textarea id="hr-q1" rows="2" placeholder="家賃・礼金・敷金・AD・ターゲット層"></textarea></div>
+    <div class="hr-form-hint">💡 家賃の相場帯・礼敷・フリーレント・AD(広告料)・ターゲット層（単身/ファミリー/学生/外国人/法人）</div>
+
+    <div class="hr-form-row"><label>② 必要な室内設備</label><textarea id="hr-q2" rows="2" placeholder="必須（エアコン/給湯器/Wi-Fi等）/ あると強い（宅配BOX/追焚き等）"></textarea></div>
+    <div class="hr-form-hint">💡 "これがないと客がつかない最低ライン"を明確にしてリフォーム予算化</div>
+
+    <div class="hr-form-row"><label>③ 必要な駐車場台数</label><textarea id="hr-q3" rows="2" placeholder="何台 / 車種 / 並列or縦列 / 屋根有無"></textarea></div>
+    <div class="hr-form-hint">💡 地方は駐車場なし=致命傷。ファミリー向けなら2台確保が望ましい</div>
+
+    <div class="hr-form-row"><label>④ 家賃を上げる方法</label><textarea id="hr-q4" rows="2" placeholder="ネット無料/ペット可/宅配BOX/家具家電付き等で何円up"></textarea></div>
+    <div class="hr-form-hint">💡 数千円の家賃アップ×12ヶ月で年間利回りに効く。費用対効果を聞く</div>
+
+    <div class="hr-form-row"><label>⑤ 同様の物件の事例</label><textarea id="hr-q5" rows="2" placeholder="近隣の直近成約事例・成約家賃・成約までの期間"></textarea></div>
+    <div class="hr-form-hint">💡 ネット掲載の"募集家賃"と実際の"成約家賃"は違う</div>
+
+    <div class="hr-form-row"><label>⑥ 繁忙期と契約数</label><textarea id="hr-q6" rows="2" placeholder="繁忙期（1-3月）・月間成約数・閑散期の動き"></textarea></div>
+    <div class="hr-form-hint">💡 繁忙期入居を狙うなら逆算して募集開始時期を決める</div>
+
+    <div class="hr-form-row"><label>⑦ 他社紹介・AD・契約形態</label><textarea id="hr-q7" rows="2" placeholder="両手/分かれ・レインズ/ATBB・AD相場・普通借/定借 を1セットで"></textarea></div>
+    <div class="hr-form-hint">💡 両手=1社で両方、分かれ=別々。AD=成功報酬（家賃1-2ヶ月）。定借は出口有利</div>
+
+    <div class="hr-form-row"><label>⑧ 入居者属性条件</label><textarea id="hr-q8" rows="2" placeholder="生保/保証会社/ペット/喫煙/外国人 の可否"></textarea></div>
+    <div class="hr-form-hint">💡 生保OKで反響激増。保証会社加入は今はほぼ必須</div>
+
+    <div class="hr-form-row"><label>⑨ ターゲット層</label><textarea id="hr-q9" rows="2" placeholder="メインターゲット（例: 単身ファミリー車好き）"></textarea></div>
+    <div class="hr-form-hint">💡 募集戦略に直結。簡潔に</div>
+
+    <div class="hr-form-row"><label>⑩ 担当者・所感</label><textarea id="hr-q10" rows="2" placeholder="担当者の得意分野・値下げ限界・次回連絡のヒント"></textarea></div>
+    <div class="hr-form-hint">💡 長期関係構築のため担当者の人物メモも残す</div>
+
+    <div class="hr-form-row"><label>💬 フリーメモ</label><textarea id="hr-free-memo" rows="3" placeholder="上記に該当しない重要発言・物件スペック・エリア特性・心理的瑕疵対応・管理体制など"></textarea></div>
+    <div class="hr-form-hint">💡 PLAUDの「フリーメモ」もここに入ります</div>
+
+    <details style="margin-top:10px;background:#fafafa;border:1px solid var(--gray2);border-radius:3px;padding:8px 12px;">
+      <summary style="cursor:pointer;font-size:11.5px;color:var(--gray3);font-weight:600;">📄 元データ (文字起こし・要約テキスト)</summary>
+      <div class="form-group" style="margin-top:8px;">
+        <label>PLAUDのSummary原文（取り込み時に自動保存）</label>
+        <textarea id="hr-plaud-raw" rows="3" placeholder="元データを保持（後で読み返し可）" style="font-size:11px;font-family:monospace;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>🎙 文字起こし Transcript（任意）</label>
+        <textarea id="hr-transcript" rows="3" placeholder="生の文字起こし全文" style="font-size:11px;font-family:monospace;"></textarea>
+      </div>
+    </details>
+
+    <div style="margin-top:20px;display:flex;gap:8px;">
+      <button type="button" class="btn btn-danger" onclick="deleteHearing()">🗑 削除</button>
+      <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">保存</button>
+    </div>
+  </form>
+</div>
+</div>
+
 <!-- Property Modal -->
 <div class="modal-overlay" id="modal-property">
 <div class="modal">
@@ -320,8 +930,8 @@ select{appearance:auto;}
   <form onsubmit="saveProperty(event)">
     <input type="hidden" id="prop-id">
 
-    <div class="form-section">📍 基本情報</div>
-    <div class="form-group"><label>日付</label><input type="text" id="prop-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-section">基本情報</div>
+    <div class="form-group"><label>物件登録日</label><input type="text" id="prop-date" placeholder="YYYY-MM-DD"></div>
     <div class="form-group"><label>物件名 *</label><input type="text" id="prop-name" required></div>
     <div class="form-group"><label>住所</label><input type="text" id="prop-location"></div>
     <div class="form-group"><label>Google Maps URL</label><input type="text" id="prop-mapurl"></div>
@@ -332,8 +942,26 @@ select{appearance:auto;}
       <div class="form-group"><label>築年数</label><input type="number" id="prop-age" placeholder="年"></div>
     </div>
     <div class="form-row">
+      <div class="form-group"><label>構造</label>
+        <select id="prop-structure"><option value="">--</option><option>木造平屋</option><option>木造2階建て</option><option>木造3階建て</option><option>軽量鉄骨</option><option>重量鉄骨</option><option>RC造</option><option>その他</option></select>
+      </div>
+      <div class="form-group"><label>間取り</label><input type="text" id="prop-layout" placeholder="例: 3LDK"></div>
+    </div>
+    <div class="form-row">
       <div class="form-group"><label>延床面積 (㎡)</label><input type="number" id="prop-area" step="0.01"></div>
       <div class="form-group"><label>土地面積 (㎡)</label><input type="number" id="prop-land" step="0.01"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>方位</label>
+        <select id="prop-direction"><option value="">--</option><option>東</option><option>西</option><option>南</option><option>北</option><option>南東</option><option>南西</option><option>北東</option><option>北西</option></select>
+      </div>
+      <div class="form-group"><label>駐車場台数</label><input type="number" id="prop-parking" placeholder="台"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>現況</label>
+        <select id="prop-occupancy"><option value="">--</option><option>空室</option><option>居住中</option><option>賃貸中</option></select>
+      </div>
+      <div class="form-group"><label>引渡時期</label><input type="text" id="prop-delivery" placeholder="例: 即時 / 相談"></div>
     </div>
     <div class="form-group"><label>アクセス</label><input type="text" id="prop-access" placeholder="例: ○○駅 徒歩10分"></div>
     <div class="form-group"><label>掲載URL</label><input type="text" id="prop-listingurl"></div>
@@ -354,31 +982,84 @@ select{appearance:auto;}
       </select>
     </div>
 
-    <div class="form-section">📜 法的・行政情報</div>
-    <div class="form-group"><label>用途地域</label><input type="text" id="prop-zoning"></div>
+    <div class="form-section" style="color:var(--red);">購入前必須チェック</div>
+    <div class="sub-section">接道状況（道路種別・幅員・間口を入力すると再建築可否を自動判定）</div>
+    <div class="form-row">
+      <div class="form-group"><label>道路種別</label>
+        <select id="prop-road-type" onchange="updateRebuildJudge()">
+          <option value="">--</option>
+          <option>42条1項1号(公道)</option>
+          <option>42条1項2号(開発道路)</option>
+          <option>42条1項3号(既存道路)</option>
+          <option>42条1項5号(位置指定道路)</option>
+          <option>42条2項(みなし道路)</option>
+          <option>43条但し書き</option>
+          <option>未接道/その他</option>
+        </select>
+      </div>
+      <div class="form-group"><label>道路の方位</label>
+        <select id="prop-road-direction"><option value="">--</option><option>東</option><option>西</option><option>南</option><option>北</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>幅員 (m)</label><input type="number" id="prop-road-width" step="0.1" oninput="updateRebuildJudge()"></div>
+      <div class="form-group"><label>間口 (m)</label><input type="number" id="prop-frontage" step="0.1" oninput="updateRebuildJudge()"></div>
+    </div>
+    <div id="prop-rebuild-judge" class="auto-judge unknown">自動判定: 接道3項目を入力すると判定されます</div>
+    <div class="verify-row">
+      <label><input type="checkbox" id="prop-road-verified"> 役所確認済</label>
+      <input type="text" id="prop-road-verify-date" placeholder="確認日 YYYY-MM-DD" style="max-width:160px;">
+      <input type="text" id="prop-road-verify-by" placeholder="確認先 例: 建築指導課">
+    </div>
+    <div class="form-group"><label>接道メモ（補足・自由記述）</label><input type="text" id="prop-road" placeholder="例: セットバック0.5m必要、等"></div>
+    <div class="form-group"><label>再建築（手動上書き・通常は自動判定でOK）</label>
+      <select id="prop-rebuild"><option value="">自動判定に従う</option><option>可</option><option>不可</option><option>要確認</option></select>
+    </div>
+
+    <div class="sub-section">用途地域・建築制限</div>
+    <div class="form-group"><label>用途地域</label><input type="text" id="prop-zoning" placeholder="例: 第一種住居地域"></div>
     <div class="form-row">
       <div class="form-group"><label>建ぺい率 (%)</label><input type="number" id="prop-coverage" step="0.1"></div>
       <div class="form-group"><label>容積率 (%)</label><input type="number" id="prop-far" step="0.1"></div>
     </div>
-    <div class="form-group"><label>接道状況</label><input type="text" id="prop-road"></div>
-    <div class="form-group"><label>再建築可否</label>
-      <select id="prop-rebuild"><option value="">--</option><option>可</option><option>不可</option><option>要確認</option></select>
+    <div class="verify-row">
+      <label><input type="checkbox" id="prop-zoning-verified"> 役所確認済</label>
+      <input type="text" id="prop-zoning-verify-date" placeholder="確認日 YYYY-MM-DD" style="max-width:160px;">
+      <input type="text" id="prop-zoning-verify-by" placeholder="確認先 例: 都市計画課">
     </div>
-    <div class="form-group"><label>登記・権利関係メモ</label><textarea id="prop-legal-memo" rows="2"></textarea></div>
 
-    <div class="form-section">💴 収支・数値（見込み）</div>
+    <div class="sub-section">登記情報</div>
+    <div class="form-group"><label>登記内容（所有権・抵当権・差押等）</label><textarea id="prop-registry-memo" rows="2" placeholder="例: 所有権OK / 抵当権なし / 差押なし / 共有者なし"></textarea></div>
+    <div class="form-group"><label>登記・権利関係メモ（自由記述）</label><textarea id="prop-legal-memo" rows="1" placeholder="任意"></textarea></div>
+    <div class="verify-row">
+      <label><input type="checkbox" id="prop-registry-verified"> 法務局確認済</label>
+      <input type="text" id="prop-registry-verify-date" placeholder="確認日 YYYY-MM-DD" style="max-width:160px;">
+      <input type="text" id="prop-registry-verify-by" placeholder="確認先 例: 法務局">
+    </div>
+
+    <div class="form-section" style="color:var(--red);">重要事項（該当する物件のみ入力・未確認なら空欄）</div>
+    <div id="prop-important-list"></div>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addImportantCustom()" style="margin-top:8px;">+ 項目追加</button>
+
+    <div class="form-section">費用内訳</div>
+    <div id="prop-cost-list"></div>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="addCostItem()" style="margin-top:8px;">+ 費用項目追加</button>
+    <div style="font-size:11px;color:var(--gray3);margin-top:4px;">※ 金額は円単位で入力。工事費用は将来リフォームプラン確定後に自動連動予定</div>
+
+    <div class="form-section">収支見込み</div>
     <div class="form-row">
-      <div class="form-group"><label>購入価格 (万円)</label><input type="number" id="prop-price"></div>
       <div class="form-group"><label>想定家賃 (円/月)</label><input type="number" id="prop-rent"></div>
+      <div class="form-group"><label>近隣相場 下限 (円/月)</label><input type="number" id="prop-market-rent"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>近隣相場 (円/月)</label><input type="number" id="prop-market-rent"></div>
-      <div class="form-group"><label>修繕費見込 (万円)</label><input type="number" id="prop-repair"></div>
+      <div class="form-group"><label>近隣相場 上限 (円/月)</label><input type="number" id="prop-market-rent-hi"></div>
+      <div class="form-group"><label>購入価格 [旧・万円]</label><input type="number" id="prop-price" placeholder="費用内訳に移行推奨"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>諸費用見込 (万円)</label><input type="number" id="prop-closing"></div>
-      <div class="form-group"><label>自己資金 (万円)</label><input type="number" id="prop-downpayment"></div>
+      <div class="form-group"><label>修繕費見込 [旧・万円]</label><input type="number" id="prop-repair" placeholder="費用内訳に移行推奨"></div>
+      <div class="form-group"><label>諸費用見込 [旧・万円]</label><input type="number" id="prop-closing" placeholder="費用内訳に移行推奨"></div>
     </div>
+    <div class="form-group"><label>自己資金 (万円)</label><input type="number" id="prop-downpayment"></div>
 
     <div class="form-section">🚪 出口戦略</div>
     <div class="form-group"><label>出口方針</label>
@@ -395,11 +1076,38 @@ select{appearance:auto;}
     <div class="form-group"><label>撮影メモ</label><input type="text" id="prop-photo-memo" placeholder="例: 外観・内装・水回り撮影済み"></div>
 
     <div id="drop-section" style="display:none;">
-      <div class="form-section">❌ 見送り情報</div>
-      <div class="form-group"><label>見送り理由</label>
-        <select id="prop-drop-reason"><option value="">--</option><option>価格が高い</option><option>利回り不足</option><option>立地が悪い</option><option>修繕費が大きい</option><option>法的リスク</option><option>融資が通らない</option><option>空室リスク</option><option>築古すぎる</option><option>その他</option></select>
+      <div class="form-section" style="color:var(--red);">見送り情報（次回に活かすためのノウハウ蓄積）</div>
+      <div class="form-row">
+        <div class="form-group"><label>見送り日</label><input type="text" id="prop-drop-date" placeholder="YYYY-MM-DD"></div>
+        <div class="form-group"><label>見送りフェーズ</label>
+          <select id="prop-drop-phase"><option value="">--</option><option>候補発見時</option><option>デスクトップ調査後</option><option>ヒアリング後</option><option>内見前準備で</option><option>内見後</option><option>交渉中</option><option>融資否決</option></select>
+        </div>
       </div>
-      <div class="form-group"><label>見送り詳細</label><textarea id="prop-drop-memo" rows="2"></textarea></div>
+      <div class="form-group"><label>主な見送り理由</label>
+        <select id="prop-drop-reason"><option value="">--</option><option>価格が合わない</option><option>利回り不足</option><option>立地・エリア判断</option><option>再建築不可</option><option>告知事項NG</option><option>境界・越境問題</option><option>近隣トラブル</option><option>ハザードリスク</option><option>ヒアリング結果不振</option><option>修繕費が膨らんだ</option><option>融資否決</option><option>他物件を優先</option><option>その他</option></select>
+      </div>
+      <div class="form-group"><label>💡 この物件から得た学び・気づき（次回に活かす）</label><textarea id="prop-drop-memo" rows="3" placeholder="例: 立地は駅徒歩20分以内に絞るべきだった。告知期間内は避けるほうが客付けしやすい、等"></textarea></div>
+      <div class="form-group"><label>🎯 類似物件に出会った時の注意点</label><textarea id="prop-drop-tip" rows="2" placeholder="例: 同エリアで築30年超はリフォーム費○万以上見込むべき、等"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>当時の仲介への伝え方</label><textarea id="prop-drop-comm" rows="2"></textarea></div>
+        <div class="form-group"><label>仲介反応・関係維持メモ</label><textarea id="prop-drop-agent" rows="2"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>他候補者の有無</label>
+          <select id="prop-drop-compete"><option value="">不明</option><option>あり（先着順で負けた）</option><option>あり（買付競合中）</option><option>なし（売れ残り）</option></select>
+        </div>
+        <div class="form-group"><label>★ 物件評価</label>
+          <select id="prop-drop-rating"><option value="">--</option><option value="5">★★★★★ 見送ったが優良</option><option value="4">★★★★☆ 良物件</option><option value="3">★★★☆☆ 普通</option><option value="2">★★☆☆☆ いまいち</option><option value="1">★☆☆☆☆ 完全NG</option></select>
+        </div>
+      </div>
+      <div class="sub-section">📊 追跡情報（見送り後の動向）</div>
+      <div class="form-row">
+        <div class="form-group"><label>掲載終了日</label><input type="text" id="prop-drop-end" placeholder="YYYY-MM-DD"></div>
+        <div class="form-group"><label>最終販売価格 (万円)</label><input type="number" id="prop-drop-final-price" placeholder="値下げ幅を追う"></div>
+      </div>
+      <div class="form-group"><label>追跡状態</label>
+        <select id="prop-drop-status"><option value="継続掲載中">継続掲載中</option><option value="売約済">売約済</option><option value="取り下げ">取り下げ</option><option value="価格改定（継続）">価格改定（継続）</option></select>
+      </div>
     </div>
 
     <div class="form-section">📝 その他</div>
@@ -627,9 +1335,66 @@ let data = {
   diary: [],         // Journal（旧名互換） → GASシート: Journal
   journals: [],      // Journal
   schedules: [],     // カレンダー予定 → GASシート: カレンダー予定
+  contacts: [],      // 連絡先 (Step 3)
+  hearings: [],      // ヒアリング記録 (Step 3)
   gasUrl: '', gasApiKey: '', gasWritePassword: '',
   calcPatterns: [{ id: genId(), name: 'パターンA', income: [{ name: '家賃収入', value: 0, unit: '月' }], acquisition: [{ name: '物件価格', value: 0, unit: '一時' }], running: [{ name: '管理費', value: 0, unit: '月' }, { name: '修繕積立金', value: 0, unit: '月' }, { name: '固定資産税', value: 0, unit: '年' }], vacancyRate: 10 }]
 };
+
+/* ===== 連絡先・ヒアリング (Step 3) ===== */
+// 業種タグ 12種類
+const CONTACT_TYPES = [
+  { key: '銀行', group: 'bank', label: '🏦 銀行' },
+  { key: '信金・信組', group: 'bank', label: '🏦 信金・信組' },
+  { key: '日本政策金融公庫', group: 'bank', label: '🏦 日本政策金融公庫' },
+  { key: '元付け', group: 'estate', label: '🏢 元付け' },
+  { key: '客付け', group: 'estate', label: '🏢 客付け' },
+  { key: '管理会社', group: 'estate', label: '🏢 管理会社' },
+  { key: '工務店・リフォーム', group: 'reform', label: '🔨 工務店・リフォーム' },
+  { key: '設備業者', group: 'reform', label: '🔨 設備業者' },
+  { key: '司法書士系', group: 'pro', label: '📜 司法書士系' },
+  { key: '税理士', group: 'pro', label: '📜 税理士' },
+  { key: 'オーナー系', group: 'owner', label: '🏠 オーナー系' },
+  { key: '大家仲間・メンター', group: 'friend', label: '👥 大家仲間・メンター' },
+  { key: 'その他', group: 'other', label: 'その他' }
+];
+// カタカナ→ひらがな変換（検索時に音で一致させる）
+function kataToHira(str) {
+  return (str || '').replace(/[\u30A1-\u30F6]/g, function(m){
+    return String.fromCharCode(m.charCodeAt(0) - 0x60);
+  });
+}
+function normalizeForSearch(str) {
+  return kataToHira(String(str || '')).toLowerCase();
+}
+
+function contactGroup(types) {
+  // 最初のタグのグループを使用（アバター色用）
+  if (!types || !types.length) return 'other';
+  const first = CONTACT_TYPES.find(t => t.key === types[0]);
+  return first ? first.group : 'other';
+}
+function contactInitial(name) {
+  return name ? name.charAt(0) : '?';
+}
+function daysSince(dateStr) {
+  if (!dateStr) return null;
+  try {
+    const d = new Date(dateStr);
+    const now = new Date();
+    return Math.floor((now - d) / (1000 * 60 * 60 * 24));
+  } catch(e) { return null; }
+}
+function lastContactLabel(dateStr) {
+  if (!dateStr) return { cls: '', text: '未接触' };
+  const days = daysSince(dateStr);
+  if (days === null) return { cls: '', text: dateStr };
+  if (days === 0) return { cls: 'hot', text: '今日' };
+  if (days <= 7) return { cls: 'hot', text: days + '日前' };
+  if (days <= 30) return { cls: '', text: days + '日前' };
+  if (days <= 90) return { cls: '', text: Math.floor(days/30) + 'ヶ月前' };
+  return { cls: 'cold', text: Math.floor(days/30) + 'ヶ月前' };
+}
 
 let currentPropertyId = null;
 let currentCalcPatternIdx = 0;
@@ -654,6 +1419,8 @@ function loadData() {
     if (!data.diary) data.diary = [];
     if (!data.journals) data.journals = [];
     if (!data.schedules) data.schedules = [];
+    if (!data.contacts) data.contacts = [];
+    if (!data.hearings) data.hearings = [];
     // diary → journals マイグレーション（後方互換）
     if (data.diary && data.diary.length && !data.journals.length) {
       data.journals = data.diary.slice();
@@ -675,16 +1442,27 @@ function toast(msg, type='success') {
 }
 
 /* ===== NAVIGATION ===== */
-function showPage(name) {
+const LAST_PAGE_KEY = 'fudosan_last_page';
+const LAST_PROP_KEY = 'fudosan_last_prop_id';
+const LAST_SCROLL_KEY = 'fudosan_last_scroll';
+
+function showPage(name, skipScrollReset) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const page = document.getElementById('page-' + name);
   if (page) page.classList.add('active');
   document.querySelectorAll('.sidebar nav a, .tabbar a').forEach(a => {
     a.classList.toggle('active', a.dataset.page === name);
   });
-  const titles = { home: 'Property Note', property: '物件', 'property-detail': '物件詳細', memo: 'Memo', learn: 'Learn', calendar: 'カレンダー', settings: 'Settings' };
+  const titles = { home: 'Property Note', property: '物件', 'property-detail': '物件詳細', contacts: '連絡先', area: 'エリア情報', memo: 'Memo', learn: 'Learn', calendar: 'カレンダー', settings: 'Settings' };
   document.getElementById('topbar-title').textContent = titles[name] || 'Property Note';
-  window.scrollTo(0, 0);
+  // 最後に見たページを記憶 (リロード時に復元するため)
+  try {
+    localStorage.setItem(LAST_PAGE_KEY, name);
+    if (name === 'property-detail' && currentPropertyId) {
+      localStorage.setItem(LAST_PROP_KEY, String(currentPropertyId));
+    }
+  } catch(e){}
+  if (!skipScrollReset) window.scrollTo(0, 0);
   renderCurrentPage();
 }
 
@@ -702,6 +1480,121 @@ const STATUS_PHASE = {
 function statusBadge(s) { return '<span class="status-badge ' + (STATUS_PHASE[s]||'') + '">' + esc(s) + '</span>'; }
 
 /* ===== PROPERTY ===== */
+/* ===== モーダル内の動的UI ヘルパー (Step 1.5) ===== */
+function renderImportantMattersEditor(p) {
+  const container = document.getElementById('prop-important-list');
+  if (!container) return;
+  const im = (p && p.importantMatters) || {};
+  const hidden = (p && p.importantHidden) || [];
+  const custom = (p && p.importantCustom) || [];
+  let html = '';
+  IMPORTANT_MATTERS_DEFAULTS.forEach(function(label){
+    const isHidden = hidden.indexOf(label) >= 0;
+    const val = im[label] || '';
+    html += '<div class="imp-row' + (isHidden?' imp-hidden':'') + '" data-label="'+esc(label)+'">' +
+      '<span class="imp-label">'+esc(label)+'</span>' +
+      '<input type="text" class="imp-value" value="'+esc(val)+'" placeholder="未確認なら空欄">' +
+      '<button type="button" class="imp-toggle" onclick="toggleImportantHidden(this)">'+(isHidden?'↩ 表示':'👁 非表示')+'</button>' +
+      '</div>';
+  });
+  custom.forEach(function(kv){
+    html += '<div class="imp-row imp-custom">' +
+      '<input type="text" class="imp-label-input" value="'+esc(kv.label||'')+'" placeholder="項目名">' +
+      '<input type="text" class="imp-value" value="'+esc(kv.value||'')+'" placeholder="値">' +
+      '<button type="button" class="imp-delete" onclick="deleteImportantCustom(this)">×</button>' +
+      '</div>';
+  });
+  container.innerHTML = html;
+}
+function addImportantCustom() {
+  const container = document.getElementById('prop-important-list');
+  const html = '<div class="imp-row imp-custom">' +
+    '<input type="text" class="imp-label-input" value="" placeholder="項目名">' +
+    '<input type="text" class="imp-value" value="" placeholder="値">' +
+    '<button type="button" class="imp-delete" onclick="deleteImportantCustom(this)">×</button>' +
+    '</div>';
+  container.insertAdjacentHTML('beforeend', html);
+}
+function toggleImportantHidden(btn) {
+  const row = btn.closest('.imp-row');
+  row.classList.toggle('imp-hidden');
+  btn.textContent = row.classList.contains('imp-hidden') ? '↩ 表示' : '👁 非表示';
+}
+function deleteImportantCustom(btn) { btn.closest('.imp-row').remove(); }
+
+const DEFAULT_COST_ITEMS = [
+  { label: '物件価格', vendor: '' },
+  { label: '工事費', vendor: '工務店' },
+  { label: '仲介手数料', vendor: '' },
+  { label: '司法書士手数料', vendor: '' },
+  { label: '不動産取得税', vendor: '', undecided: true },
+  { label: '印紙代', vendor: '' }
+];
+function renderCostBreakdownEditor(p) {
+  const container = document.getElementById('prop-cost-list');
+  if (!container) return;
+  let cb = (p && Array.isArray(p.costBreakdown) && p.costBreakdown.length) ? p.costBreakdown.slice() : null;
+  if (!cb) {
+    cb = DEFAULT_COST_ITEMS.map(function(t){ return Object.assign({ amount: '', undecided: false }, t); });
+    if (p && p.price) cb[0].amount = p.price * 10000;
+    if (p && p.repairCost) cb[1].amount = p.repairCost * 10000;
+  }
+  let html = '';
+  cb.forEach(function(c){
+    html += '<div class="cost-row">' +
+      '<input type="text" class="cost-label" value="'+esc(c.label||'')+'" placeholder="項目名">' +
+      '<input type="number" class="cost-amount" value="'+(c.amount||'')+'" placeholder="金額(円)"'+(c.undecided?' disabled':'')+'>' +
+      '<select class="cost-vendor">' +
+        '<option value="">ベンダー</option>' +
+        '<option value="工務店"'+(c.vendor==='工務店'?' selected':'')+'>工務店</option>' +
+        '<option value="ガス屋"'+(c.vendor==='ガス屋'?' selected':'')+'>ガス屋</option>' +
+        '<option value="DIY"'+(c.vendor==='DIY'?' selected':'')+'>DIY</option>' +
+        '<option value="その他"'+(c.vendor==='その他'?' selected':'')+'>その他</option>' +
+      '</select>' +
+      '<label><input type="checkbox" class="cost-undecided"'+(c.undecided?' checked':'')+' onchange="toggleCostUndecided(this)"> 未定</label>' +
+      '<button type="button" class="cost-delete" onclick="deleteCostItem(this)">×</button>' +
+      '</div>';
+  });
+  container.innerHTML = html;
+}
+function addCostItem() {
+  const container = document.getElementById('prop-cost-list');
+  const html = '<div class="cost-row">' +
+    '<input type="text" class="cost-label" value="" placeholder="項目名">' +
+    '<input type="number" class="cost-amount" value="" placeholder="金額(円)">' +
+    '<select class="cost-vendor">' +
+      '<option value="">ベンダー</option>' +
+      '<option value="工務店">工務店</option>' +
+      '<option value="ガス屋">ガス屋</option>' +
+      '<option value="DIY">DIY</option>' +
+      '<option value="その他">その他</option>' +
+    '</select>' +
+    '<label><input type="checkbox" class="cost-undecided" onchange="toggleCostUndecided(this)"> 未定</label>' +
+    '<button type="button" class="cost-delete" onclick="deleteCostItem(this)">×</button>' +
+    '</div>';
+  container.insertAdjacentHTML('beforeend', html);
+}
+function toggleCostUndecided(cb) {
+  const row = cb.closest('.cost-row');
+  const amountEl = row.querySelector('.cost-amount');
+  amountEl.disabled = cb.checked;
+  if (cb.checked) amountEl.value = '';
+}
+function deleteCostItem(btn) { btn.closest('.cost-row').remove(); }
+
+function updateRebuildJudge() {
+  const el = document.getElementById('prop-rebuild-judge');
+  if (!el) return;
+  const fakeP = {
+    roadType: document.getElementById('prop-road-type').value,
+    roadWidth: document.getElementById('prop-road-width').value,
+    frontage: document.getElementById('prop-frontage').value
+  };
+  const j = judgeRebuild(fakeP);
+  el.className = 'auto-judge ' + j.s;
+  el.textContent = '自動判定: ' + j.note + '（' + j.label + '）';
+}
+
 function openPropertyModal(id) {
   const m = document.getElementById('modal-property');
   const isEdit = !!id;
@@ -715,32 +1608,76 @@ function openPropertyModal(id) {
   document.getElementById('prop-mapurl').value = p ? (p.mapUrl||'') : '';
   document.getElementById('prop-ptype').value = p ? (p.ptype||'') : '';
   document.getElementById('prop-age').value = p ? (p.age||'') : '';
+  document.getElementById('prop-structure').value = p ? (p.structure||'') : '';
+  document.getElementById('prop-layout').value = p ? (p.layout||'') : '';
   document.getElementById('prop-area').value = p ? (p.area||'') : '';
   document.getElementById('prop-land').value = p ? (p.land||'') : '';
+  document.getElementById('prop-direction').value = p ? (p.direction||'') : '';
+  document.getElementById('prop-parking').value = p ? (p.parking||'') : '';
+  document.getElementById('prop-occupancy').value = p ? (p.occupancy||'') : '';
+  document.getElementById('prop-delivery').value = p ? (p.deliveryTime||'') : '';
   document.getElementById('prop-access').value = p ? (p.access||'') : '';
   document.getElementById('prop-listingurl').value = p ? (p.listingUrl||'') : '';
   document.getElementById('prop-status').value = p ? (p.status||'候補発見') : '候補発見';
+  // 接道
+  document.getElementById('prop-road-type').value = p ? (p.roadType||'') : '';
+  document.getElementById('prop-road-width').value = p ? (p.roadWidth||'') : '';
+  document.getElementById('prop-frontage').value = p ? (p.frontage||'') : '';
+  document.getElementById('prop-road-direction').value = p ? (p.roadDirection||'') : '';
+  document.getElementById('prop-road-verified').checked = !!(p && p.roadVerified);
+  document.getElementById('prop-road-verify-date').value = p ? (p.roadVerifyDate||'') : '';
+  document.getElementById('prop-road-verify-by').value = p ? (p.roadVerifyBy||'') : '';
+  document.getElementById('prop-road').value = p ? (p.road||'') : '';
+  document.getElementById('prop-rebuild').value = p ? (p.rebuild||'') : '';
+  // 用途地域
   document.getElementById('prop-zoning').value = p ? (p.zoning||'') : '';
   document.getElementById('prop-coverage').value = p ? (p.coverage||'') : '';
   document.getElementById('prop-far').value = p ? (p.far||'') : '';
-  document.getElementById('prop-road').value = p ? (p.road||'') : '';
-  document.getElementById('prop-rebuild').value = p ? (p.rebuild||'') : '';
+  document.getElementById('prop-zoning-verified').checked = !!(p && p.zoningVerified);
+  document.getElementById('prop-zoning-verify-date').value = p ? (p.zoningVerifyDate||'') : '';
+  document.getElementById('prop-zoning-verify-by').value = p ? (p.zoningVerifyBy||'') : '';
+  // 登記
+  document.getElementById('prop-registry-memo').value = p ? (p.registryMemo||'') : '';
   document.getElementById('prop-legal-memo').value = p ? (p.legalMemo||'') : '';
+  document.getElementById('prop-registry-verified').checked = !!(p && p.registryVerified);
+  document.getElementById('prop-registry-verify-date').value = p ? (p.registryVerifyDate||'') : '';
+  document.getElementById('prop-registry-verify-by').value = p ? (p.registryVerifyBy||'') : '';
+  // 収支
   document.getElementById('prop-price').value = p ? (p.price||'') : '';
   document.getElementById('prop-rent').value = p ? (p.rentExpected||'') : '';
   document.getElementById('prop-market-rent').value = p ? (p.rentMarket||'') : '';
+  document.getElementById('prop-market-rent-hi').value = p ? (p.rentMarketHi||'') : '';
   document.getElementById('prop-repair').value = p ? (p.repairCost||'') : '';
   document.getElementById('prop-closing').value = p ? (p.closingCost||'') : '';
   document.getElementById('prop-downpayment').value = p ? (p.downPayment||'') : '';
+  // 出口
   document.getElementById('prop-exit').value = p ? (p.exitStrategy||'') : '';
   document.getElementById('prop-exit-year').value = p ? (p.exitTargetYear||'') : '';
   document.getElementById('prop-exit-price').value = p ? (p.exitTargetPrice||'') : '';
   document.getElementById('prop-exit-reason').value = p ? (p.exitReason||'') : '';
+  // 写真メモ
   document.getElementById('prop-photo-url').value = p ? (p.photoAlbumUrl||'') : '';
   document.getElementById('prop-photo-memo').value = p ? (p.photoMemo||'') : '';
+  // 見送り
+  document.getElementById('prop-drop-date').value = p ? (p.dropDate||'') : '';
+  document.getElementById('prop-drop-phase').value = p ? (p.dropPhase||'') : '';
   document.getElementById('prop-drop-reason').value = p ? (p.dropReason||'') : '';
   document.getElementById('prop-drop-memo').value = p ? (p.dropMemo||'') : '';
+  document.getElementById('prop-drop-tip').value = p ? (p.dropTip||'') : '';
+  document.getElementById('prop-drop-comm').value = p ? (p.dropComm||'') : '';
+  document.getElementById('prop-drop-agent').value = p ? (p.dropAgent||'') : '';
+  document.getElementById('prop-drop-compete').value = p ? (p.dropCompete||'') : '';
+  document.getElementById('prop-drop-rating').value = p ? (p.dropRating||'') : '';
+  document.getElementById('prop-drop-end').value = p ? (p.dropEnd||'') : '';
+  document.getElementById('prop-drop-final-price').value = p ? (p.dropFinalPrice||'') : '';
+  document.getElementById('prop-drop-status').value = p ? (p.dropStatus||'継続掲載中') : '継続掲載中';
+  // 自由メモ
   document.getElementById('prop-memo').value = p ? (p.memo||'') : '';
+
+  // 動的UI
+  renderImportantMattersEditor(p);
+  renderCostBreakdownEditor(p);
+  updateRebuildJudge();
 
   toggleDropSection();
   m.classList.add('show');
@@ -764,20 +1701,79 @@ function saveProperty(e) {
   p.mapUrl = document.getElementById('prop-mapurl').value;
   p.ptype = document.getElementById('prop-ptype').value;
   p.age = num(document.getElementById('prop-age').value);
+  p.structure = document.getElementById('prop-structure').value;
+  p.layout = document.getElementById('prop-layout').value;
   p.area = num(document.getElementById('prop-area').value);
   p.land = num(document.getElementById('prop-land').value);
+  p.direction = document.getElementById('prop-direction').value;
+  p.parking = num(document.getElementById('prop-parking').value);
+  p.occupancy = document.getElementById('prop-occupancy').value;
+  p.deliveryTime = document.getElementById('prop-delivery').value;
   p.access = document.getElementById('prop-access').value;
   p.listingUrl = document.getElementById('prop-listingurl').value;
   p.status = document.getElementById('prop-status').value;
+  // 接道
+  p.roadType = document.getElementById('prop-road-type').value;
+  p.roadWidth = num(document.getElementById('prop-road-width').value);
+  p.frontage = num(document.getElementById('prop-frontage').value);
+  p.roadDirection = document.getElementById('prop-road-direction').value;
+  p.roadVerified = document.getElementById('prop-road-verified').checked;
+  p.roadVerifyDate = document.getElementById('prop-road-verify-date').value;
+  p.roadVerifyBy = document.getElementById('prop-road-verify-by').value;
+  p.road = document.getElementById('prop-road').value;
+  p.rebuild = document.getElementById('prop-rebuild').value;
+  // 用途地域
   p.zoning = document.getElementById('prop-zoning').value;
   p.coverage = num(document.getElementById('prop-coverage').value);
   p.far = num(document.getElementById('prop-far').value);
-  p.road = document.getElementById('prop-road').value;
-  p.rebuild = document.getElementById('prop-rebuild').value;
+  p.zoningVerified = document.getElementById('prop-zoning-verified').checked;
+  p.zoningVerifyDate = document.getElementById('prop-zoning-verify-date').value;
+  p.zoningVerifyBy = document.getElementById('prop-zoning-verify-by').value;
+  // 登記
+  p.registryMemo = document.getElementById('prop-registry-memo').value;
   p.legalMemo = document.getElementById('prop-legal-memo').value;
+  p.registryVerified = document.getElementById('prop-registry-verified').checked;
+  p.registryVerifyDate = document.getElementById('prop-registry-verify-date').value;
+  p.registryVerifyBy = document.getElementById('prop-registry-verify-by').value;
+  // 重要事項
+  const im = {};
+  const impHidden = [];
+  const impCustom = [];
+  document.querySelectorAll('#prop-important-list .imp-row').forEach(function(row){
+    if (row.classList.contains('imp-custom')) {
+      const lblEl = row.querySelector('.imp-label-input');
+      const valEl = row.querySelector('.imp-value');
+      if (lblEl && valEl) {
+        const lbl = lblEl.value.trim();
+        const val = valEl.value.trim();
+        if (lbl) impCustom.push({ label: lbl, value: val });
+      }
+    } else {
+      const label = row.dataset.label;
+      const val = (row.querySelector('.imp-value')||{}).value || '';
+      if (val.trim()) im[label] = val.trim();
+      if (row.classList.contains('imp-hidden')) impHidden.push(label);
+    }
+  });
+  p.importantMatters = im;
+  p.importantHidden = impHidden;
+  p.importantCustom = impCustom;
+  // 費用内訳
+  const costs = [];
+  document.querySelectorAll('#prop-cost-list .cost-row').forEach(function(row){
+    const label = (row.querySelector('.cost-label')||{}).value || '';
+    if (!label.trim()) return;
+    const undecided = (row.querySelector('.cost-undecided')||{}).checked || false;
+    const amount = undecided ? null : num((row.querySelector('.cost-amount')||{}).value);
+    const vendor = (row.querySelector('.cost-vendor')||{}).value || '';
+    costs.push({ id: genId(), label: label.trim(), amount: amount, vendor: vendor, undecided: undecided });
+  });
+  p.costBreakdown = costs;
+  // 収支
   p.price = num(document.getElementById('prop-price').value);
   p.rentExpected = num(document.getElementById('prop-rent').value);
   p.rentMarket = num(document.getElementById('prop-market-rent').value);
+  p.rentMarketHi = num(document.getElementById('prop-market-rent-hi').value);
   p.repairCost = num(document.getElementById('prop-repair').value);
   p.closingCost = num(document.getElementById('prop-closing').value);
   p.downPayment = num(document.getElementById('prop-downpayment').value);
@@ -789,9 +1785,18 @@ function saveProperty(e) {
   p.photoMemo = document.getElementById('prop-photo-memo').value;
   p.richNote = p.richNote || '';
   if (p.status === '見送り') {
+    p.dropDate = document.getElementById('prop-drop-date').value || today();
+    p.dropPhase = document.getElementById('prop-drop-phase').value;
     p.dropReason = document.getElementById('prop-drop-reason').value;
     p.dropMemo = document.getElementById('prop-drop-memo').value;
-    p.dropDate = p.dropDate || today();
+    p.dropTip = document.getElementById('prop-drop-tip').value;
+    p.dropComm = document.getElementById('prop-drop-comm').value;
+    p.dropAgent = document.getElementById('prop-drop-agent').value;
+    p.dropCompete = document.getElementById('prop-drop-compete').value;
+    p.dropRating = document.getElementById('prop-drop-rating').value;
+    p.dropEnd = document.getElementById('prop-drop-end').value;
+    p.dropFinalPrice = num(document.getElementById('prop-drop-final-price').value);
+    p.dropStatus = document.getElementById('prop-drop-status').value;
   }
   p.memo = document.getElementById('prop-memo').value;
 
@@ -843,82 +1848,1686 @@ function showPropertyDetail(id) {
 }
 function editCurrentProperty() { openPropertyModal(currentPropertyId); }
 
+/* ===== 連絡先 (Step 3) ===== */
+let currentContactId = null;
+let contactFilterType = '';
+let contactFavOnly = false;
+
+function renderContactsPage() {
+  renderContactFilter();
+  renderContactStats();
+  renderAreaFilterOptions();
+  renderContactsList();
+}
+
+function renderContactStats() {
+  const total = data.contacts.filter(c => !c.archived).length;
+  const fav = data.contacts.filter(c => c.favorite && !c.archived).length;
+  const now = new Date();
+  let stale = 0, recent = 0;
+  data.contacts.forEach(function(c){
+    if (c.archived) return;
+    const d = daysSince(c.lastContactDate);
+    if (d == null) return;
+    if (d > 90) stale++;
+    if (d <= 30) recent++;
+  });
+  document.getElementById('ct-stats').innerHTML =
+    '<div class="ct-stat"><div class="cs-num">' + total + '</div><div class="cs-lbl">総連絡先</div></div>' +
+    '<div class="ct-stat"><div class="cs-num">' + fav + '</div><div class="cs-lbl">★ お気に入り</div></div>' +
+    '<div class="ct-stat"><div class="cs-num">' + stale + '</div><div class="cs-lbl">⚠ 3ヶ月以上未接触</div></div>' +
+    '<div class="ct-stat"><div class="cs-num">' + recent + '</div><div class="cs-lbl">💬 今月接触</div></div>';
+}
+
+function renderContactFilter() {
+  const counts = {};
+  data.contacts.forEach(function(c){
+    if (c.archived) return;
+    (c.types || []).forEach(function(t){ counts[t] = (counts[t]||0) + 1; });
+  });
+  const total = data.contacts.filter(c => !c.archived).length;
+  let h = '<div class="ct-chip' + (contactFilterType===''?' active':'') + '" onclick="setContactFilter(\'\')">すべて<span class="ct-count">'+total+'</span></div>';
+  CONTACT_TYPES.forEach(function(t){
+    const n = counts[t.key] || 0;
+    h += '<div class="ct-chip' + (contactFilterType===t.key?' active':'') + '" onclick="setContactFilter(\''+esc(t.key)+'\')">'+esc(t.label)+(n>0?'<span class="ct-count">'+n+'</span>':'')+'</div>';
+  });
+  document.getElementById('ct-filter').innerHTML = h;
+}
+
+function setContactFilter(type) {
+  contactFilterType = type;
+  renderContactFilter();
+  renderContactsList();
+}
+
+function toggleContactFavOnly() {
+  contactFavOnly = !contactFavOnly;
+  document.getElementById('ct-fav-toggle-label').textContent = contactFavOnly ? '★ お気に入りのみ（ON）' : '☆ お気に入りのみ';
+  renderContactsList();
+}
+
+function renderAreaFilterOptions() {
+  const sel = document.getElementById('ct-area-filter');
+  const areas = new Set();
+  data.contacts.forEach(function(c){ (c.areas || []).forEach(function(a){ if (a) areas.add(a); }); });
+  const sorted = Array.from(areas).sort();
+  sel.innerHTML = '<option value="">全エリア</option>' + sorted.map(function(a){ return '<option value="'+esc(a)+'">'+esc(a)+'</option>'; }).join('');
+}
+
+function renderContactsList() {
+  const q = (document.getElementById('ct-search').value || '').toLowerCase();
+  const areaFilter = document.getElementById('ct-area-filter').value;
+  let list = data.contacts.filter(function(c){ return !c.archived; });
+  if (contactFilterType) list = list.filter(function(c){ return (c.types||[]).indexOf(contactFilterType) >= 0; });
+  if (contactFavOnly) list = list.filter(function(c){ return c.favorite; });
+  if (areaFilter) list = list.filter(function(c){ return (c.areas||[]).indexOf(areaFilter) >= 0; });
+  if (q) {
+    const nq = normalizeForSearch(q);
+    list = list.filter(function(c){
+      const hay = normalizeForSearch([c.name, c.nameKana, c.company, c.companyKana, c.branch, c.title, c.memo, (c.types||[]).join(' '), (c.areas||[]).join(' ')].join(' '));
+      return hay.indexOf(nq) >= 0;
+    });
+  }
+  // お気に入り優先
+  list.sort(function(a,b){ return (b.favorite?1:0) - (a.favorite?1:0); });
+  const el = document.getElementById('ct-grid');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:30px;"><div class="icon">📇</div>該当する連絡先がありません</div>';
+    return;
+  }
+  el.innerHTML = list.map(renderContactCard).join('');
+}
+
+function renderContactCard(c) {
+  const grp = contactGroup(c.types);
+  const types = (c.types || []).slice(0, 3);
+  const last = lastContactLabel(c.lastContactDate);
+  let h = '<div class="ct-card" onclick="openContactModal(\'' + c.id + '\')">';
+  h += '<div class="ct-star'+(c.favorite?' fav':'')+'" onclick="event.stopPropagation();toggleContactFavorite(\''+c.id+'\')">'+(c.favorite?'★':'☆')+'</div>';
+  h += '<div class="ct-head">';
+  h += '<div class="ct-avatar t-'+grp+'">'+esc(contactInitial(c.name))+'</div>';
+  h += '<div style="min-width:0;flex:1;">';
+  h += '<div class="ct-nm">'+esc(c.name||'(名無し)')+(c.nameKana?' <span style="font-size:10px;color:var(--gray3);font-weight:400;">('+esc(c.nameKana)+')</span>':'')+'</div>';
+  if (c.title) h += '<div class="ct-sub">'+esc(c.title)+'</div>';
+  if (c.company || c.branch) h += '<div class="ct-co">'+esc([c.company, c.branch].filter(Boolean).join(' '))+'</div>';
+  if (types.length) {
+    h += '<div class="ct-tags">';
+    types.forEach(function(t){
+      const ct = CONTACT_TYPES.find(function(x){ return x.key === t; });
+      const g = ct ? ct.group : 'other';
+      h += '<span class="ct-tag t-'+g+'">'+esc(t)+'</span>';
+    });
+    h += '</div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  h += '<div class="ct-meta">';
+  h += '<div class="ct-line"><span>'+esc((c.areas||[]).join(', ')||'—')+'</span><span class="ct-last '+last.cls+'">📅 '+esc(last.text)+'</span></div>';
+  if (c.memo) h += '<div class="ct-memo">'+esc(c.memo.substring(0, 80))+(c.memo.length>80?'...':'')+'</div>';
+  h += '</div>';
+  h += '<div class="ct-actions" onclick="event.stopPropagation()">';
+  if (c.phone) h += '<a class="ct-mini-btn" href="tel:'+esc(c.phone)+'">📞 '+esc(c.phone)+'</a>';
+  if (c.mobile) h += '<a class="ct-mini-btn" href="tel:'+esc(c.mobile)+'">📱</a>';
+  if (c.email) h += '<a class="ct-mini-btn" href="mailto:'+esc(c.email)+'">✉</a>';
+  if (c.line) h += '<a class="ct-mini-btn" href="'+esc(c.line)+'" target="_blank">LINE</a>';
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+function toggleContactFavorite(id) {
+  const c = data.contacts.find(x => String(x.id) === String(id));
+  if (!c) return;
+  c.favorite = !c.favorite;
+  saveData();
+  renderContactsPage();
+  toast(c.favorite ? '★ お気に入りに追加' : '☆ お気に入り解除');
+}
+
+function openContactModal(id) {
+  currentContactId = id || null;
+  const isEdit = !!id;
+  const c = isEdit ? data.contacts.find(x => String(x.id) === String(id)) : null;
+  document.getElementById('contact-modal-title').textContent = isEdit ? '連絡先を編集' : '連絡先を追加';
+  document.getElementById('ct-id').value = isEdit ? c.id : '';
+  document.getElementById('ct-name').value = c ? (c.name||'') : '';
+  document.getElementById('ct-name-kana').value = c ? (c.nameKana||'') : '';
+  document.getElementById('ct-title').value = c ? (c.title||'') : '';
+  document.getElementById('ct-company').value = c ? (c.company||'') : '';
+  document.getElementById('ct-company-kana').value = c ? (c.companyKana||'') : '';
+  document.getElementById('ct-branch').value = c ? (c.branch||'') : '';
+  document.getElementById('ct-phone').value = c ? (c.phone||'') : '';
+  document.getElementById('ct-mobile').value = c ? (c.mobile||'') : '';
+  document.getElementById('ct-email').value = c ? (c.email||'') : '';
+  document.getElementById('ct-line').value = c ? (c.line||'') : '';
+  document.getElementById('ct-website').value = c ? (c.website||'') : '';
+  document.getElementById('ct-areas').value = c ? ((c.areas||[]).join(', ')) : '';
+  document.getElementById('ct-stance').value = c ? (c.stance||'') : '';
+  document.getElementById('ct-favorite').value = c && c.favorite ? 'true' : 'false';
+  document.getElementById('ct-memo').value = c ? (c.memo||'') : '';
+  renderTypesSelector('ct-types-select', c ? (c.types||[]) : []);
+  document.getElementById('modal-contact').classList.add('show');
+}
+
+function renderTypesSelector(containerId, selected) {
+  const el = document.getElementById(containerId);
+  selected = selected || [];
+  el.innerHTML = CONTACT_TYPES.map(function(t){
+    const active = selected.indexOf(t.key) >= 0 ? ' active' : '';
+    return '<label class="'+active.trim()+'"><input type="checkbox" value="'+esc(t.key)+'"'+(active?' checked':'')+' onchange="this.closest(\'label\').classList.toggle(\'active\')">'+esc(t.label)+'</label>';
+  }).join('');
+}
+
+function collectSelectedTypes(containerId) {
+  const el = document.getElementById(containerId);
+  return Array.from(el.querySelectorAll('input[type=checkbox]:checked')).map(function(i){ return i.value; });
+}
+
+function saveContact(e) {
+  e.preventDefault();
+  const id = document.getElementById('ct-id').value;
+  const isEdit = !!id;
+  const c = isEdit ? data.contacts.find(x => String(x.id) === String(id)) : { id: genId(), archived: false, firstContactDate: today() };
+  c.name = document.getElementById('ct-name').value.trim();
+  c.nameKana = document.getElementById('ct-name-kana').value.trim();
+  c.title = document.getElementById('ct-title').value.trim();
+  c.company = document.getElementById('ct-company').value.trim();
+  c.companyKana = document.getElementById('ct-company-kana').value.trim();
+  c.branch = document.getElementById('ct-branch').value.trim();
+  c.types = collectSelectedTypes('ct-types-select');
+  c.phone = document.getElementById('ct-phone').value.trim();
+  c.mobile = document.getElementById('ct-mobile').value.trim();
+  c.email = document.getElementById('ct-email').value.trim();
+  c.line = document.getElementById('ct-line').value.trim();
+  c.website = document.getElementById('ct-website').value.trim();
+  c.areas = document.getElementById('ct-areas').value.split(/[,、,]/).map(function(s){ return s.trim(); }).filter(Boolean);
+  c.stance = document.getElementById('ct-stance').value;
+  c.favorite = document.getElementById('ct-favorite').value === 'true';
+  c.memo = document.getElementById('ct-memo').value.trim();
+  if (!isEdit) data.contacts.unshift(c);
+  saveData();
+  closeModal('modal-contact');
+  toast('連絡先「' + c.name + '」を保存');
+  renderCurrentPage();
+}
+
+function deleteContact() {
+  const id = document.getElementById('ct-id').value;
+  if (!id) { closeModal('modal-contact'); return; }
+  if (!confirm('この連絡先を削除しますか？')) return;
+  data.contacts = data.contacts.filter(x => String(x.id) !== String(id));
+  saveData();
+  closeModal('modal-contact');
+  toast('連絡先を削除');
+  renderCurrentPage();
+}
+
+/* ===== ヒアリング (Step 3) ===== */
+let currentHearingContactId = null; // picker state
+let currentHearingContext = null;    // 物件詳細から開いた場合のID
+
+function renderHearingPane(p) {
+  const related = data.hearings.filter(function(h){ return (h.propertyIds||[]).indexOf(p.id) >= 0; }).sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+  // 紐付け未設定のヒアリング（どの物件にも紐付いていない、または過去のバグで空配列）
+  const orphans = data.hearings.filter(function(h){ return !h.propertyIds || h.propertyIds.length === 0; }).sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+  let h = '<div class="detail-pane" id="dtab-2">';
+  h += '<div style="display:flex;gap:6px;margin-bottom:10px;">';
+  h += '<button class="btn btn-primary btn-sm" onclick="openHearingModal(null, \''+p.id+'\')">+ ヒアリング記録を追加</button>';
+  h += '</div>';
+  h += '<div class="hr-intro">客付け会社への<b>10項目ヒアリング</b>を記録。最低3社・2社が前向きなら買付GO。1つの記録で複数物件に紐付け可能。</div>';
+  if (!related.length) {
+    h += '<div class="empty" style="padding:30px;"><div class="icon">📞</div>この物件に紐づくヒアリング記録がありません<br><small>「+ ヒアリング記録を追加」から登録してください</small></div>';
+  } else {
+    h += '<div class="hr-list">';
+    related.forEach(function(hr){ h += renderHearingCard(hr); });
+    h += '</div>';
+  }
+  // 紐付け未設定のヒアリング（救済UI）
+  if (orphans.length > 0) {
+    h += '<details style="margin-top:12px;background:#fff8e1;border:1px solid #e0a800;border-radius:3px;padding:10px 12px;">';
+    h += '<summary style="cursor:pointer;font-size:12px;color:#7a5b00;font-weight:700;">⚠ 紐付け未設定のヒアリング ('+orphans.length+'件) — どの物件にも紐付いていない記録</summary>';
+    h += '<div style="font-size:11px;color:var(--gray4);margin-top:6px;line-height:1.5;">下記カードの「✏ 編集」から「対象物件」で本物件にチェック→保存すると、このヒアリング一覧に統合されます。</div>';
+    h += '<div class="hr-list" style="margin-top:8px;">';
+    orphans.forEach(function(hr){ h += renderHearingCard(hr); });
+    h += '</div></details>';
+  }
+  h += '</div>';
+  return h;
+}
+
+function renderHearingCard(hr) {
+  const contact = hr.contactId ? data.contacts.find(x => String(x.id) === String(hr.contactId)) : null;
+  const agent = contact ? (contact.name + (contact.company ? ' / ' + contact.company : '') + (contact.branch ? ' ' + contact.branch : '')) : (hr.agentName || '担当者未設定');
+  const Q = [
+    ['① 募集条件', hr.q1],
+    ['② 室内設備', hr.q2],
+    ['③ 駐車場', hr.q3],
+    ['④ 家賃UP方法', hr.q4],
+    ['⑤ 類似事例', hr.q5],
+    ['⑥ 繁忙期・契約数', hr.q6],
+    ['⑦ 他社紹介・AD・契約形態', hr.q7],
+    ['⑧ 入居者属性', hr.q8],
+    ['⑨ ターゲット層', hr.q9],
+    ['⑩ 担当者・所感', hr.q10]
+  ];
+  let h = '<div class="hr-card">';
+  h += '<div class="hr-card-head">';
+  h += '<span class="hr-date">'+esc(hr.date||'')+'</span>';
+  h += '<span class="hr-agent">'+esc(agent)+'</span>';
+  h += '<div class="hr-actions">';
+  h += '<button class="btn btn-secondary btn-sm" onclick="openHearingModal(\''+hr.id+'\')">✏ 編集</button>';
+  h += '</div></div>';
+  if (hr.area) h += '<div style="font-size:11px;color:var(--gray3);margin-bottom:4px;">エリア: '+esc(hr.area)+'</div>';
+  Q.forEach(function(qa){
+    const val = qa[1];
+    h += '<div class="hr-item"><span class="hi-k">'+esc(qa[0])+'</span><span class="hi-v'+(val?'':' empty')+'">'+(val?esc(val):'—')+'</span></div>';
+  });
+  if (hr.freeMemo) {
+    h += '<div class="hr-item"><span class="hi-k">💬 フリーメモ</span><span class="hi-v">'+esc(hr.freeMemo)+'</span></div>';
+  }
+  if (hr.plaudRaw || hr.transcript) {
+    h += '<details style="margin-top:6px;font-size:11px;color:var(--gray3);"><summary style="cursor:pointer;font-weight:600;">📄 元データを見る</summary>';
+    if (hr.plaudRaw) h += '<pre style="white-space:pre-wrap;margin-top:4px;padding:6px 8px;background:#fafafa;border:1px solid var(--gray2);border-radius:2px;font-size:11px;font-family:monospace;max-height:300px;overflow-y:auto;">'+esc(hr.plaudRaw)+'</pre>';
+    if (hr.transcript) h += '<div style="font-size:10.5px;color:var(--gray4);margin-top:4px;">🎙 文字起こし</div><pre style="white-space:pre-wrap;padding:6px 8px;background:#fafafa;border:1px solid var(--gray2);border-radius:2px;font-size:11px;font-family:monospace;max-height:200px;overflow-y:auto;">'+esc(hr.transcript)+'</pre>';
+    h += '</details>';
+  }
+  h += '</div>';
+  return h;
+}
+
+function openHearingModal(id, propContextId) {
+  currentHearingContext = propContextId || null;
+  const isEdit = !!id;
+  const hr = isEdit ? data.hearings.find(x => String(x.id) === String(id)) : null;
+  document.getElementById('hearing-modal-title').textContent = isEdit ? 'ヒアリング記録を編集' : 'ヒアリング記録を追加';
+  document.getElementById('hr-id').value = isEdit ? hr.id : '';
+  document.getElementById('hr-prop-context').value = propContextId || '';
+  document.getElementById('hr-date').value = hr ? (hr.date||today()) : today();
+  document.getElementById('hr-area').value = hr ? (hr.area||'') : '';
+  // 物件チョイス: 現在 物件詳細から開いた場合は自動選択
+  const selectedPropIds = hr ? (hr.propertyIds||[]) : (propContextId ? [propContextId] : []);
+  renderPropertiesSelector('hr-properties-select', selectedPropIds);
+  // 担当者 picker
+  currentHearingContactId = hr ? hr.contactId : null;
+  if (currentHearingContactId) {
+    showPickedContact(currentHearingContactId);
+  } else {
+    resetContactPicker();
+  }
+  // 10項目
+  for (let i = 1; i <= 10; i++) document.getElementById('hr-q'+i).value = hr ? (hr['q'+i]||'') : '';
+  // フリーメモ・元データ
+  document.getElementById('hr-free-memo').value = hr ? (hr.freeMemo||'') : '';
+  document.getElementById('hr-plaud-raw').value = hr ? (hr.plaudRaw||'') : '';
+  document.getElementById('hr-transcript').value = hr ? (hr.transcript||'') : '';
+  document.getElementById('hr-plaud-input').value = '';
+  document.getElementById('modal-hearing').classList.add('show');
+}
+
+function parsePlaudSummary(text) {
+  // ## ① 募集条件 〜 ## ⑩ その他 + ## 💬 フリーメモ の形式を解析
+  const result = { q1:'', q2:'', q3:'', q4:'', q5:'', q6:'', q7:'', q8:'', q9:'', q10:'', freeMemo:'' };
+  if (!text) return result;
+  const markers = [
+    { key: 'q1', re: /##\s*[①1]\s*[^\n]*\n/ },
+    { key: 'q2', re: /##\s*[②2]\s*[^\n]*\n/ },
+    { key: 'q3', re: /##\s*[③3]\s*[^\n]*\n/ },
+    { key: 'q4', re: /##\s*[④4]\s*[^\n]*\n/ },
+    { key: 'q5', re: /##\s*[⑤5]\s*[^\n]*\n/ },
+    { key: 'q6', re: /##\s*[⑥6]\s*[^\n]*\n/ },
+    { key: 'q7', re: /##\s*[⑦7]\s*[^\n]*\n/ },
+    { key: 'q8', re: /##\s*[⑧8]\s*[^\n]*\n/ },
+    { key: 'q9', re: /##\s*[⑨9]\s*[^\n]*\n/ },
+    { key: 'q10', re: /##\s*[⑩]\s*[^\n]*\n/ },
+    { key: 'freeMemo', re: /##\s*💬?\s*フリーメモ[^\n]*\n/ }
+  ];
+  const positions = [];
+  markers.forEach(function(m){
+    const match = text.match(m.re);
+    if (match) {
+      positions.push({ key: m.key, start: match.index, headerEnd: match.index + match[0].length });
+    }
+  });
+  positions.sort(function(a,b){ return a.start - b.start; });
+  positions.forEach(function(p, i){
+    const next = positions[i+1];
+    const end = next ? next.start : text.length;
+    result[p.key] = text.substring(p.headerEnd, end).trim();
+  });
+  return result;
+}
+
+function importFromPlaud() {
+  const inp = document.getElementById('hr-plaud-input');
+  const text = inp.value.trim();
+  if (!text) {
+    toast('テキストを貼り付けてください', 'error');
+    return;
+  }
+  const parsed = parsePlaudSummary(text);
+  const filledCount = Object.keys(parsed).filter(k => parsed[k]).length;
+  if (filledCount === 0) {
+    toast('## ①〜⑩ の形式が見つかりませんでした', 'error');
+    return;
+  }
+  for (let i = 1; i <= 10; i++) {
+    if (parsed['q'+i]) document.getElementById('hr-q'+i).value = parsed['q'+i];
+  }
+  if (parsed.freeMemo) document.getElementById('hr-free-memo').value = parsed.freeMemo;
+  // 元データを保存（raw）
+  document.getElementById('hr-plaud-raw').value = text;
+  // 入力欄はクリア（次の取込みに備え）
+  inp.value = '';
+  toast(filledCount + ' 項目を取り込みました');
+}
+
+async function pasteFromClipboard(targetId) {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text) { toast('クリップボードが空です', 'error'); return; }
+    document.getElementById(targetId).value = text;
+    toast('クリップボードから貼り付け');
+  } catch(e) {
+    toast('クリップボード読み取り失敗: 手動ペーストしてください', 'error');
+  }
+}
+
+function renderPropertiesSelector(containerId, selectedIds) {
+  const el = document.getElementById(containerId);
+  selectedIds = selectedIds || [];
+  // 売却済のみ除外（見送り・運用中など全て候補に含める）
+  // propContextIdが渡されている物件は status に関係なく必ず含める
+  const propsFiltered = data.property.filter(function(p){
+    if (currentHearingContext && String(p.id) === String(currentHearingContext)) return true;
+    return p.status !== '売却済';
+  });
+  el.innerHTML = propsFiltered.map(function(p){
+    const active = selectedIds.indexOf(p.id) >= 0 ? ' active' : '';
+    const statusHint = p.status ? ' <span style="font-size:9.5px;color:var(--gray3);">['+esc(p.status)+']</span>' : '';
+    return '<label class="'+active.trim()+'"><input type="checkbox" value="'+esc(p.id)+'"'+(active?' checked':'')+' onchange="this.closest(\'label\').classList.toggle(\'active\')">'+esc(p.name)+statusHint+'</label>';
+  }).join('') || '<span style="font-size:11px;color:var(--gray3);">物件がありません</span>';
+}
+
+function searchHearingContact(query) {
+  const dd = document.getElementById('hr-contact-dropdown');
+  if (!query.trim()) { dd.style.display = 'none'; return; }
+  const nq = normalizeForSearch(query);
+  const matched = data.contacts.filter(function(c){
+    if (c.archived) return false;
+    const hay = normalizeForSearch([c.name, c.nameKana, c.company, c.companyKana, c.branch, c.title].join(' '));
+    return hay.indexOf(nq) >= 0;
+  }).slice(0, 10);
+  let h = '';
+  matched.forEach(function(c){
+    const grp = contactGroup(c.types);
+    h += '<div class="picker-item" onclick="pickContact(\''+c.id+'\')">';
+    h += '<div class="picker-avatar t-'+grp+'">'+esc(contactInitial(c.name))+'</div>';
+    h += '<div class="picker-info"><div class="picker-nm">'+esc(c.name)+(c.title?'<span style="font-weight:400;color:var(--gray3);margin-left:6px;font-size:10.5px;">'+esc(c.title)+'</span>':'')+'</div>';
+    h += '<div class="picker-co">'+esc([c.company, c.branch].filter(Boolean).join(' · '))+'</div></div></div>';
+  });
+  h += '<div class="picker-add" onclick="showInlineContactForm(\''+esc(query)+'\')"><span style="font-size:15px;font-weight:700;">+</span> "'+esc(query)+'" で新規追加 <span style="color:var(--gray4);font-weight:400;font-size:10.5px;">（該当者がいなければクリック）</span></div>';
+  dd.innerHTML = h;
+  dd.style.display = 'block';
+}
+
+function pickContact(id) {
+  currentHearingContactId = id;
+  showPickedContact(id);
+}
+
+function showPickedContact(id) {
+  const c = data.contacts.find(x => String(x.id) === String(id));
+  if (!c) return resetContactPicker();
+  const wrap = document.getElementById('hr-contact-wrap');
+  const grp = contactGroup(c.types);
+  wrap.innerHTML = '<div class="picked-contact">' +
+    '<div class="picker-avatar t-'+grp+'">'+esc(contactInitial(c.name))+'</div>' +
+    '<div><div class="pc-nm">'+esc(c.name)+'</div><div class="pc-co">'+esc([c.company, c.branch].filter(Boolean).join(' · '))+'</div></div>' +
+    '<button type="button" class="pc-clear" onclick="resetContactPicker()">✕ 変更</button>' +
+    '</div>';
+}
+
+function resetContactPicker() {
+  currentHearingContactId = null;
+  const wrap = document.getElementById('hr-contact-wrap');
+  wrap.innerHTML = '<div class="picker" id="hr-contact-picker">' +
+    '<input type="text" id="hr-contact-search" placeholder="🔍 名前・会社で検索..." style="padding:6px 10px;" oninput="searchHearingContact(this.value)">' +
+    '<div id="hr-contact-dropdown" class="picker-dropdown" style="display:none;"></div>' +
+    '</div>' +
+    '<div id="hr-contact-inline-form" style="display:none;"></div>';
+}
+
+function showInlineContactForm(name) {
+  const wrap = document.getElementById('hr-contact-wrap');
+  wrap.innerHTML = '<div style="background:#fafdf9;border:2px solid #4a6a4a;border-radius:3px;padding:10px 12px;">' +
+    '<div style="font-size:12px;color:#1f3d1f;font-weight:700;margin-bottom:6px;">+ 新規連絡先を登録（最小項目でOK・後から編集可）</div>' +
+    '<div class="form-row"><div class="form-group"><label>名前 *</label><input type="text" id="hr-ic-name" value="'+esc(name)+'" required></div><div class="form-group"><label>ふりがな（音検索用）</label><input type="text" id="hr-ic-name-kana" placeholder="例: さとう はなこ"></div></div>' +
+    '<div class="form-row"><div class="form-group"><label>会社</label><input type="text" id="hr-ic-company"></div><div class="form-group"><label>会社のふりがな</label><input type="text" id="hr-ic-company-kana" placeholder="例: まるまるふどうさん"></div></div>' +
+    '<div class="form-group"><label>業種タグ（複数可）</label><div id="hr-ic-types" class="prop-select-chips"></div></div>' +
+    '<div class="form-group"><label>電話 or メール（任意）</label><input type="text" id="hr-ic-contact"></div>' +
+    '<div style="display:flex;gap:6px;margin-top:6px;">' +
+    '<button type="button" class="btn btn-primary btn-sm" onclick="saveInlineContact()">✓ 登録して担当者に設定</button>' +
+    '<button type="button" class="btn btn-secondary btn-sm" onclick="resetContactPicker()">キャンセル</button>' +
+    '</div></div>';
+  renderTypesSelector('hr-ic-types', []);
+}
+
+function saveInlineContact() {
+  const name = (document.getElementById('hr-ic-name').value || '').trim();
+  if (!name) { toast('名前を入力してください', 'error'); return; }
+  const nameKana = (document.getElementById('hr-ic-name-kana')?.value || '').trim();
+  const company = (document.getElementById('hr-ic-company').value || '').trim();
+  const companyKana = (document.getElementById('hr-ic-company-kana')?.value || '').trim();
+  const contact = (document.getElementById('hr-ic-contact').value || '').trim();
+  const types = collectSelectedTypes('hr-ic-types');
+  const c = { id: genId(), name: name, nameKana: nameKana, company: company, companyKana: companyKana, types: types, archived: false, firstContactDate: today() };
+  if (contact.indexOf('@') >= 0) c.email = contact;
+  else if (contact) c.phone = contact;
+  data.contacts.unshift(c);
+  saveData();
+  toast('連絡先「' + name + '」を登録');
+  currentHearingContactId = c.id;
+  showPickedContact(c.id);
+}
+
+function saveHearing(e) {
+  e.preventDefault();
+  if (!currentHearingContactId) {
+    toast('担当者を選択または新規追加してください', 'error');
+    return;
+  }
+  const id = document.getElementById('hr-id').value;
+  const isEdit = !!id;
+  const hr = isEdit ? data.hearings.find(x => String(x.id) === String(id)) : { id: genId() };
+  hr.date = document.getElementById('hr-date').value || today();
+  hr.area = document.getElementById('hr-area').value.trim();
+  hr.contactId = currentHearingContactId;
+  // 対象物件
+  hr.propertyIds = Array.from(document.querySelectorAll('#hr-properties-select input[type=checkbox]:checked')).map(function(i){ return i.value; });
+  for (let i = 1; i <= 10; i++) hr['q'+i] = document.getElementById('hr-q'+i).value.trim();
+  hr.freeMemo = document.getElementById('hr-free-memo').value.trim();
+  hr.plaudRaw = document.getElementById('hr-plaud-raw').value.trim();
+  hr.transcript = document.getElementById('hr-transcript').value.trim();
+  if (!isEdit) data.hearings.unshift(hr);
+  // 連絡先の最終接触日を更新
+  const c = data.contacts.find(x => String(x.id) === String(hr.contactId));
+  if (c) c.lastContactDate = hr.date;
+  saveData();
+  closeModal('modal-hearing');
+  toast(isEdit ? 'ヒアリングを更新' : 'ヒアリングを追加');
+  renderCurrentPage();
+  // 物件詳細ページならヒアリングタブを自動アクティブ化
+  const activePage = document.querySelector('.page.active');
+  if (activePage && activePage.id === 'page-property-detail') {
+    setTimeout(function(){
+      const tabs = document.querySelectorAll('.detail-tab');
+      if (tabs[2]) switchDetailTab(tabs[2], 'dtab-2');
+    }, 0);
+  }
+}
+
+function deleteHearing() {
+  const id = document.getElementById('hr-id').value;
+  if (!id) { closeModal('modal-hearing'); return; }
+  if (!confirm('このヒアリング記録を削除しますか？')) return;
+  data.hearings = data.hearings.filter(x => String(x.id) !== String(id));
+  saveData();
+  closeModal('modal-hearing');
+  toast('ヒアリング記録を削除');
+  renderCurrentPage();
+}
+
+/* ===== エリア情報ページ (Step 3) ===== */
+function collectAllAreas() {
+  const s = new Set();
+  data.contacts.forEach(function(c){ (c.areas||[]).forEach(function(a){ if (a) s.add(a); }); });
+  data.hearings.forEach(function(h){ if (h.area) s.add(h.area); });
+  data.property.forEach(function(p){
+    const city = extractCity(p.location);
+    if (city) s.add(city);
+  });
+  return Array.from(s).sort();
+}
+
+function renderAreaPageInit() {
+  const sel = document.getElementById('area-select');
+  const areas = collectAllAreas();
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">-- エリアを選択 --</option>' + areas.map(function(a){ return '<option value="'+esc(a)+'">'+esc(a)+'</option>'; }).join('');
+  if (currentVal && areas.indexOf(currentVal) >= 0) sel.value = currentVal;
+  renderAreaPage();
+}
+
+function renderAreaPage() {
+  const area = document.getElementById('area-select').value;
+  const container = document.getElementById('area-content');
+  if (!area) {
+    container.innerHTML = '<div class="area-empty">エリアを選択してください</div>';
+    return;
+  }
+  // 物件
+  const props = data.property.filter(function(p){ return extractCity(p.location) === area || (p.location||'').indexOf(area) >= 0; });
+  // 連絡先
+  const contacts = data.contacts.filter(function(c){ return (c.areas||[]).indexOf(area) >= 0 && !c.archived; });
+  // ヒアリング
+  const hearings = data.hearings.filter(function(h){ return h.area === area; }).sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+  // Memo（相場調査・人脈づくり等・エリア含む）
+  const memos = data.action.filter(function(m){
+    const hay = [m.title, m.content, m.property, (m.properties||[]).join(' ')].join(' ');
+    return hay.indexOf(area) >= 0;
+  }).sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+
+  let h = '';
+  // 物件
+  h += '<div class="area-section">';
+  h += '<div class="area-section-title">🏢 関連物件 ('+props.length+'件)</div>';
+  if (props.length) {
+    h += '<div>' + props.map(renderPropertyCard).join('') + '</div>';
+  } else {
+    h += '<div class="area-empty">このエリアの物件はありません</div>';
+  }
+  h += '</div>';
+  // ヒアリング
+  h += '<div class="area-section">';
+  h += '<div class="area-section-title">📞 ヒアリング記録 ('+hearings.length+'件)</div>';
+  if (hearings.length) {
+    h += '<div class="hr-list">' + hearings.map(renderHearingCard).join('') + '</div>';
+  } else {
+    h += '<div class="area-empty">このエリアのヒアリングはありません</div>';
+  }
+  h += '</div>';
+  // 連絡先
+  h += '<div class="area-section">';
+  h += '<div class="area-section-title">📇 関連連絡先 ('+contacts.length+'人)</div>';
+  if (contacts.length) {
+    h += '<div class="ct-grid">' + contacts.map(renderContactCard).join('') + '</div>';
+  } else {
+    h += '<div class="area-empty">このエリアの連絡先はありません</div>';
+  }
+  h += '</div>';
+  // Memo
+  h += '<div class="area-section">';
+  h += '<div class="area-section-title">📝 関連Memo ('+memos.length+'件)</div>';
+  if (memos.length) {
+    h += memos.slice(0, 10).map(function(m){
+      return '<div class="card" style="cursor:pointer;" onclick="openMemoModal(\''+m.id+'\')"><div class="card-header"><div><div class="card-title" style="font-size:13px;">'+esc(m.title||'')+'</div><div class="card-sub">'+esc(m.date||'')+(m.category?' · '+esc(m.category):'')+'</div></div></div></div>';
+    }).join('');
+  } else {
+    h += '<div class="area-empty">このエリアのMemoはありません</div>';
+  }
+  h += '</div>';
+
+  container.innerHTML = h;
+}
+
+/* ===== リフォームプラン (Step 4) ===== */
+const REFORM_STAGES = ['仮プラン', '現調後', '業者打合せ後', '確定'];
+const EXECUTOR_OPTIONS = ['工務店', 'ガス屋', 'DIY', 'その他'];
+const ITEM_CATEGORIES = ['天井', '壁', '床', '設備', 'その他'];
+
+function execClass(exec) {
+  if (exec === '工務店') return 'kou';
+  if (exec === 'ガス屋') return 'gas';
+  if (exec === 'DIY') return 'diy';
+  return 'other';
+}
+
+function getReformTotals(plan) {
+  const totals = { 工務店: 0, ガス屋: 0, DIY: 0, その他: 0, total: 0 };
+  (plan.rooms || []).forEach(function(r){
+    (r.items || []).forEach(function(it){
+      const amt = parseFloat(it.estCost) || 0;
+      totals.total += amt;
+      const key = EXECUTOR_OPTIONS.indexOf(it.executor) >= 0 ? it.executor : 'その他';
+      totals[key] += amt;
+    });
+  });
+  return totals;
+}
+
+function renderReformPane(p) {
+  if (!p.reformPlan) p.reformPlan = { stage: '仮プラン', rooms: [], quotes: [], updated: '' };
+  const plan = p.reformPlan;
+  const totals = getReformTotals(plan);
+
+  let h = '<div class="detail-pane" id="dtab-3">';
+  h += '<div class="rf-intro">内見前に<b>仮プラン</b>作成 → 現調で修正 → 業者打合せで確定 → <b>PDF出力で見積依頼</b>。合計金額は「費用内訳」の工事費に反映できます。</div>';
+
+  // ステージ
+  h += '<div class="rf-stages">';
+  REFORM_STAGES.forEach(function(s, i){
+    const active = plan.stage === s;
+    h += '<button class="rf-stage-btn'+(active?' active':'')+'" onclick="changeReformStage(\''+esc(s)+'\')">'+(i+1)+'. '+esc(s)+'</button>';
+  });
+  h += '</div>';
+
+  // サマリー
+  h += '<div class="rf-summary"><div class="rf-summary-grid">';
+  h += '<div class="rf-sum-item kou"><div class="rsi-v">'+fmtNum(totals.工務店)+'</div><div class="rsi-l">工務店</div></div>';
+  h += '<div class="rf-sum-item gas"><div class="rsi-v">'+fmtNum(totals.ガス屋)+'</div><div class="rsi-l">ガス屋</div></div>';
+  h += '<div class="rf-sum-item diy"><div class="rsi-v">'+fmtNum(totals.DIY)+'</div><div class="rsi-l">DIY</div></div>';
+  h += '<div class="rf-sum-item other"><div class="rsi-v">'+fmtNum(totals.その他)+'</div><div class="rsi-l">その他</div></div>';
+  h += '<div class="rf-sum-item"><div class="rsi-v" style="font-size:17px;">'+fmtNum(totals.total)+'</div><div class="rsi-l">合計 (円)</div></div>';
+  h += '</div></div>';
+
+  // ツールバー
+  h += '<div class="rf-toolbar">';
+  h += '<span style="font-size:11px;color:var(--gray4);">部屋別にプラン作成:</span>';
+  h += '<div class="right">';
+  h += '<button class="btn btn-secondary btn-sm" onclick="syncReformToCostBreakdown()">💴 費用内訳に反映</button>';
+  h += '<button class="btn btn-secondary btn-sm" onclick="printReformPlan()">📄 PDF出力</button>';
+  h += '</div>';
+  h += '</div>';
+
+  // 部屋リスト
+  (plan.rooms || []).forEach(function(room){
+    h += renderReformRoom(room);
+  });
+
+  h += '<button class="rf-add-room-btn" onclick="addReformRoom()">+ 部屋を追加</button>';
+
+  // 相見積もり
+  h += '<div class="rf-quotes">';
+  h += '<h4>相見積もり（複数業者の比較）</h4>';
+  h += '<div style="font-size:11px;color:var(--gray3);margin-bottom:6px;">業者別の見積金額を並べて比較。採用する業者にチェック。</div>';
+  (plan.quotes || []).forEach(function(q){ h += renderReformQuote(q); });
+  h += '<button class="rf-add-item-btn" onclick="addReformQuote()" style="margin-top:8px;">+ 見積を追加</button>';
+  h += '</div>';
+
+  if (plan.updated) h += '<div style="font-size:10.5px;color:var(--gray3);margin-top:8px;text-align:right;">最終更新: '+esc(plan.updated)+'</div>';
+
+  h += '</div>';
+  return h;
+}
+
+function renderReformRoom(room) {
+  let roomTotal = 0;
+  (room.items || []).forEach(function(it){ roomTotal += parseFloat(it.estCost) || 0; });
+  const isOpen = !room.collapsed;
+  let h = '<div class="rf-room" data-room-id="'+esc(room.id)+'">';
+  h += '<div class="rf-room-head">';
+  h += '<input type="text" class="rf-room-name-input" value="'+esc(room.name||'')+'" placeholder="部屋名 (例: 和室①)" onchange="updateReformRoom(\''+esc(room.id)+'\',\'name\',this.value)">';
+  h += '<input type="text" class="rf-room-memo-input" value="'+esc(room.memo||'')+'" placeholder="位置メモ (例: 1F玄関側)" onchange="updateReformRoom(\''+esc(room.id)+'\',\'memo\',this.value)">';
+  h += '<span class="rf-room-total">'+fmtNum(roomTotal)+' 円</span>';
+  h += '<button class="rf-room-toggle" onclick="toggleReformRoom(\''+esc(room.id)+'\')">'+(isOpen?'▲':'▼')+'</button>';
+  h += '<button class="rf-room-delete" onclick="deleteReformRoom(\''+esc(room.id)+'\')">削除</button>';
+  h += '</div>';
+  h += '<div class="rf-room-body'+(isOpen?' open':'')+'">';
+  h += '<table class="rf-item-table">';
+  h += '<thead><tr><th style="width:70px;">カテゴリ</th><th>内容</th><th style="width:90px;">実行者</th><th style="width:90px;">見積(円)</th><th style="width:30px;"></th></tr></thead>';
+  h += '<tbody>';
+  (room.items || []).forEach(function(it){
+    const ec = execClass(it.executor);
+    h += '<tr>';
+    h += '<td><select onchange="updateReformItem(\''+esc(room.id)+'\',\''+esc(it.id)+'\',\'category\',this.value)">';
+    h += '<option value="">--</option>';
+    ITEM_CATEGORIES.forEach(function(cat){ h += '<option value="'+esc(cat)+'"'+(it.category===cat?' selected':'')+'>'+esc(cat)+'</option>'; });
+    h += '</select></td>';
+    h += '<td><input type="text" value="'+esc(it.content||'')+'" placeholder="例: 畳撤去→コンパネ+CF化" onchange="updateReformItem(\''+esc(room.id)+'\',\''+esc(it.id)+'\',\'content\',this.value)"></td>';
+    h += '<td><select class="rf-exec-tag '+ec+'" onchange="updateReformItem(\''+esc(room.id)+'\',\''+esc(it.id)+'\',\'executor\',this.value); renderPropertyDetail(); setTimeout(function(){var t=document.querySelectorAll(\'.detail-tab\')[3]; if(t)switchDetailTab(t,\'dtab-3\');},0);">';
+    h += '<option value="">--</option>';
+    EXECUTOR_OPTIONS.forEach(function(e){ h += '<option value="'+esc(e)+'"'+(it.executor===e?' selected':'')+'>'+esc(e)+'</option>'; });
+    h += '</select></td>';
+    h += '<td><input type="number" value="'+(it.estCost||'')+'" placeholder="円" onchange="updateReformItem(\''+esc(room.id)+'\',\''+esc(it.id)+'\',\'estCost\',this.value); renderPropertyDetail(); setTimeout(function(){var t=document.querySelectorAll(\'.detail-tab\')[3]; if(t)switchDetailTab(t,\'dtab-3\');},0);"></td>';
+    h += '<td><button class="it-del" onclick="deleteReformItem(\''+esc(room.id)+'\',\''+esc(it.id)+'\')">×</button></td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  h += '<button class="rf-add-item-btn" onclick="addReformItem(\''+esc(room.id)+'\')">+ 項目追加</button>';
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+function renderReformQuote(q) {
+  let h = '<div class="rf-quote-row'+(q.selected?' selected':'')+'">';
+  h += '<label title="採用業者にチェック"><input type="checkbox"'+(q.selected?' checked':'')+' onchange="selectReformQuote(\''+esc(q.id)+'\', this.checked)"></label>';
+  h += '<input type="text" value="'+esc(q.vendorName||'')+'" placeholder="業者名" onchange="updateReformQuote(\''+esc(q.id)+'\',\'vendorName\',this.value)">';
+  h += '<input type="text" value="'+esc(q.date||'')+'" placeholder="YYYY-MM-DD" onchange="updateReformQuote(\''+esc(q.id)+'\',\'date\',this.value)">';
+  h += '<input type="number" value="'+(q.amount||'')+'" placeholder="金額(円)" onchange="updateReformQuote(\''+esc(q.id)+'\',\'amount\',this.value)">';
+  h += '<button class="rf-quote-del" onclick="deleteReformQuote(\''+esc(q.id)+'\')">×</button>';
+  h += '</div>';
+  return h;
+}
+
+function getCurrentReformPlan() {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p) return null;
+  if (!p.reformPlan) p.reformPlan = { stage: '仮プラン', rooms: [], quotes: [], updated: '' };
+  return p.reformPlan;
+}
+
+function reRenderReformOnly() {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p) return;
+  const pane = document.getElementById('dtab-3');
+  if (!pane) return;
+  // dtab-3 の innerHTML を再生成
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = renderReformPane(p);
+  pane.innerHTML = wrapper.firstChild.innerHTML;
+}
+
+function changeReformStage(stage) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  plan.stage = stage;
+  plan.updated = today();
+  saveData();
+  reRenderReformOnly();
+}
+
+function addReformRoom() {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  if (!plan.rooms) plan.rooms = [];
+  plan.rooms.push({ id: genId(), name: '', memo: '', items: [], collapsed: false });
+  plan.updated = today();
+  saveData();
+  reRenderReformOnly();
+}
+
+function deleteReformRoom(roomId) {
+  if (!confirm('この部屋とその項目をすべて削除しますか？')) return;
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  plan.rooms = (plan.rooms || []).filter(r => String(r.id) !== String(roomId));
+  plan.updated = today();
+  saveData();
+  reRenderReformOnly();
+}
+
+function toggleReformRoom(roomId) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  const room = (plan.rooms || []).find(r => String(r.id) === String(roomId));
+  if (room) room.collapsed = !room.collapsed;
+  saveData();
+  reRenderReformOnly();
+}
+
+function updateReformRoom(roomId, field, value) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  const room = (plan.rooms || []).find(r => String(r.id) === String(roomId));
+  if (!room) return;
+  room[field] = value;
+  plan.updated = today();
+  saveData();
+}
+
+function addReformItem(roomId) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  const room = (plan.rooms || []).find(r => String(r.id) === String(roomId));
+  if (!room) return;
+  if (!room.items) room.items = [];
+  room.items.push({ id: genId(), category: '', content: '', executor: '', estCost: '' });
+  plan.updated = today();
+  saveData();
+  reRenderReformOnly();
+}
+
+function deleteReformItem(roomId, itemId) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  const room = (plan.rooms || []).find(r => String(r.id) === String(roomId));
+  if (!room) return;
+  room.items = (room.items || []).filter(it => String(it.id) !== String(itemId));
+  plan.updated = today();
+  saveData();
+  reRenderReformOnly();
+}
+
+function updateReformItem(roomId, itemId, field, value) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  const room = (plan.rooms || []).find(r => String(r.id) === String(roomId));
+  if (!room) return;
+  const item = (room.items || []).find(it => String(it.id) === String(itemId));
+  if (!item) return;
+  item[field] = value;
+  plan.updated = today();
+  saveData();
+}
+
+function addReformQuote() {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  if (!plan.quotes) plan.quotes = [];
+  plan.quotes.push({ id: genId(), vendorName: '', date: today(), amount: '', selected: false });
+  plan.updated = today();
+  saveData();
+  reRenderReformOnly();
+}
+
+function deleteReformQuote(quoteId) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  plan.quotes = (plan.quotes || []).filter(q => String(q.id) !== String(quoteId));
+  plan.updated = today();
+  saveData();
+  reRenderReformOnly();
+}
+
+function updateReformQuote(quoteId, field, value) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  const q = (plan.quotes || []).find(x => String(x.id) === String(quoteId));
+  if (!q) return;
+  q[field] = value;
+  plan.updated = today();
+  saveData();
+}
+
+function selectReformQuote(quoteId, checked) {
+  const plan = getCurrentReformPlan();
+  if (!plan) return;
+  (plan.quotes || []).forEach(function(q){
+    q.selected = (String(q.id) === String(quoteId)) ? checked : false;
+  });
+  plan.updated = today();
+  saveData();
+  reRenderReformOnly();
+}
+
+function syncReformToCostBreakdown() {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p || !p.reformPlan) return;
+  const totals = getReformTotals(p.reformPlan);
+  if (!Array.isArray(p.costBreakdown)) p.costBreakdown = [];
+  const upsert = function(label, amount, vendor){
+    if (amount <= 0) {
+      p.costBreakdown = p.costBreakdown.filter(c => c.label !== label);
+      return;
+    }
+    const existing = p.costBreakdown.find(c => c.label === label);
+    if (existing) { existing.amount = amount; existing.vendor = vendor; existing.undecided = false; }
+    else p.costBreakdown.push({ id: genId(), label: label, amount: amount, vendor: vendor, undecided: false });
+  };
+  upsert('工事費（工務店）', totals.工務店, '工務店');
+  upsert('ガス設備', totals.ガス屋, 'ガス屋');
+  upsert('施主支給品（DIY）', totals.DIY, 'DIY');
+  upsert('その他リフォーム', totals.その他, 'その他');
+  saveData();
+  toast('費用内訳に反映しました');
+  renderPropertyDetail();
+  setTimeout(function(){ const t = document.querySelectorAll('.detail-tab')[3]; if (t) switchDetailTab(t, 'dtab-3'); }, 0);
+}
+
+function printReformPlan() {
+  // PDF出力はブラウザの印刷機能を使用
+  toast('ブラウザの「印刷→PDFとして保存」を使ってください');
+  setTimeout(function(){ window.print(); }, 300);
+}
+
+/* ===== シミュレーション (Step 5) ===== */
+const SIM_TEMPLATES = {
+  '楽観': { vacancyRate: 5, rentDown: 0, extraRepair: 0 },
+  '中庸': { vacancyRate: 10, rentDown: 5, extraRepair: 0 },
+  '悲観': { vacancyRate: 20, rentDown: 10, extraRepair: 100000 }
+};
+
+function getYieldThresholds() {
+  // 設定（今は固定値、将来 Settings で変更可）
+  return { good: 25, warn: 15 };
+}
+
+function getCostBreakdownTotal(p) {
+  if (Array.isArray(p.costBreakdown) && p.costBreakdown.length) {
+    let t = 0;
+    p.costBreakdown.forEach(function(c){ if (!c.undecided && c.amount) t += parseFloat(c.amount) || 0; });
+    return t;
+  }
+  let total = 0;
+  if (p.price) total += p.price * 10000;
+  if (p.repairCost) total += p.repairCost * 10000;
+  if (p.closingCost) total += p.closingCost * 10000;
+  return total;
+}
+
+function calcSim(sim, p) {
+  const totalCost = parseFloat(sim.totalCost) || getCostBreakdownTotal(p);
+  const monthlyRent = parseFloat(sim.rent) || (p.rentExpected || 0);
+  const vacancyRate = parseFloat(sim.vacancyRate) || 0;
+  const grossAnnualRent = monthlyRent * 12;
+  const actualAnnualRent = grossAnnualRent * (1 - vacancyRate/100);
+  const grossYield = totalCost ? (grossAnnualRent / totalCost * 100) : null;
+  const netYield = totalCost ? (actualAnnualRent / totalCost * 100) : null;
+
+  const annualExpense = (parseFloat(sim.propertyTax)||0) + (parseFloat(sim.mgmtFee)||0) + (parseFloat(sim.insuranceFee)||0) + (parseFloat(sim.otherFee)||0);
+
+  let monthlyLoan = 0;
+  const loanAmount = parseFloat(sim.loanAmount) || 0;
+  const loanRate = parseFloat(sim.loanRate) || 0;
+  const loanYears = parseFloat(sim.loanYears) || 0;
+  if (loanAmount > 0 && loanYears > 0) {
+    if (loanRate > 0) {
+      const r = loanRate / 100 / 12;
+      const n = loanYears * 12;
+      monthlyLoan = loanAmount * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1);
+    } else {
+      monthlyLoan = loanAmount / (loanYears * 12);
+    }
+  }
+
+  const monthlyIncome = actualAnnualRent / 12;
+  const monthlyExpense = annualExpense / 12;
+  const monthlyCashflow = monthlyIncome - monthlyExpense - monthlyLoan;
+  const annualCashflow = monthlyCashflow * 12;
+
+  const selfFund = parseFloat(sim.selfFund) || 0;
+  const paybackYears = (selfFund > 0 && annualCashflow > 0) ? (selfFund / annualCashflow) : null;
+
+  const cocReturn = (selfFund > 0) ? (annualCashflow / selfFund * 100) : null;
+
+  return {
+    totalCost: totalCost,
+    monthlyRent: monthlyRent,
+    grossAnnualRent: grossAnnualRent,
+    actualAnnualRent: actualAnnualRent,
+    grossYield: grossYield,
+    netYield: netYield,
+    annualExpense: annualExpense,
+    monthlyLoan: monthlyLoan,
+    monthlyCashflow: monthlyCashflow,
+    annualCashflow: annualCashflow,
+    paybackYears: paybackYears,
+    cocReturn: cocReturn
+  };
+}
+
+let currentSimIdx = 0;
+
+function ensureSimulations(p) {
+  if (!p.simulations || !p.simulations.length) {
+    p.simulations = ['楽観', '中庸', '悲観'].map(function(name){
+      const tpl = SIM_TEMPLATES[name];
+      return {
+        id: genId(), name: name,
+        totalCost: '', rent: '', vacancyRate: tpl.vacancyRate,
+        propertyTax: '', mgmtFee: '', insuranceFee: '', otherFee: '',
+        loanAmount: '', loanRate: '', loanYears: '', selfFund: '',
+        memo: ''
+      };
+    });
+  }
+}
+
+function renderSimulationSection(p) {
+  ensureSimulations(p);
+  if (currentSimIdx >= p.simulations.length) currentSimIdx = 0;
+  const sim = p.simulations[currentSimIdx];
+  const result = calcSim(sim, p);
+  const thresholds = getYieldThresholds();
+
+  const netYieldCls = result.netYield == null ? '' : (result.netYield >= thresholds.good ? '' : (result.netYield >= thresholds.warn ? 'orange' : 'red'));
+  const cfCls = result.monthlyCashflow > 0 ? '' : 'red';
+
+  let h = '<div class="sim-block">';
+  h += '<div class="sim-head"><h3>収支シミュレーション</h3>';
+  h += '<button class="btn btn-secondary btn-sm" onclick="loadSimFromProperty()">🔄 物件データから再取込</button>';
+  h += '</div>';
+  h += '<div class="sim-intro">候補発見から買付までのどの段階でも使えます。複数のパターン（楽観/中庸/悲観）で購入判断の温度感を確認。<b>物件データ（価格・家賃・費用内訳等）が自動反映</b>され、入力で上書きも可能。</div>';
+
+  // パターンタブ
+  h += '<div class="sim-tabs">';
+  p.simulations.forEach(function(s, i){
+    h += '<div class="sim-tab'+(i===currentSimIdx?' active':'')+'" onclick="switchSim('+i+')">'+esc(s.name)+'</div>';
+  });
+  h += '<div class="sim-tab add" onclick="addSim()">+ 追加</div>';
+  if (p.simulations.length > 1) h += '<div class="sim-tab add" onclick="deleteSim('+currentSimIdx+')" style="color:var(--red);border-color:var(--red);">× 削除</div>';
+  h += '</div>';
+
+  // 入力フォーム
+  h += '<div class="sim-form">';
+
+  h += '<div class="sim-group" style="grid-column:1/-1;"><label>パターン名</label><input type="text" value="'+esc(sim.name)+'" onchange="updateSim(\'name\',this.value)"></div>';
+
+  h += '<div class="sim-subtitle">前提（空なら物件データを自動使用）</div>';
+
+  const autoTotalCost = getCostBreakdownTotal(p);
+  const autoRent = p.rentExpected || 0;
+  h += '<div class="sim-group"><label>総費用 <span class="src-tag prop">物件: '+fmtNum(autoTotalCost)+'円</span></label><input type="number" value="'+(sim.totalCost||'')+'" placeholder="'+fmtNum(autoTotalCost)+'" onchange="updateSim(\'totalCost\',this.value)"></div>';
+  h += '<div class="sim-group"><label>月家賃 <span class="src-tag prop">物件: '+fmtNum(autoRent)+'円</span></label><input type="number" value="'+(sim.rent||'')+'" placeholder="'+fmtNum(autoRent)+'" onchange="updateSim(\'rent\',this.value)"></div>';
+  h += '<div class="sim-group"><label>空室率 (%)</label><input type="number" step="0.1" value="'+(sim.vacancyRate||'')+'" placeholder="例: 10" onchange="updateSim(\'vacancyRate\',this.value)"></div>';
+  const autoSelfFund = (p.downPayment || 0) * 10000;
+  h += '<div class="sim-group"><label>自己資金 <span class="src-tag prop">物件: '+fmtNum(autoSelfFund)+'円</span></label><input type="number" value="'+(sim.selfFund||'')+'" placeholder="'+fmtNum(autoSelfFund)+'" onchange="updateSim(\'selfFund\',this.value)"></div>';
+
+  h += '<div class="sim-subtitle">年間支出 (円)</div>';
+  h += '<div class="sim-group"><label>固定資産税</label><input type="number" value="'+(sim.propertyTax||'')+'" placeholder="例: 60000" onchange="updateSim(\'propertyTax\',this.value)"></div>';
+  h += '<div class="sim-group"><label>管理費</label><input type="number" value="'+(sim.mgmtFee||'')+'" placeholder="自主管理なら0" onchange="updateSim(\'mgmtFee\',this.value)"></div>';
+  h += '<div class="sim-group"><label>保険料</label><input type="number" value="'+(sim.insuranceFee||'')+'" placeholder="例: 15000" onchange="updateSim(\'insuranceFee\',this.value)"></div>';
+  h += '<div class="sim-group"><label>その他（修繕積立等）</label><input type="number" value="'+(sim.otherFee||'')+'" placeholder="例: 50000" onchange="updateSim(\'otherFee\',this.value)"></div>';
+
+  h += '<div class="sim-subtitle">融資条件（無借金運用なら空欄）</div>';
+  h += '<div class="sim-group"><label>借入額 (円)</label><input type="number" value="'+(sim.loanAmount||'')+'" placeholder="例: 2000000" onchange="updateSim(\'loanAmount\',this.value)"></div>';
+  h += '<div class="sim-group"><label>金利 (%)</label><input type="number" step="0.01" value="'+(sim.loanRate||'')+'" placeholder="例: 2.5" onchange="updateSim(\'loanRate\',this.value)"></div>';
+  h += '<div class="sim-group"><label>借入期間 (年)</label><input type="number" value="'+(sim.loanYears||'')+'" placeholder="例: 20" onchange="updateSim(\'loanYears\',this.value)"></div>';
+
+  h += '<div class="sim-group" style="grid-column:1/-1;"><label>メモ</label><textarea rows="2" placeholder="前提の根拠・判断メモ" onchange="updateSim(\'memo\',this.value)">'+esc(sim.memo||'')+'</textarea></div>';
+
+  h += '</div>';
+
+  // 結果
+  h += '<div class="sim-result">';
+  h += '<div style="font-size:11px;color:var(--gray4);margin-bottom:8px;font-weight:700;">📊 「'+esc(sim.name)+'」の結果</div>';
+  h += '<div class="sim-result-grid">';
+  h += '<div class="sim-result-item"><div class="srv">'+(result.grossYield!=null?result.grossYield.toFixed(1)+'%':'-')+'</div><div class="srl">表面利回り</div></div>';
+  h += '<div class="sim-result-item"><div class="srv '+netYieldCls+'">'+(result.netYield!=null?result.netYield.toFixed(1)+'%':'-')+'</div><div class="srl">実質利回り<br><span style="font-size:9px;">(空室込み)</span></div></div>';
+  h += '<div class="sim-result-item"><div class="srv '+cfCls+'">'+fmtNum(Math.round(result.monthlyCashflow))+'円</div><div class="srl">月間キャッシュフロー</div></div>';
+  h += '<div class="sim-result-item"><div class="srv '+cfCls+'">'+fmtNum(Math.round(result.annualCashflow))+'円</div><div class="srl">年間キャッシュフロー</div></div>';
+  h += '<div class="sim-result-item"><div class="srv">'+(result.paybackYears!=null?result.paybackYears.toFixed(1)+'年':'-')+'</div><div class="srl">自己資金回収</div></div>';
+  h += '<div class="sim-result-item"><div class="srv">'+(result.cocReturn!=null?result.cocReturn.toFixed(1)+'%':'-')+'</div><div class="srl">自己資金収益率<br><span style="font-size:9px;">(CoC)</span></div></div>';
+  h += '<div class="sim-result-item"><div class="srv" style="font-size:14px;">'+fmtNum(Math.round(result.actualAnnualRent))+'円</div><div class="srl">年間家賃（空室込）</div></div>';
+  h += '<div class="sim-result-item"><div class="srv" style="font-size:14px;">'+fmtNum(Math.round(result.monthlyLoan))+'円</div><div class="srl">月々返済</div></div>';
+  h += '</div></div>';
+
+  // 比較テーブル
+  if (p.simulations.length > 1) {
+    h += '<div class="sim-compare">';
+    h += '<div style="font-size:12px;font-weight:700;color:var(--gray4);margin:14px 0 6px;">📋 全パターン比較</div>';
+    h += '<table class="sim-compare-table"><thead><tr><th>項目</th>';
+    p.simulations.forEach(function(s, i){ h += '<th'+(i===currentSimIdx?' style="background:#eef2ed;color:#1f3d1f;"':'')+'>'+esc(s.name)+'</th>'; });
+    h += '</tr></thead><tbody>';
+    const rows = [
+      { label: '表面利回り', key: 'grossYield', fmt: function(v){ return v!=null?v.toFixed(1)+'%':'-'; }, hilight: true },
+      { label: '実質利回り', key: 'netYield', fmt: function(v){ return v!=null?v.toFixed(1)+'%':'-'; }, hilight: true },
+      { label: '月間CF', key: 'monthlyCashflow', fmt: function(v){ return fmtNum(Math.round(v))+'円'; } },
+      { label: '年間CF', key: 'annualCashflow', fmt: function(v){ return fmtNum(Math.round(v))+'円'; } },
+      { label: '自己資金回収', key: 'paybackYears', fmt: function(v){ return v!=null?v.toFixed(1)+'年':'-'; } },
+      { label: '月々返済', key: 'monthlyLoan', fmt: function(v){ return fmtNum(Math.round(v))+'円'; } }
+    ];
+    rows.forEach(function(r){
+      h += '<tr'+(r.hilight?' class="hilight"':'')+'><td>'+r.label+'</td>';
+      p.simulations.forEach(function(s){
+        const res = calcSim(s, p);
+        h += '<td class="num">'+r.fmt(res[r.key])+'</td>';
+      });
+      h += '</tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+
+function reRenderSimOnly() {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p) return;
+  const wrap = document.getElementById('sim-section');
+  if (!wrap) {
+    renderPropertyDetail();
+    setTimeout(function(){ const t = document.querySelectorAll('.detail-tab')[6]; if (t) switchDetailTab(t, 'dtab-6'); }, 0);
+    return;
+  }
+  wrap.innerHTML = renderSimulationSection(p);
+}
+
+function switchSim(idx) {
+  currentSimIdx = idx;
+  reRenderSimOnly();
+}
+
+function addSim() {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p) return;
+  ensureSimulations(p);
+  const newSim = { id: genId(), name: 'パターン'+(p.simulations.length+1), totalCost:'', rent:'', vacancyRate:10, propertyTax:'', mgmtFee:'', insuranceFee:'', otherFee:'', loanAmount:'', loanRate:'', loanYears:'', selfFund:'', memo:'' };
+  p.simulations.push(newSim);
+  currentSimIdx = p.simulations.length - 1;
+  saveData();
+  reRenderSimOnly();
+}
+
+function deleteSim(idx) {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p || !p.simulations || p.simulations.length <= 1) return;
+  if (!confirm('このパターンを削除しますか？')) return;
+  p.simulations.splice(idx, 1);
+  if (currentSimIdx >= p.simulations.length) currentSimIdx = p.simulations.length - 1;
+  saveData();
+  reRenderSimOnly();
+}
+
+function updateSim(field, value) {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p || !p.simulations) return;
+  const sim = p.simulations[currentSimIdx];
+  if (!sim) return;
+  sim[field] = value;
+  saveData();
+  // 結果だけ更新（入力中のfocus維持のためフォームは再描画しない）
+  // 比較テーブル・結果パネルは再計算を反映するため再描画
+  reRenderSimOnly();
+}
+
+function loadSimFromProperty() {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p || !p.simulations) return;
+  const sim = p.simulations[currentSimIdx];
+  sim.totalCost = getCostBreakdownTotal(p);
+  sim.rent = p.rentExpected || '';
+  sim.selfFund = (p.downPayment || 0) * 10000;
+  // 融資タブから最新の承認ローンを取得
+  const approvedLoan = (p.loans || []).find(function(l){ return l.status === '承認' && !l.archived; });
+  if (approvedLoan) {
+    sim.loanAmount = (approvedLoan.amount || 0) * 10000;
+    sim.loanRate = approvedLoan.rate || '';
+    sim.loanYears = approvedLoan.years || '';
+  }
+  saveData();
+  toast('物件データを再取込しました');
+  reRenderSimOnly();
+}
+
+/* ===== デスクトップ調査タブ ヘルパー (Step 2) ===== */
+const RESEARCH_ITEMS = [
+  {
+    key: 'mieruChintai',
+    title: '見える賃貸経営',
+    desc: '賃貸需要の有無・空室率・募集家賃相場を確認。<b>需要がないエリアは撤退推奨</b>',
+    urlGen: function(p, city) {
+      // Google検索経由で見える賃貸経営のエリアページに辿り着く
+      // (LIFULL HOMESのサイト内URL構造が非公開のため、検索経由が最も確実)
+      if (city) return 'https://www.google.com/search?q=' + encodeURIComponent('見える賃貸経営 ' + city);
+      return 'https://toushi.homes.co.jp/owner/';
+    },
+    secondaryUrl: null
+  },
+  {
+    key: 'wikipedia',
+    title: 'Wikipedia（エリア基礎知識）',
+    desc: '駅の力・人口推移・主要産業。<b>衰退エリアか成長エリアか</b>を見極める',
+    urlGen: function(p, city) {
+      return city ? 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(city) : '';
+    },
+    secondaryUrl: null
+  },
+  {
+    key: 'googleMaps',
+    title: 'Google Maps（周辺施設）',
+    desc: '行政施設・病院・学校・スーパー・コンビニ等。<b>生活利便性</b>を確認',
+    urlGen: function(p, city) {
+      return p.location ? 'https://www.google.com/maps/search/' + encodeURIComponent(p.location) : '';
+    },
+    secondaryUrl: null
+  },
+  {
+    key: 'market',
+    title: '競合物件調査（賃貸・売買市況）',
+    desc: 'そのエリアの<b>賃貸市況・売買市況</b>。同条件の物件がいくらで出ているか',
+    urlGen: function(p, city) {
+      return city ? 'https://suumo.jp/chintai/kanagawa/city/?kw=' + encodeURIComponent(city) : '';
+    },
+    secondaryUrl: function(p, city) {
+      return city ? 'https://suumo.jp/jj/bukken/ichiran/JJ010FJ001/?ar=030&bs=030&ta=&kw=' + encodeURIComponent(city) : '';
+    }
+  }
+];
+
+function extractCity(address) {
+  if (!address) return '';
+  // 郵便番号を除去
+  let a = address.replace(/〒?\d{3}-?\d{4}\s*/, '').trim();
+  // 都道府県を除去
+  a = a.replace(/^(?:北海道|東京都|京都府|大阪府|[^\s]{2,3}県)\s*/, '');
+  // 「市+区」パターン (例: 仙台市青葉区、横浜市港北区)
+  let m = a.match(/^(.+?市.+?区)/);
+  if (m) return m[1];
+  // 「市」のみ (例: さいたま市、千葉市)
+  m = a.match(/^(.+?市)/);
+  if (m) return m[1];
+  // 「区」のみ (東京23区・政令市)
+  m = a.match(/^(.+?区)/);
+  if (m) return m[1];
+  // 「町」「村」
+  m = a.match(/^(.+?[町村])/);
+  if (m) return m[1];
+  return a.split(/[\s　]/)[0] || '';
+}
+
+function renderResearchPane(p) {
+  const city = extractCity(p.location);
+  const research = p.desktopResearch || {};
+  let h = '<div class="detail-pane" id="dtab-1">';
+  h += '<div class="rs-intro">';
+  h += '物件を見つけたら、<b>ヒアリング前にここで5項目を調べる</b>。需要がないエリア・致命的な問題があれば早期に見送り判断できる。<br>';
+  h += '抽出地域: <b>' + (city || '住所未入力') + '</b>（※リンクが違う地域に飛ぶ場合はURL欄を編集）';
+  h += '</div>';
+  h += '<div class="rs-grid">';
+
+  // 5項目のうち 1〜4 を固定ループ
+  RESEARCH_ITEMS.forEach(function(item, i){
+    const r = research[item.key] || {};
+    const isDone = !!r.done;
+    const autoUrl = item.urlGen(p, city);
+    const url = r.url || autoUrl;
+    const secUrl = item.secondaryUrl ? item.secondaryUrl(p, city) : null;
+    h += '<div class="rs-card' + (isDone?' done':'') + '">';
+    h += '<div class="rs-head">';
+    h += '<span class="rs-num">' + (i+1) + '</span>';
+    h += '<span class="rs-title">' + esc(item.title) + '</span>';
+    h += '<label class="rs-done-chk"><input type="checkbox"' + (isDone?' checked':'') + ' onchange="toggleResearchDone(\''+esc(item.key)+'\', this)">確認済</label>';
+    h += '</div>';
+    h += '<div class="rs-desc">' + item.desc + '</div>';
+    h += '<div class="rs-links">';
+    if (url) h += '<a class="rs-link" href="'+esc(url)+'" target="_blank">開く↗</a>';
+    if (secUrl) h += '<a class="rs-link secondary" href="'+esc(secUrl)+'" target="_blank">売買市況↗</a>';
+    h += '<input type="text" class="rs-url-input" value="'+esc(r.url || '')+'" placeholder="URL上書き（空なら自動生成）" onchange="saveResearchField(\''+esc(item.key)+'\', \'url\', this.value)">';
+    h += '</div>';
+    h += '<textarea class="rs-memo" placeholder="調査結果を簡潔にメモ..." onchange="saveResearchField(\''+esc(item.key)+'\', \'memo\', this.value)">'+esc(r.memo || '')+'</textarea>';
+    if (r.updated) h += '<div class="rs-updated">最終更新: ' + esc(r.updated) + '</div>';
+    h += '</div>';
+  });
+
+  // 5. 修繕予算逆算（特殊カード）
+  const rb = research.repairBudget || {};
+  const isDone5 = !!rb.done;
+  const targetYield = rb.targetYield != null ? rb.targetYield : 25;
+  const annualRent = (p.rentExpected || 0) * 12;
+  const price = (p.price || 0) * 10000;
+  const closingCost = (p.closingCost || 0) * 10000;
+  const miscCost = price + closingCost;
+  let allowedTotalCost = null;
+  let repairBudgetMax = null;
+  if (annualRent && targetYield > 0) {
+    allowedTotalCost = annualRent / (targetYield / 100);
+    repairBudgetMax = Math.max(0, allowedTotalCost - miscCost);
+  }
+  h += '<div class="rs-card' + (isDone5?' done':'') + '">';
+  h += '<div class="rs-head">';
+  h += '<span class="rs-num">5</span>';
+  h += '<span class="rs-title">修繕予算の逆算</span>';
+  h += '<label class="rs-done-chk"><input type="checkbox"' + (isDone5?' checked':'') + ' onchange="toggleResearchDone(\'repairBudget\', this)">確認済</label>';
+  h += '</div>';
+  h += '<div class="rs-desc">目標利回りから逆算して、<b>修繕に使える予算の上限</b>を算出。この金額内でリフォームプランを作る</div>';
+  h += '<div class="rs-budget-input">';
+  h += '<label>目標利回り(%)</label>';
+  h += '<input type="number" step="0.1" value="'+targetYield+'" id="rs-target-yield" onchange="saveRepairBudget(this.value)">';
+  h += '</div>';
+  h += '<div class="rs-budget">';
+  h += '<div class="rs-budget-row"><span>想定年間家賃</span><span class="rb-v">' + fmtNum(annualRent) + ' 円</span></div>';
+  h += '<div class="rs-budget-row"><span>許容総費用（利回り達成）</span><span class="rb-v">' + (allowedTotalCost ? fmtNum(Math.round(allowedTotalCost)) + ' 円' : '-') + '</span></div>';
+  h += '<div class="rs-budget-row"><span>現状: 物件価格 + 諸費用</span><span class="rb-v">' + fmtNum(Math.round(miscCost)) + ' 円</span></div>';
+  h += '<div class="rs-budget-row"><span>💰 修繕予算の上限</span><span class="rb-v">' + (repairBudgetMax != null ? fmtNum(Math.round(repairBudgetMax)) + ' 円' : '-') + '</span></div>';
+  h += '</div>';
+  h += '<textarea class="rs-memo" placeholder="想定リフォーム内容・予算配分のメモ..." onchange="saveResearchField(\'repairBudget\', \'memo\', this.value)" style="margin-top:8px;">'+esc(rb.memo || '')+'</textarea>';
+  if (rb.updated) h += '<div class="rs-updated">最終更新: ' + esc(rb.updated) + '</div>';
+  h += '</div>';
+
+  h += '</div>'; // .rs-grid
+
+  // サマリー
+  const doneCount = RESEARCH_ITEMS.filter(function(it){ return (research[it.key]||{}).done; }).length + (isDone5?1:0);
+  h += '<div style="margin-top:14px;padding:8px 14px;background:#eef2ed;border-left:3px solid #4a6a4a;border-radius:3px;font-size:12.5px;color:#1f3d1f;">';
+  h += '<b>進捗: ' + doneCount + ' / 5 項目 確認済</b>';
+  if (doneCount < 5) h += ' <span style="color:var(--gray4);font-weight:400;">— 残り ' + (5 - doneCount) + ' 項目を調査しましょう</span>';
+  else h += ' <span style="color:#4a6a4a;">✓ 次はヒアリングへ</span>';
+  h += '</div>';
+
+  h += '</div>';
+  return h;
+}
+
+function saveResearchField(key, field, value) {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p) return;
+  if (!p.desktopResearch) p.desktopResearch = {};
+  if (!p.desktopResearch[key]) p.desktopResearch[key] = {};
+  p.desktopResearch[key][field] = value;
+  p.desktopResearch[key].updated = today();
+  saveData();
+  toast('調査メモを保存');
+}
+
+function toggleResearchDone(key, cb) {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p) return;
+  if (!p.desktopResearch) p.desktopResearch = {};
+  if (!p.desktopResearch[key]) p.desktopResearch[key] = {};
+  p.desktopResearch[key].done = cb.checked;
+  p.desktopResearch[key].updated = today();
+  saveData();
+  renderPropertyDetail(); // 進捗カウンタ更新のため再描画
+  // タブ状態維持: 調査タブをアクティブに
+  const tab = document.querySelectorAll('.detail-tab')[1];
+  if (tab) switchDetailTab(tab, 'dtab-1');
+}
+
+function saveRepairBudget(val) {
+  const p = data.property.find(x => String(x.id) === String(currentPropertyId));
+  if (!p) return;
+  if (!p.desktopResearch) p.desktopResearch = {};
+  if (!p.desktopResearch.repairBudget) p.desktopResearch.repairBudget = {};
+  p.desktopResearch.repairBudget.targetYield = parseFloat(val) || 25;
+  p.desktopResearch.repairBudget.updated = today();
+  saveData();
+  renderPropertyDetail();
+  const tab = document.querySelectorAll('.detail-tab')[1];
+  if (tab) switchDetailTab(tab, 'dtab-1');
+}
+
+/* ===== Overview v3 Helpers (Ver 3.0 Step 1) ===== */
+const IMPORTANT_MATTERS_DEFAULTS = [
+  '告知事項', '近隣問題', '境界', '越境物', '私道・共有部',
+  '法令制限', '土壌汚染・地歴', 'ハザード', 'インフラ', 'その他'
+];
+
+function judgeRebuild(p) {
+  const t = p.roadType || '';
+  const w = parseFloat(p.roadWidth);
+  const f = parseFloat(p.frontage);
+  if (t) {
+    if (/43条|未接道/.test(t)) {
+      return { s: 'ng', label: '原則不可', note: '43条但し書き or 未接道のため原則不可・要個別審査' };
+    }
+    if (!isNaN(f) && f < 2) {
+      return { s: 'ng', label: '再建築不可', note: '間口 < 2m (接道義務未達)' };
+    }
+    if (/42条2項/.test(t) && !isNaN(w) && w < 4) {
+      return { s: 'warn', label: 'セットバック要', note: '42条2項・幅員<4m → 再建築可（セットバック必要）' };
+    }
+    if (!isNaN(w) && w >= 4 && !isNaN(f) && f >= 2) {
+      return { s: 'ok', label: '再建築可', note: '42条道路・間口≥2m・幅員≥4m なので「再建築可」' };
+    }
+  }
+  const text = (p.rebuild || '') + ' ' + (p.road || '');
+  if (/再建築不可|不可/.test(text)) return { s: 'ng', label: '再建築不可', note: '（テキスト判定）' };
+  if (/再建築可/.test(text)) return { s: 'ok', label: '再建築可', note: '（テキスト判定）' };
+  return { s: 'unknown', label: '未判定', note: '接道3項目（道路種別・幅員・間口）を入力すると自動判定されます' };
+}
+
+function getProgressIdx(status) {
+  // 7段階: 0:候補発見 1:調査 2:ヒアリング 3:内見 4:交渉 5:融資 6:買付
+  const m = {
+    '候補発見': 0,
+    '調査中': 1,
+    '内覧予定': 3, '内覧済': 3,
+    '交渉中': 4,
+    '買付済': 6, '契約済': 6,
+    '修繕中': 6, '募集中': 6, '運用中': 6,
+    '売却検討中': 6, '売却済': 6
+  };
+  return m[status] !== undefined ? m[status] : 0;
+}
+
+function getCostBreakdown(p) {
+  if (Array.isArray(p.costBreakdown) && p.costBreakdown.length) {
+    return p.costBreakdown.slice();
+  }
+  const arr = [];
+  if (p.price) arr.push({ label: '物件価格', amount: p.price * 10000, vendor: '' });
+  if (p.repairCost) arr.push({ label: '修繕費見込', amount: p.repairCost * 10000, vendor: '工務店' });
+  if (p.closingCost) arr.push({ label: '諸費用見込', amount: p.closingCost * 10000, vendor: '' });
+  return arr;
+}
+
+function renderOverviewPane(p) {
+  const rebuildJ = judgeRebuild(p);
+  const yieldVal = (p.price && p.rentExpected) ? ((p.rentExpected * 12) / (p.price * 10000) * 100) : null;
+  const annualRent = p.rentExpected ? p.rentExpected * 12 : 0;
+  const cb = getCostBreakdown(p);
+  let costTotal = 0;
+  cb.forEach(function(c){ if (!c.undecided && c.amount) costTotal += parseFloat(c.amount) || 0; });
+  const yieldGood = 25, yieldWarn = 15;
+  const yieldCls = yieldVal == null ? '' : (yieldVal >= yieldGood ? '' : (yieldVal >= yieldWarn ? 'orange' : 'red'));
+  const progressIdx = getProgressIdx(p.status);
+  const isDrop = p.status === '見送り';
+
+  let h = '<div class="detail-pane active" id="dtab-0">';
+
+  // HERO
+  h += '<div class="ov-hero">';
+  h += '<div class="ov-left">';
+  h += '<div class="ov-photo">';
+  h += '<div class="ov-photo-ph">' + (p.photoAlbumUrl ? '写真アルバム' : '写真未登録') + '</div>';
+  if (p.photoAlbumUrl) h += '<a href="'+esc(p.photoAlbumUrl)+'" target="_blank" class="ov-photo-link">アルバムを開く</a>';
+  h += '</div>';
+  // サマリーピクト（ドット色のみで状態表示）
+  h += '<div class="ov-pict">';
+  h += '<div class="pict-item"><span class="pict-dot '+rebuildJ.s+'"></span>再建築</div>';
+  h += '<div class="pict-item"><span class="pict-dot '+(p.zoning?'ok':'unknown')+'"></span>用途地域</div>';
+  h += '<div class="pict-item"><span class="pict-dot '+(p.registryVerified?'ok':'unknown')+'"></span>登記</div>';
+  const imObj = p.importantMatters || {};
+  const imCount = Object.keys(imObj).filter(function(k){ return imObj[k] && String(imObj[k]).trim(); }).length;
+  h += '<div class="pict-item"><span class="pict-dot '+(imCount>0?'warn':'unknown')+'"></span>重要事項</div>';
+  h += '</div>';
+  h += '</div>';
+
+  // Right: stats + info + progress
+  h += '<div class="ov-right">';
+  h += '<div class="ov-stats">';
+  h += '<div class="stat"><span class="k">表面利回り (≥'+yieldGood+'%で合格)</span><span class="v '+yieldCls+'">'+(yieldVal!==null?yieldVal.toFixed(1)+'%':'-')+'</span></div>';
+  h += '<div class="ov-sep"></div>';
+  h += '<div class="stat"><span class="k">想定家賃</span><span class="v">'+(annualRent?(annualRent/10000).toFixed(1)+'万/年':'-')+'</span></div>';
+  h += '<div class="ov-sep"></div>';
+  h += '<div class="stat"><span class="k">総費用</span><span class="v">'+(costTotal?(costTotal/10000).toFixed(1)+'万':'-')+'</span></div>';
+  h += '</div>';
+
+  h += '<dl class="ov-info">';
+  if (p.location) h += '<dt>住所</dt><dd>'+esc(p.location)+'</dd>';
+  if (p.access) h += '<dt>アクセス</dt><dd>'+esc(p.access)+'</dd>';
+  const stc = [p.ptype, p.age?p.age+'年':null, p.structure].filter(Boolean).join(' / ');
+  if (stc) h += '<dt>種別 / 築 / 構造</dt><dd>'+esc(stc)+'</dd>';
+  const ld = [p.layout, p.direction].filter(Boolean).join(' / ');
+  if (ld) h += '<dt>間取り / 方位</dt><dd>'+esc(ld)+'</dd>';
+  const ar = [p.area?p.area+'㎡':null, p.land?p.land+'㎡':null].filter(Boolean).join(' / ');
+  if (ar) h += '<dt>延床 / 土地</dt><dd>'+esc(ar)+'</dd>';
+  const pc = [p.parking?p.parking+'台':null, p.occupancy].filter(Boolean).join(' / ');
+  if (pc) h += '<dt>駐車場 / 現況</dt><dd>'+esc(pc)+'</dd>';
+  if (p.deliveryTime) h += '<dt>引渡時期</dt><dd>'+esc(p.deliveryTime)+'</dd>';
+  if (p.date) h += '<dt>物件登録日</dt><dd>'+esc(p.date)+'</dd>';
+  const links = [];
+  if (p.listingUrl) links.push('<a href="'+esc(p.listingUrl)+'" target="_blank">掲載URL ↗</a>');
+  if (p.mapUrl) links.push('<a href="'+esc(p.mapUrl)+'" target="_blank">Maps ↗</a>');
+  if (links.length) h += '<dt>リンク</dt><dd>'+links.join(' &nbsp; ')+'</dd>';
+  h += '</dl>';
+
+  // Progress chain
+  h += '<div class="ov-progress">';
+  const steps = ['候補発見','調査','ヒアリング','内見','交渉','融資','買付'];
+  steps.forEach(function(s, i){
+    let cls = '';
+    if (!isDrop) {
+      if (i < progressIdx) cls = ' done';
+      else if (i === progressIdx) cls = ' active';
+      else if (i === progressIdx + 1) cls = ' next';
+    }
+    const dotIcon = (i < progressIdx) ? '✓' : String(i+1);
+    h += '<div class="pstep'+cls+'"><span class="pdot">'+dotIcon+'</span>'+s+'</div>';
+  });
+  h += '</div>';
+  h += '</div>'; // ov-right
+  h += '</div>'; // ov-hero
+
+  // === 購入前必須 + 重要事項 (横並び) ===
+  h += '<div class="ov-pair">';
+
+  // 購入前必須
+  h += '<div class="ov-col">';
+  h += '<div class="ov-sh critical">購入前必須チェック<button class="ov-edit-btn" onclick="editCurrentProperty()">✏ 編集</button></div>';
+  h += '<div class="ov-cards">';
+  // 再建築カード
+  h += '<div class="ov-card '+rebuildJ.s+'">';
+  h += '<div class="ov-clabel"><span>接道・再建築可否</span><span style="color:var(--red);font-weight:600;font-size:10px;">最重要</span></div>';
+  h += '<div class="ov-cvalue '+rebuildJ.s+'"><span class="ov-cbadge '+rebuildJ.s+'">'+(rebuildJ.s==='ok'?'OK':rebuildJ.s==='ng'?'NG':rebuildJ.s==='warn'?'要SB':'?')+'</span>'+rebuildJ.label+'</div>';
+  if (p.roadType || p.roadWidth || p.frontage || p.roadDirection) {
+    h += '<div class="ov-subs">';
+    if (p.roadType) h += '<div>道路種別: <b>'+esc(p.roadType)+'</b></div>';
+    if (p.roadWidth) h += '<div>幅員: <b>'+p.roadWidth+' m</b></div>';
+    if (p.frontage) h += '<div>間口: <b>'+p.frontage+' m</b></div>';
+    if (p.roadDirection) h += '<div>方位: <b>'+esc(p.roadDirection)+'</b></div>';
+    h += '</div>';
+  }
+  h += '<div class="ov-autonote '+rebuildJ.s+'">自動判定: '+rebuildJ.note+'</div>';
+  const rv = !!p.roadVerified;
+  h += '<label class="ov-verify'+(rv?' ok':'')+'"><input type="checkbox"'+(rv?' checked':'')+' disabled>'+(rv?'✓ 確認済':'□ 役所確認');
+  if (rv && p.roadVerifyDate) h += '<span class="ov-vd">（'+esc(p.roadVerifyDate)+(p.roadVerifyBy?' '+esc(p.roadVerifyBy):'')+'）</span>';
+  h += '</label>';
+  h += '</div>';
+  // 用途地域カード
+  const zv = !!p.zoningVerified;
+  h += '<div class="ov-card '+(p.zoning?'ok':'unknown')+'">';
+  h += '<div class="ov-clabel">用途地域・制限</div>';
+  h += '<div class="ov-cvalue '+(p.zoning?'ok':'unknown')+'">'+(p.zoning?esc(p.zoning):'<span class="ov-cbadge unknown">未取得</span>未取得')+'</div>';
+  if (p.coverage || p.far) {
+    h += '<div class="ov-cdetail">';
+    if (p.coverage) h += '建ぺい率 '+p.coverage+'% ';
+    if (p.far) h += '/ 容積率 '+p.far+'%';
+    h += '</div>';
+  }
+  h += '<label class="ov-verify'+(zv?' ok':'')+'"><input type="checkbox"'+(zv?' checked':'')+' disabled>'+(zv?'✓ 確認済':'□ 役所確認（都市計画課）');
+  if (zv && p.zoningVerifyDate) h += '<span class="ov-vd">（'+esc(p.zoningVerifyDate)+'）</span>';
+  h += '</label>';
+  h += '</div>';
+  // 登記情報カード
+  const rgv = !!p.registryVerified;
+  h += '<div class="ov-card '+(p.registryMemo?'ok':'unknown')+'">';
+  h += '<div class="ov-clabel">登記情報</div>';
+  h += '<div class="ov-cvalue '+(p.registryMemo?'ok':'unknown')+'">'+(p.registryMemo?esc(String(p.registryMemo).substring(0,40)):'<span class="ov-cbadge unknown">未取得</span>要取得')+'</div>';
+  if (!p.registryMemo) h += '<div class="ov-cdetail">所有権・抵当権・差押等の確認必要</div>';
+  h += '<label class="ov-verify'+(rgv?' ok':'')+'"><input type="checkbox"'+(rgv?' checked':'')+' disabled>'+(rgv?'✓ 確認済':'□ 法務局確認');
+  if (rgv && p.registryVerifyDate) h += '<span class="ov-vd">（'+esc(p.registryVerifyDate)+'）</span>';
+  h += '</label>';
+  h += '</div>';
+  h += '</div>'; // ov-cards
+  h += '</div>'; // 購入前
+
+  // 重要事項
+  h += '<div class="ov-col">';
+  h += '<div class="ov-sh critical">重要事項<button class="ov-edit-btn" onclick="editCurrentProperty()">✏ 編集</button></div>';
+  h += '<div class="ov-info-box">';
+  const im = p.importantMatters || {};
+  const hidden = p.importantHidden || [];
+  IMPORTANT_MATTERS_DEFAULTS.forEach(function(label){
+    if (hidden.indexOf(label) >= 0) return;
+    const val = im[label] || '';
+    h += '<div class="ov-row"><span class="ov-rl">'+esc(label)+'</span><span class="ov-rv'+(val?'':' empty')+'">'+(val?esc(val):'未確認')+'</span></div>';
+  });
+  (p.importantCustom || []).forEach(function(kv){
+    if (hidden.indexOf(kv.label) >= 0) return;
+    h += '<div class="ov-row"><span class="ov-rl">'+esc(kv.label)+'</span><span class="ov-rv'+(kv.value?'':' empty')+'">'+(kv.value?esc(kv.value):'未確認')+'</span></div>';
+  });
+  h += '</div>';
+  if (hidden.length > 0) {
+    h += '<details class="ov-hidden-box"><summary>🙈 非表示中（'+hidden.length+'件）</summary>';
+    hidden.forEach(function(label){
+      h += '<div class="ov-row" style="opacity:.5;"><span class="ov-rl">'+esc(label)+'</span><span class="ov-rv empty">（非表示）</span></div>';
+    });
+    h += '</details>';
+  }
+  h += '<div class="ov-note">全項目デフォ表示。該当しないものは編集から非表示に（後で復活可）</div>';
+  h += '</div>'; // 重要
+  h += '</div>'; // ov-pair
+
+  // === 費用内訳 + 収支見込み (横並び) ===
+  h += '<div class="ov-pair">';
+  // 費用内訳
+  h += '<div class="ov-col">';
+  h += '<div class="ov-sh">費用内訳<button class="ov-edit-btn" onclick="editCurrentProperty()">✏ 編集</button></div>';
+  h += '<table class="ov-cost"><tbody>';
+  if (cb.length) {
+    cb.forEach(function(c){
+      const v = c.undecided ? '<span class="ov-ud">※未定</span>' : (c.amount ? fmtNum(c.amount)+' 円' : '-');
+      const tagCls = c.vendor==='工務店'?'kou':c.vendor==='ガス屋'?'gas':c.vendor==='DIY'?'diy':'';
+      const tag = c.vendor && tagCls ? '<span class="ov-vtag '+tagCls+'">'+esc(c.vendor)+'</span>' : '';
+      h += '<tr><td>'+esc(c.label)+tag+'</td><td class="amt">'+v+'</td></tr>';
+    });
+    h += '<tr class="total"><td>合計</td><td class="amt">'+fmtNum(costTotal)+' 円</td></tr>';
+  } else {
+    h += '<tr><td colspan="2" style="padding:16px;color:var(--gray3);text-align:center;">費用項目未登録</td></tr>';
+  }
+  h += '</tbody></table>';
+  h += '<div class="ov-note">工事費用はリフォームプラン確定後に自動連動（Step 4で実装予定）</div>';
+  h += '</div>';
+
+  // 収支見込み
+  h += '<div class="ov-col">';
+  h += '<div class="ov-sh">収支見込み<button class="ov-edit-btn" onclick="editCurrentProperty()">✏ 編集</button></div>';
+  h += '<div class="ov-info-box">';
+  if (p.rentExpected) h += '<div class="ov-row"><span class="ov-rl">想定家賃</span><span class="ov-rv">'+fmtNum(p.rentExpected)+' 円 / 月</span></div>';
+  if (p.rentMarket || p.rentMarketHi) {
+    const rm = (p.rentMarket?fmtNum(p.rentMarket):'-') + (p.rentMarketHi?' 〜 '+fmtNum(p.rentMarketHi):'') + ' 円 / 月';
+    h += '<div class="ov-row"><span class="ov-rl">近隣相場</span><span class="ov-rv">'+rm+'</span></div>';
+  }
+  if (annualRent) h += '<div class="ov-row"><span class="ov-rl">年間家賃収入</span><span class="ov-rv">'+fmtNum(annualRent)+' 円</span></div>';
+  if (costTotal) h += '<div class="ov-row"><span class="ov-rl">総費用</span><span class="ov-rv">'+fmtNum(costTotal)+' 円</span></div>';
+  if (yieldVal !== null) {
+    const ycolor = yieldVal >= yieldGood ? 'var(--green)' : yieldVal >= yieldWarn ? '#e65100' : 'var(--red)';
+    const ymark = yieldVal >= yieldGood ? ' ✓' : '';
+    h += '<div class="ov-row"><span class="ov-rl">表面利回り</span><span class="ov-rv" style="color:'+ycolor+';font-weight:700;">'+yieldVal.toFixed(1)+' %'+ymark+'</span></div>';
+  }
+  h += '</div>';
+  h += '</div>';
+  h += '</div>'; // ov-pair
+
+  // 出口戦略
+  if (p.exitStrategy || p.exitTargetYear || p.exitTargetPrice) {
+    h += '<div class="ov-sh">出口戦略<button class="ov-edit-btn" onclick="editCurrentProperty()">✏ 編集</button></div>';
+    h += '<div class="ov-info-box">';
+    if (p.exitStrategy) h += '<div class="ov-row"><span class="ov-rl">方針</span><span class="ov-rv">'+esc(p.exitStrategy)+'</span></div>';
+    if (p.exitTargetYear) h += '<div class="ov-row"><span class="ov-rl">想定保有</span><span class="ov-rv">'+p.exitTargetYear+' 年</span></div>';
+    if (p.exitTargetPrice) h += '<div class="ov-row"><span class="ov-rl">想定売却価格</span><span class="ov-rv">'+fmtNum(p.exitTargetPrice)+' 万円</span></div>';
+    if (p.exitReason) h += '<div style="padding:8px 10px;font-size:12px;color:var(--gray4);">'+esc(p.exitReason)+'</div>';
+    h += '</div>';
+  }
+
+  // 見送り
+  if (isDrop && (p.dropReason || p.dropMemo)) {
+    h += '<div class="ov-sh critical">見送り情報<button class="ov-edit-btn" onclick="editCurrentProperty()">✏ 編集</button></div>';
+    h += '<div class="ov-info-box">';
+    if (p.dropDate) h += '<div class="ov-row"><span class="ov-rl">日付</span><span class="ov-rv">'+esc(p.dropDate)+'</span></div>';
+    if (p.dropReason) h += '<div class="ov-row"><span class="ov-rl">理由</span><span class="ov-rv">'+esc(p.dropReason)+'</span></div>';
+    if (p.dropMemo) h += '<div style="padding:8px 10px;font-size:12px;color:var(--gray4);white-space:pre-wrap;">'+esc(p.dropMemo)+'</div>';
+    h += '</div>';
+  }
+
+  // メモ
+  if (p.memo) {
+    h += '<div class="ov-sh">メモ</div>';
+    h += '<div class="ov-info-box" style="padding:10px 14px;font-size:12.5px;color:var(--gray4);white-space:pre-wrap;">'+esc(p.memo)+'</div>';
+  }
+
+  h += '</div>'; // end overview pane
+  return h;
+}
+
 function renderPropertyDetail() {
   const p = data.property.find(x => String(x.id) === String(currentPropertyId));
   if (!p) return;
-  const yield_ = (p.price && p.rentExpected) ? ((p.rentExpected * 12) / (p.price * 10000) * 100).toFixed(1) : null;
 
   let html = '<h2 style="font-size:18px;margin-bottom:4px;">' + esc(p.name) + '</h2>' +
     '<div style="margin-bottom:12px;">' + statusBadge(p.status) + '</div>';
 
+  const tabs = ['Overview','調査','ヒアリング','現調/リフォーム','Log','融資','収支','Note'];
   html += '<div class="detail-tabs">' +
-    ['Overview','Log','融資','収支','Note'].map((t, i) =>
-      '<div class="detail-tab' + (i===0?' active':'') + '" onclick="switchDetailTab(this, \'dtab-'+i+'\')">' + t + '</div>'
-    ).join('') + '</div>';
+    tabs.map(function(t, i){
+      return '<div class="detail-tab' + (i===0?' active':'') + '" onclick="switchDetailTab(this, \'dtab-'+i+'\')">' + t + '</div>';
+    }).join('') + '</div>';
 
-  // Overview
-  html += '<div class="detail-pane active" id="dtab-0">';
-  const fields = [
-    ['日付', p.date], ['住所', p.location], ['種別', p.ptype], ['築年数', p.age ? p.age+'年' : null],
-    ['延床面積', p.area ? p.area+'㎡' : null], ['土地面積', p.land ? p.land+'㎡' : null], ['アクセス', p.access]
-  ];
-  fields.forEach(([l,v]) => { if(v) html += '<div class="field-row"><span class="field-label">'+l+'</span><span class="field-value">'+esc(String(v))+'</span></div>'; });
+  // Overview (dtab-0)
+  html += renderOverviewPane(p);
 
-  if (p.listingUrl) html += '<div class="field-row"><span class="field-label">掲載URL</span><span class="field-value"><a href="'+esc(p.listingUrl)+'" target="_blank" style="color:var(--green)">リンク↗</a></span></div>';
-  if (p.mapUrl) html += '<div class="field-row"><span class="field-label">Google Maps</span><span class="field-value"><a href="'+esc(p.mapUrl)+'" target="_blank" style="color:var(--green)">地図↗</a></span></div>';
+  // 調査 (dtab-1) — Step 2
+  html += renderResearchPane(p);
 
-  if (p.zoning || p.road || p.rebuild) {
-    html += '<div class="form-section">📜 法的・行政</div>';
-    if(p.zoning) html += '<div class="field-row"><span class="field-label">用途地域</span><span class="field-value">'+esc(p.zoning)+'</span></div>';
-    if(p.coverage) html += '<div class="field-row"><span class="field-label">建ぺい率</span><span class="field-value">'+p.coverage+'%</span></div>';
-    if(p.far) html += '<div class="field-row"><span class="field-label">容積率</span><span class="field-value">'+p.far+'%</span></div>';
-    if(p.road) html += '<div class="field-row"><span class="field-label">接道状況</span><span class="field-value">'+esc(p.road)+'</span></div>';
-    if(p.rebuild) html += '<div class="field-row"><span class="field-label">再建築</span><span class="field-value">'+esc(p.rebuild)+'</span></div>';
-    if(p.legalMemo) html += '<div style="margin-top:6px;font-size:13px;color:var(--gray4)">'+esc(p.legalMemo)+'</div>';
-  }
+  // ヒアリング (dtab-2) — Step 3
+  html += renderHearingPane(p);
 
-  html += '<div class="form-section">💴 収支</div>';
-  const fin = [
-    ['購入価格', p.price ? fmtNum(p.price)+'万円' : null],
-    ['想定家賃', p.rentExpected ? fmtNum(p.rentExpected)+'円/月' : null],
-    ['近隣相場', p.rentMarket ? fmtNum(p.rentMarket)+'円/月' : null],
-    ['修繕費見込', p.repairCost ? fmtNum(p.repairCost)+'万円' : null],
-    ['諸費用見込', p.closingCost ? fmtNum(p.closingCost)+'万円' : null],
-    ['自己資金', p.downPayment ? fmtNum(p.downPayment)+'万円' : null],
-    ['表面利回り', yield_ ? yield_+'%' : null],
-  ];
-  fin.forEach(([l,v]) => { if(v) html += '<div class="field-row"><span class="field-label">'+l+'</span><span class="field-value">'+v+'</span></div>'; });
+  // 現調/リフォーム (dtab-3) — Step 4
+  html += renderReformPane(p);
 
-  if (p.exitStrategy) {
-    html += '<div class="form-section">🚪 出口戦略</div>';
-    html += '<div class="field-row"><span class="field-label">方針</span><span class="field-value">'+esc(p.exitStrategy)+'</span></div>';
-    if(p.exitTargetYear) html += '<div class="field-row"><span class="field-label">想定保有</span><span class="field-value">'+p.exitTargetYear+'年</span></div>';
-    if(p.exitTargetPrice) html += '<div class="field-row"><span class="field-label">想定売却価格</span><span class="field-value">'+fmtNum(p.exitTargetPrice)+'万円</span></div>';
-    if(p.exitReason) html += '<div style="margin-top:6px;font-size:13px;color:var(--gray4)">'+esc(p.exitReason)+'</div>';
-  }
-
-  if (p.photoAlbumUrl) {
-    html += '<div class="form-section">📸 写真</div>';
-    html += '<div class="field-row"><span class="field-label">アルバム</span><span class="field-value"><a href="'+esc(p.photoAlbumUrl)+'" target="_blank" style="color:var(--green)">開く↗</a></span></div>';
-    if(p.photoMemo) html += '<div style="font-size:13px;color:var(--gray4)">'+esc(p.photoMemo)+'</div>';
-  }
-
-  if (p.status === '見送り' && p.dropReason) {
-    html += '<div class="form-section">❌ 見送り</div>';
-    html += '<div class="field-row"><span class="field-label">理由</span><span class="field-value">'+esc(p.dropReason)+'</span></div>';
-    if(p.dropMemo) html += '<div style="font-size:13px;color:var(--gray4)">'+esc(p.dropMemo)+'</div>';
-  }
-  if (p.memo) html += '<div class="form-section">📝 メモ</div><div style="font-size:13px;color:var(--gray4);white-space:pre-wrap;">'+esc(p.memo)+'</div>';
-
-  html += '</div>';
-
-  // Log
-  html += '<div class="detail-pane" id="dtab-1">';
-  const logs = (p.timeline || []).slice().sort((a,b) => b.date > a.date ? 1 : -1);
-  const relatedMemos = data.action.filter(m => (m.properties || []).includes(p.name) || m.property === p.name);
-  const allLogs = [...logs.map(l => ({...l, src:'log'})), ...relatedMemos.map(m => ({date:m.date, text: '[Memo] ' + m.title + (m.content ? ': '+m.content : ''), src:'memo'}))].sort((a,b) => b.date > a.date ? 1 : -1);
+  // Log (dtab-4)
+  html += '<div class="detail-pane" id="dtab-4">';
+  const logs = (p.timeline || []).slice().sort(function(a,b){ return b.date > a.date ? 1 : -1; });
+  const relatedMemos = data.action.filter(function(m){ return (m.properties || []).indexOf(p.name) >= 0 || m.property === p.name; });
+  const allLogs = logs.map(function(l){ return Object.assign({}, l, {src:'log'}); })
+    .concat(relatedMemos.map(function(m){ return {date:m.date, text: '[Memo] ' + m.title + (m.content ? ': '+m.content : ''), src:'memo'}; }))
+    .sort(function(a,b){ return b.date > a.date ? 1 : -1; });
   if (allLogs.length) {
-    allLogs.forEach(l => {
+    allLogs.forEach(function(l){
       html += '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;"><span style="color:var(--gray3);margin-right:8px;">'+esc(l.date)+'</span>'+esc(l.text)+'</div>';
     });
   } else {
@@ -926,25 +3535,28 @@ function renderPropertyDetail() {
   }
   html += '</div>';
 
-  // 融資
-  html += '<div class="detail-pane" id="dtab-2">';
+  // 融資 (dtab-5)
+  html += '<div class="detail-pane" id="dtab-5">';
   html += '<button class="btn btn-primary btn-sm" onclick="openLoanModal(\'' + p.id + '\')" style="margin-bottom:12px;">+ 融資情報を追加</button>';
-  const activeLoans = (p.loans||[]).filter(l => !l.archived);
-  const archivedLoans = (p.loans||[]).filter(l => l.archived);
+  const activeLoans = (p.loans||[]).filter(function(l){ return !l.archived; });
+  const archivedLoans = (p.loans||[]).filter(function(l){ return l.archived; });
   if (activeLoans.length) {
-    activeLoans.forEach(l => { html += renderLoanCard(l, p.id); });
+    activeLoans.forEach(function(l){ html += renderLoanCard(l, p.id); });
   } else {
     html += '<div class="empty" style="padding:20px;"><div class="icon">🏦</div>融資情報がありません</div>';
   }
   if (archivedLoans.length) {
     html += '<details style="margin-top:12px;"><summary style="font-size:13px;color:var(--gray3);cursor:pointer;">過去の打診履歴（' + archivedLoans.length + '件）</summary>';
-    archivedLoans.forEach(l => { html += renderLoanCard(l, p.id, true); });
+    archivedLoans.forEach(function(l){ html += renderLoanCard(l, p.id, true); });
     html += '</details>';
   }
   html += '</div>';
 
-  // 収支
-  html += '<div class="detail-pane" id="dtab-3">';
+  // 収支 (dtab-6)
+  html += '<div class="detail-pane" id="dtab-6">';
+  // シミュレーションセクション (Step 5)
+  html += '<div id="sim-section">' + renderSimulationSection(p) + '</div>';
+  html += '<h3 style="font-size:14px;font-weight:700;color:#1f3d1f;margin:16px 0 8px;padding:6px 10px;background:#eef2ed;border-left:3px solid #4a6a4a;">📋 収支実績記録（購入後）</h3>';
   html += '<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">';
   html += '<button class="btn btn-primary btn-sm" onclick="openCashflowModal(\'' + p.id + '\')">+ 収支追加</button>';
   html += '<button class="btn btn-secondary btn-sm" onclick="exportCashflowCSV(\'' + p.id + '\')">📥 CSVエクスポート</button>';
@@ -985,12 +3597,29 @@ function renderPropertyDetail() {
   }
   html += '</div>';
 
-  // Note
-  html += '<div class="detail-pane" id="dtab-4">';
+  // Note (dtab-7)
+  html += '<div class="detail-pane" id="dtab-7">';
   html += '<textarea id="prop-rich-note" rows="10" style="width:100%;min-height:200px;" placeholder="自由にメモを記入..." oninput="saveRichNote()">' + esc(p.richNote||'') + '</textarea>';
   html += '</div>';
 
   document.getElementById('property-detail-content').innerHTML = html;
+
+  // 最後に見ていた物件詳細タブを復元
+  try {
+    const lastTab = localStorage.getItem('fudosan_last_detail_tab');
+    if (lastTab && /^dtab-\d+$/.test(lastTab)) {
+      const idx = parseInt(lastTab.replace('dtab-', ''), 10);
+      const tabs = document.querySelectorAll('.detail-tab');
+      if (tabs[idx]) {
+        // 既定のactive (dtab-0) を解除し、記憶タブをactiveに
+        tabs.forEach(function(t){ t.classList.remove('active'); });
+        document.querySelectorAll('.detail-pane').forEach(function(p){ p.classList.remove('active'); });
+        tabs[idx].classList.add('active');
+        const pane = document.getElementById(lastTab);
+        if (pane) pane.classList.add('active');
+      }
+    }
+  } catch(e){}
 }
 
 function renderLoanCard(l, propId, archived) {
@@ -1018,6 +3647,8 @@ function switchDetailTab(el, paneId) {
   el.classList.add('active');
   document.querySelectorAll('.detail-pane').forEach(p => p.classList.remove('active'));
   document.getElementById(paneId).classList.add('active');
+  // 現在のタブを記憶（リロード時に復元するため）
+  try { localStorage.setItem('fudosan_last_detail_tab', paneId); } catch(e){}
 }
 
 function saveRichNote() {
@@ -1758,6 +4389,53 @@ function voiceInputProperty() {
   openPropertyModal();
 }
 
+/* ===== データ エクスポート / インポート ===== */
+function exportAllData() {
+  try {
+    const raw = localStorage.getItem('fudosan_note_v2') || JSON.stringify(data);
+    // 読みやすく整形
+    let pretty;
+    try { pretty = JSON.stringify(JSON.parse(raw), null, 2); } catch(e) { pretty = raw; }
+    const blob = new Blob([pretty], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'property-note-backup-' + today() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('エクスポート完了');
+  } catch(e) {
+    toast('エクスポート失敗: ' + e.message, 'error');
+  }
+}
+
+function importAllData(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  if (!confirm('現在のデータが上書きされます。続行しますか？\n（事前に現在のデータもエクスポートしておくのがおすすめ）')) {
+    e.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const text = ev.target.result;
+      const parsed = JSON.parse(text); // バリデーション
+      if (typeof parsed !== 'object' || parsed === null) throw new Error('JSONオブジェクトではありません');
+      localStorage.setItem('fudosan_note_v2', JSON.stringify(parsed));
+      toast('インポート完了。リロードします...');
+      setTimeout(function(){ location.reload(); }, 600);
+    } catch(err) {
+      toast('JSONファイルが不正: ' + err.message, 'error');
+    }
+  };
+  reader.onerror = function() { toast('ファイル読込失敗', 'error'); };
+  reader.readAsText(file);
+  e.target.value = ''; // 同じファイルを再選択可にリセット
+}
+
 /* ===== GAS SYNC ===== */
 function testAndSaveGAS() {
   const url = document.getElementById('gas-url').value;
@@ -1794,6 +4472,8 @@ function renderCurrentPage() {
   if (id === 'home') renderHome();
   else if (id === 'property') renderPropertyList();
   else if (id === 'property-detail') renderPropertyDetail();
+  else if (id === 'contacts') renderContactsPage();
+  else if (id === 'area') renderAreaPageInit();
   else if (id === 'memo') renderMemoList();
   else if (id === 'learn') renderLearnList();
   else if (id === 'calendar') renderCalendarPage();
@@ -1807,7 +4487,44 @@ document.querySelectorAll('.modal-overlay').forEach(ov => {
 /* ===== INIT ===== */
 loadData();
 initVoice();
-renderHome();
+
+// リロード時に最後に見ていたページを復元
+(function restoreLastPage(){
+  let lastPage = '';
+  let lastScroll = 0;
+  try {
+    lastPage = localStorage.getItem(LAST_PAGE_KEY) || '';
+    lastScroll = parseInt(localStorage.getItem(LAST_SCROLL_KEY), 10) || 0;
+    const lastPropId = localStorage.getItem(LAST_PROP_KEY);
+    if (lastPage === 'property-detail' && lastPropId) {
+      // 物件がまだ存在するか確認
+      if (data.property.find(x => String(x.id) === String(lastPropId))) {
+        currentPropertyId = lastPropId;
+      } else {
+        lastPage = 'property'; // 見つからなければ一覧に
+      }
+    }
+  } catch(e){}
+  if (lastPage && document.getElementById('page-' + lastPage)) {
+    showPage(lastPage, true);
+    // スクロール位置も復元
+    setTimeout(function(){ window.scrollTo(0, lastScroll); }, 50);
+  } else {
+    showPage('home');
+  }
+})();
+
+// スクロール位置を保存 (スロットル付き)
+(function(){
+  let t = null;
+  window.addEventListener('scroll', function(){
+    if (t) return;
+    t = setTimeout(function(){
+      try { localStorage.setItem(LAST_SCROLL_KEY, String(window.scrollY)); } catch(e){}
+      t = null;
+    }, 200);
+  }, { passive: true });
+})();
 </script>
 </body>
 </html>

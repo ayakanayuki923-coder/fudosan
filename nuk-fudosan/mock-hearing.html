@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>モック: ヒアリング記録（連絡先インライン追加）· Property Note</title>
+<style>
+:root{
+  --green:#2e7d32;--green-light:#e8f5e9;--green-dark:#1b5e20;
+  --red:#c62828;--red-light:#ffebee;
+  --orange:#e65100;--orange-light:#fff3e0;
+  --blue:#1565c0;--blue-light:#e3f2fd;
+  --gray:#f5f5f5;--gray2:#e0e0e0;--gray3:#9e9e9e;--gray4:#616161;
+  --white:#fff;--black:#212121;
+  --radius:10px;--shadow:0 2px 8px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:#fafafa;color:var(--black);padding:24px 32px 80px;max-width:1000px;margin:0 auto;}
+a{color:var(--green);text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:13px;}
+input,select,textarea{font-family:inherit;font-size:13px;border:1px solid var(--gray2);border-radius:6px;padding:6px 10px;width:100%;background:var(--white);}
+textarea{resize:vertical;min-height:60px;}
+
+.mock-banner{background:#fff59d;color:#5d4037;padding:10px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;}
+.mock-banner b{color:#d84315;}
+
+.breadcrumb{font-size:12px;color:var(--gray3);margin-bottom:8px;}
+.breadcrumb a{color:var(--gray4);}
+
+h1{font-size:22px;font-weight:700;margin-bottom:8px;}
+.page-sub{color:var(--gray3);font-size:13px;margin-bottom:20px;}
+
+h2.scenario{font-size:15px;margin:28px 0 10px;padding:8px 14px;background:var(--blue-light);color:var(--blue);border-radius:8px;}
+
+.modal-shell{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--gray2);}
+.modal-head h3{font-size:16px;font-weight:700;}
+.modal-head .sub{font-size:12px;color:var(--gray3);margin-top:2px;}
+
+.modal-body{padding:18px 20px;}
+
+.form-section{margin-bottom:14px;}
+.form-section h4{font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--gray2);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-bottom:10px;}
+.form-row.col-3{grid-template-columns:1fr 1fr 1fr;}
+.form-row.col-1{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:3px;}
+.form-group label{font-size:11.5px;font-weight:600;color:var(--gray4);}
+.form-group .hint{font-size:11px;color:var(--gray3);margin-top:2px;}
+
+/* ヒアリング項目の詳細ヒント（初心者向け聞き漏れ防止） */
+.hear-hint{font-size:11px;color:var(--gray4);margin:2px 0 6px;padding:6px 10px;background:#fffbf0;border-left:3px solid #ffcc80;border-radius:4px;line-height:1.6;}
+.hear-hint b{color:var(--orange);}
+.hear-hint .term{display:inline-block;background:#fff3e0;color:var(--orange);padding:0 4px;border-radius:3px;font-size:10.5px;font-weight:700;margin-right:3px;}
+
+/* 担当者選択コンポーネント (肝) */
+.contact-picker{position:relative;}
+.picker-input{width:100%;padding:8px 10px;border:2px solid var(--gray2);border-radius:6px;font-size:13px;}
+.picker-input:focus{border-color:var(--green);outline:none;}
+.picker-dropdown{position:relative;border:1px solid var(--gray2);border-radius:0 0 6px 6px;background:var(--white);max-height:280px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.1);margin-top:-1px;}
+.picker-item{padding:8px 12px;display:flex;gap:10px;align-items:center;cursor:pointer;border-bottom:1px solid #f0f0f0;}
+.picker-item:hover{background:var(--green-light);}
+.picker-item:last-child{border-bottom:none;}
+.picker-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+.picker-avatar.estate{background:var(--green-light);color:var(--green);}
+.picker-avatar.bank{background:var(--blue-light);color:var(--blue);}
+.picker-avatar.reform{background:var(--orange-light);color:var(--orange);}
+.picker-info{flex:1;min-width:0;}
+.picker-info .nm{font-size:13px;font-weight:700;}
+.picker-info .co{font-size:11px;color:var(--gray3);}
+.picker-tags{display:flex;gap:3px;flex-wrap:wrap;}
+.picker-tag{padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600;}
+.picker-tag.estate{background:var(--green-light);color:var(--green);}
+
+/* 新規追加行 */
+.picker-add{background:#fafffd;padding:10px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;border-top:2px dashed var(--green);color:var(--green);font-weight:600;font-size:12.5px;}
+.picker-add:hover{background:var(--green-light);}
+.picker-add .plus{width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;}
+
+/* 選択済み表示 */
+.picked-display{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--green-light);border:1px solid var(--green);border-radius:8px;}
+.picked-display .nm{font-size:14px;font-weight:700;color:var(--green);}
+.picked-display .co{font-size:11px;color:var(--gray4);}
+.picked-display .chg{margin-left:auto;font-size:11px;color:var(--green);padding:4px 10px;border:1px solid var(--green);border-radius:12px;}
+
+/* インライン新規追加フォーム */
+.inline-add-form{background:#fafffd;border:2px solid var(--green);border-radius:8px;padding:14px 16px;margin-top:4px;}
+.inline-add-form h5{font-size:12.5px;color:var(--green);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.inline-add-form .hint-box{background:var(--green-light);border-radius:6px;padding:8px 10px;font-size:11.5px;color:var(--gray4);margin-top:8px;}
+.tag-select{display:flex;flex-wrap:wrap;gap:4px;}
+.tag-select label{padding:3px 9px;border:1px solid var(--gray2);border-radius:12px;font-size:11px;color:var(--gray4);cursor:pointer;background:var(--white);}
+.tag-select label.active{background:var(--green-light);color:var(--green);border-color:var(--green);font-weight:600;}
+.tag-select input{display:none;}
+.inline-btns{display:flex;gap:8px;margin-top:12px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:600;}
+.btn-primary{background:var(--green);color:#fff;}
+.btn-secondary{background:var(--gray);color:var(--gray4);border:1px solid var(--gray2);}
+.btn-ghost{background:none;color:var(--gray3);}
+
+.modal-foot{padding:14px 20px;border-top:1px solid var(--gray2);display:flex;justify-content:flex-end;gap:8px;background:var(--gray);}
+
+.annotate{position:relative;}
+.annotate::before{content:attr(data-note);position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);background:var(--orange);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;}
+@media(max-width:1100px){.annotate::before{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="mock-banner">
+  🧪 <b>ヒアリング記録モーダル モック v3</b>（10項目・初心者向けヒント付き）<br>
+  項目8=AD/契約形態、項目9=入居者属性条件、項目10=その他 を追加。各項目に「聞くことリスト」と💡アドバイスを表示。
+</div>
+
+<div class="breadcrumb"><a href="/mock-overview.html">← Overview</a> / <a href="/mock-contacts.html">連絡先</a> / <b>ヒアリング記録</b></div>
+
+<h1>📞 ヒアリング記録を追加</h1>
+<div class="page-sub">物件1つ or 複数 or エリアのみ対象可。担当者は既存から選択 or その場で新規追加。</div>
+
+<!-- ==================================================== -->
+<h2 class="scenario">🟡 ステップ①: 検索して候補を見る（まずここ）</h2>
+<div class="modal-shell">
+  <div class="modal-head">
+    <div><h3>ヒアリング記録</h3><div class="sub">2026-04-25</div></div>
+  </div>
+  <div class="modal-body">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>日付</label>
+        <input type="date" value="2026-04-25">
+      </div>
+      <div class="form-group">
+        <label>対象物件（複数可）</label>
+        <select multiple size="1">
+          <option selected>○○市△△町 戸建て</option>
+          <option>□□市××町 戸建て</option>
+          <option>エリアのみ（物件特定なし）</option>
+        </select>
+        <div class="hint">複数選択可・物件特定なしも可</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>👤 担当者</h4>
+      <div class="contact-picker">
+        <input type="text" class="picker-input" value="さと" placeholder="🔍 名前・会社名で検索...">
+        <div class="picker-dropdown">
+          <div class="picker-item">
+            <div class="picker-avatar estate">佐</div>
+            <div class="picker-info">
+              <div class="nm">佐藤 花子</div>
+              <div class="co">○○不動産 青葉区店 · 営業課長</div>
+            </div>
+            <div class="picker-tags"><span class="picker-tag estate">元付け</span><span class="picker-tag estate">客付け</span></div>
+          </div>
+          <div class="picker-item">
+            <div class="picker-avatar estate">さ</div>
+            <div class="picker-info">
+              <div class="nm">里見 太郎</div>
+              <div class="co">△△不動産 · 賃貸担当</div>
+            </div>
+            <div class="picker-tags"><span class="picker-tag estate">客付け</span></div>
+          </div>
+          <div class="picker-add">
+            <div class="plus">+</div>
+            <div>"さと" で新規追加 <span style="font-weight:400;color:var(--gray4);font-size:11px;margin-left:6px;">← 該当者がいなければクリックで新規登録</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--gray3);margin-top:6px;">💡 2件ヒット。候補から選ぶ or 新規追加で「さと」さんを登録できます</div>
+    </div>
+
+    <div class="form-section">
+      <h4>📋 ヒアリング内容（10項目・初心者向けヒント付き）</h4>
+      <div class="form-row col-1">
+
+        <div class="form-group">
+          <label>① 募集条件</label>
+          <div class="hear-hint">
+            聞くこと: <b>家賃の相場帯（上限/下限）</b>・礼金・敷金・フリーレント（家賃無料期間）の有無・更新料<br>
+            💡 このエリアで"成約しやすい家賃"を知る。自分の想定と乖離がないか確認
+          </div>
+          <textarea placeholder="例: 家賃 5.5〜6万、礼金1ヶ月/敷金1ヶ月、フリーレント1ヶ月OK、更新料なし"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>② 必要な室内設備</label>
+          <div class="hear-hint">
+            聞くこと: <b>最低限必要なもの</b>（エアコン・給湯器・TVモニホン・洗濯機置場・Wi-Fi）／<b>あったら強いもの</b>（追焚・食洗機・宅配BOX・TVアンテナ）<br>
+            💡 "これがないと客がつかない最低ライン"を明確にしてリフォーム予算化
+          </div>
+          <textarea placeholder="例: 必須=エアコン・給湯器・Wi-Fi / あると強い=宅配BOX・追焚き"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>③ 必要な駐車場台数</label>
+          <div class="hear-hint">
+            聞くこと: <b>何台必要か</b>（単身=1台、ファミリー=2台が基本）・<b>車種</b>（軽/普通車）・並列 or 縦列・屋根有無<br>
+            💡 駐車場なし戸建ては地方では致命傷。ファミリー向けなら2台確保が望ましい
+          </div>
+          <textarea placeholder="例: 2台（並列・普通車対応）、ファミリー向けは2台必須"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>④ 家賃を上げる方法</label>
+          <div class="hear-hint">
+            聞くこと: 設備追加で何円upできる？（<b>インターネット無料</b>・ペット可・宅配BOX・追焚・家具家電付き など）・内装グレードUP・間取り改善<br>
+            💡 数千円の家賃アップ×12ヶ月で年間利回りに効く。費用対効果を聞く
+          </div>
+          <textarea placeholder="例: ネット無料で+3,000円、ペット可で+2,000円、家具家電付で+5,000円"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>⑤ 同様の物件の事例</label>
+          <div class="hear-hint">
+            聞くこと: 近隣の<b>直近成約事例</b>（家賃・築年数・面積）・<b>成約までの期間</b>・過去の空室期間<br>
+            💡 相場のリアル数字。ネット掲載の"募集家賃"と実際の"成約家賃"は違う
+          </div>
+          <textarea placeholder="例: 隣町の3LDK築35年、5.8万で3ヶ月目に成約。当物件なら6万強いけそう"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>⑥ 繁忙期と契約数</label>
+          <div class="hear-hint">
+            聞くこと: <b>繁忙期</b>（1〜3月が定番）・閑散期対応・<b>月間成約数</b>・月間問合せ数<br>
+            💡 繁忙期入居を狙うなら逆算して募集開始時期を決める。契約数は客付け力の指標
+          </div>
+          <textarea placeholder="例: 繁忙期1〜3月、月間成約8〜10件、閑散期でも月3〜5件はあり"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>⑦ 他社紹介の可否</label>
+          <div class="hear-hint">
+            聞くこと: <span class="term">両手</span>OK？／<span class="term">分かれ</span>可？／元付のみ希望？／<span class="term">レインズ</span>・<span class="term">ATBB</span>登録の可否<br>
+            💡 <b>両手</b>=売買/賃貸で1社が両方の仲介手数料取る形。<b>分かれ</b>=別々の会社で分ける。他社紹介OKが広告量UPに直結
+          </div>
+          <textarea placeholder="例: 他社紹介OK（分かれ対応）、レインズ・ATBB両方に登録"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>⑧ AD（広告料）・契約形態</label>
+          <div class="hear-hint">
+            聞くこと: このエリアの<b>AD相場</b>（1ヶ月分？2ヶ月分？）・ADを乗せた時の反響差・<span class="term">普通借家</span> or <span class="term">定期借家</span>どちらが主流か<br>
+            💡 <b>AD</b>（広告料）= 客付け会社への成功報酬。家賃1〜2ヶ月分が相場。<b>定借</b>は将来売却時に退去交渉不要で圧倒的有利（但し客付けハードル上がる）
+          </div>
+          <textarea placeholder="例: ADはこのエリアだと1ヶ月が標準、2ヶ月乗せれば客付けスピード2倍。普通借家が主流"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>⑨ 入居者属性条件</label>
+          <div class="hear-hint">
+            聞くこと: <span class="term">生保</span>可否・<span class="term">保証会社</span>の指定・ペット可否・喫煙可否・外国人可否・ターゲット層（単身/ファミリー/学生/法人）・連帯保証人の要否<br>
+            💡 <b>生保</b>（生活保護受給者）OK→反響激増。但し管理会社の対応力必須。<b>保証会社</b>加入は今はほぼ必須（家賃保証+孤独死保険）
+          </div>
+          <textarea placeholder="例: 生保OK（指定保証会社2社）、ペット不可、ファミリー層メイン、連帯保証人不要"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>⑩ その他 <span style="color:var(--gray3);font-weight:400;">(自由記述)</span></label>
+          <div class="hear-hint">
+            記録しておくと後で効く: <b>反響→内見→成約の数字</b>（例: 月10問合せ→3内見→1成約）・担当者の得意分野・家賃の値下げ限界・管理委託の条件（料率）・内見対応（鍵預かり可否・立会い要否）・NG要因への対処策・<b>関係構築メモ</b>（担当者の人柄・趣味など）<br>
+            💡 長期の関係構築のために担当者の人物メモも残す。次回会う時の会話の糸口に
+          </div>
+          <textarea placeholder="例: 月10問合せ→3内見→1成約。鍵預かりOK。家賃5万が下限。田中さん息子が少年野球やってて熱血パパ"></textarea>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-secondary">キャンセル</button>
+    <button class="btn btn-primary">💾 保存</button>
+  </div>
+</div>
+
+<!-- ==================================================== -->
+<h2 class="scenario">🟠 ステップ②: 「+ 新規追加」を押したらインライン展開</h2>
+<div class="modal-shell">
+  <div class="modal-body" style="padding-top:20px;">
+    <div class="form-section">
+      <h4>👤 担当者</h4>
+      <div class="contact-picker">
+        <input type="text" class="picker-input" value="新規登録モード" placeholder="🔍 名前・会社名で検索..." style="color:var(--gray3);border-color:var(--orange);background:var(--orange-light);">
+
+        <!-- インライン新規追加フォーム -->
+        <div class="inline-add-form">
+          <h5>+ 新規連絡先を登録（この場で）</h5>
+
+          <div class="form-row">
+            <div class="form-group annotate" data-note="必須">
+              <label>名前 <span style="color:var(--red);">*</span></label>
+              <input type="text" value="山本 新太郎" autofocus>
+            </div>
+            <div class="form-group">
+              <label>肩書き</label>
+              <input type="text" value="賃貸課" placeholder="任意">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>会社・組織</label>
+              <input type="text" value="◎◎不動産">
+            </div>
+            <div class="form-group">
+              <label>支店</label>
+              <input type="text" placeholder="任意">
+            </div>
+          </div>
+
+          <div class="form-row col-1">
+            <div class="form-group">
+              <label>業種タグ（複数可・12種類）</label>
+              <div class="tag-select">
+                <label><input type="checkbox">🏦 銀行</label>
+                <label><input type="checkbox">🏦 信金・信組</label>
+                <label><input type="checkbox">🏦 日本政策金融公庫</label>
+                <label><input type="checkbox">🏢 元付け</label>
+                <label class="active"><input type="checkbox" checked>🏢 客付け</label>
+                <label><input type="checkbox">🏢 管理会社</label>
+                <label><input type="checkbox">🔨 工務店・リフォーム</label>
+                <label><input type="checkbox">🔨 設備業者</label>
+                <label><input type="checkbox">📜 司法書士系</label>
+                <label><input type="checkbox">📜 税理士</label>
+                <label><input type="checkbox">🏠 オーナー系</label>
+                <label><input type="checkbox">👥 大家仲間・メンター</label>
+                <label><input type="checkbox">・ その他</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>電話</label>
+              <input type="tel" value="022-XXX-XXXX" placeholder="任意（メールか電話どちらか推奨）">
+            </div>
+            <div class="form-group">
+              <label>メール</label>
+              <input type="email" placeholder="任意">
+            </div>
+          </div>
+
+          <div class="hint-box">
+            💡 <b>最小限の項目だけでOK</b>。担当エリア・LINE・詳細メモ等は<a href="/mock-contacts.html">連絡先リスト</a>から後でゆっくり編集できます。
+          </div>
+
+          <div class="inline-btns">
+            <button class="btn btn-primary">✓ 登録して担当者に設定</button>
+            <button class="btn btn-ghost">キャンセル</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== -->
+<h2 class="scenario">🟢 ステップ③: 選択 or 登録完了後の状態</h2>
+<div class="modal-shell">
+  <div class="modal-body" style="padding-top:20px;">
+    <div class="form-section">
+      <h4>👤 担当者</h4>
+      <div class="contact-picker">
+        <div class="picked-display">
+          <div class="picker-avatar estate">佐</div>
+          <div>
+            <div class="nm">佐藤 花子<span style="font-weight:400;color:var(--gray4);font-size:11.5px;margin-left:6px;">営業課長</span></div>
+            <div class="co">○○不動産 青葉区店 <span class="picker-tag estate" style="margin-left:4px;">元付け</span><span class="picker-tag estate">客付け</span></div>
+          </div>
+          <button class="chg">✕ 変更</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--gray3);margin-top:6px;">💡 選択完了。このまま下のヒアリング内容を入力して保存します</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== -->
+<div style="margin-top:30px;padding:16px 20px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);">
+  <h3 style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:10px;">🔄 このパターンの適用先（同じUXで統一）</h3>
+  <ul style="font-size:13px;color:var(--gray4);line-height:1.8;padding-left:20px;">
+    <li><b>ヒアリング記録</b>: 担当者選択 or 新規追加（このモック）</li>
+    <li><b>融資モーダル</b>: 銀行担当者を選択 or 新規追加</li>
+    <li><b>現調/リフォームタブ</b>: 工務店・ガス屋・DIY業者を選択 or 新規追加</li>
+    <li><b>Memo「人脈づくり」</b>: 関連連絡先を選択 or 新規追加</li>
+    <li><b>物件の売主情報</b>: 売主を選択 or 新規追加</li>
+  </ul>
+  <div style="margin-top:10px;padding:10px 12px;background:var(--green-light);border-radius:6px;font-size:12.5px;color:var(--gray4);">
+    💡 どこから登録しても同じ <b>連絡先リスト</b> に蓄積されます。一度登録すれば次回以降は検索1〜2文字で瞬時に呼び出し可能。
+  </div>
+</div>
+
+</body>
+</html>

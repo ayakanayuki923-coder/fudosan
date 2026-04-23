@@ -1263,19 +1263,11 @@ select{appearance:auto;}
     <div class="form-group"><label>カテゴリ</label>
       <select id="memo-category">
         <option value="">--</option>
-        <optgroup label="🆕 新カテゴリ（v3.0〜）">
-          <option>気づき・所感</option>
-          <option>人との会話</option>
-          <option>課題・ToDoメモ</option>
-          <option>判断・思考</option>
-          <option>その他</option>
-        </optgroup>
-        <optgroup label="旧カテゴリ（互換性維持）">
-          <option>物件探し</option><option>現地調査</option><option>相場調査</option><option>法的確認</option>
-          <option>交渉・契約</option><option>融資</option><option>修繕・リフォーム</option>
-          <option>入居・管理</option><option>収支・税務</option><option>売却</option>
-          <option>人脈づくり</option>
-        </optgroup>
+        <option>気づき・所感</option>
+        <option>人との会話</option>
+        <option>課題・ToDoメモ</option>
+        <option>判断・思考</option>
+        <option>その他</option>
       </select>
     </div>
     <div class="form-group"><label>内容</label><textarea id="memo-content" rows="4"></textarea></div>
@@ -1552,6 +1544,13 @@ function today() { const d = new Date(); return d.getFullYear() + '-' + String(d
 function num(v) { const n = parseFloat(v); return isNaN(n) ? null : n; }
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function fmtNum(n) { return n != null ? Number(n).toLocaleString() : '-'; }
+function fmtDate(s) {
+  if (!s) return '';
+  // YYYY-MM-DD 先頭10文字で正規化（ISO形式 "2026-04-02T15:00:00.000Z" 等に対応）
+  const str = String(s);
+  const m = str.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : str.substring(0, 10);
+}
 
 /* ===== STORAGE ===== */
 function loadData() {
@@ -2259,7 +2258,7 @@ function renderHearingCard(hr) {
   ];
   let h = '<div class="hr-card">';
   h += '<div class="hr-card-head">';
-  h += '<span class="hr-date">'+esc(hr.date||'')+'</span>';
+  h += '<span class="hr-date">'+esc(fmtDate(hr.date||''))+'</span>';
   h += '<span class="hr-agent">'+esc(agent)+'</span>';
   h += '<div class="hr-actions">';
   h += '<button class="btn btn-secondary btn-sm" onclick="openHearingModal(\''+hr.id+'\')">✏ 編集</button>';
@@ -3465,7 +3464,7 @@ function renderOverviewPane(p) {
   const pc = [p.parking?p.parking+'台':null, p.occupancy].filter(Boolean).join(' / ');
   if (pc) h += '<dt>駐車場 / 現況</dt><dd>'+esc(pc)+'</dd>';
   if (p.deliveryTime) h += '<dt>引渡時期</dt><dd>'+esc(p.deliveryTime)+'</dd>';
-  if (p.date) h += '<dt>物件登録日</dt><dd>'+esc(p.date)+'</dd>';
+  if (p.date) h += '<dt>物件登録日</dt><dd>'+esc(fmtDate(p.date))+'</dd>';
   const links = [];
   if (p.listingUrl) links.push('<a href="'+esc(p.listingUrl)+'" target="_blank">掲載URL ↗</a>');
   if (p.mapUrl) links.push('<a href="'+esc(p.mapUrl)+'" target="_blank">Maps ↗</a>');
@@ -3675,7 +3674,7 @@ function renderPropertyDetail() {
     .sort(function(a,b){ return b.date > a.date ? 1 : -1; });
   if (allLogs.length) {
     allLogs.forEach(function(l){
-      html += '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;"><span style="color:var(--gray3);margin-right:8px;">'+esc(l.date)+'</span>'+esc(l.text)+'</div>';
+      html += '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;"><span style="color:var(--gray3);margin-right:8px;">'+esc(fmtDate(l.date))+'</span>'+esc(l.text)+'</div>';
     });
   } else {
     html += '<div class="empty"><div class="icon">📋</div>Logがありません<br><small>Memoを物件に紐づけると自動表示されます</small></div>';
@@ -3733,7 +3732,7 @@ function renderPropertyDetail() {
     cfs.forEach(cf => {
       const sign = cf.type === 'income' ? '+' : '-';
       const color = cf.type === 'income' ? 'var(--green)' : 'var(--red)';
-      html += '<div class="card"><div class="field-row"><span class="field-label">'+esc(cf.date)+' '+esc(cf.category)+'</span><span class="field-value" style="color:'+color+'">'+sign+fmtNum(cf.amount)+'円</span></div>';
+      html += '<div class="card"><div class="field-row"><span class="field-label">'+esc(fmtDate(cf.date))+' '+esc(cf.category)+'</span><span class="field-value" style="color:'+color+'">'+sign+fmtNum(cf.amount)+'円</span></div>';
       if(cf.memo) html += '<div style="font-size:12px;color:var(--gray3);">'+esc(cf.memo)+'</div>';
       if(cf.accountTag) html += '<div style="font-size:11px;color:var(--gray3);">🏷 '+esc(cf.accountTag)+'</div>';
       if(cf.recurring) html += '<div style="font-size:11px;color:var(--green);">🔄 毎月繰り返し</div>';
@@ -3953,7 +3952,7 @@ function openMemoModal(id) {
   document.getElementById('memo-modal-title').textContent = id ? 'Memo編集' : 'Memo追加';
   const memo = id ? data.action.find(x => String(x.id) === String(id)) : null;
   document.getElementById('memo-id').value = id || '';
-  document.getElementById('memo-date').value = memo ? memo.date : today();
+  document.getElementById('memo-date').value = memo ? fmtDate(memo.date) : today();
   document.getElementById('memo-title').value = memo ? memo.title : '';
   document.getElementById('memo-category').value = memo ? (memo.category||'') : '';
   document.getElementById('memo-content').value = memo ? (memo.content||'') : '';
@@ -4088,16 +4087,11 @@ function saveMemo(e) {
   renderCurrentPage();
 }
 
-// 新カテゴリ (v3.0後半で再定義: 物件についての活動記録・気づき)
+// Memoカテゴリ 5種（物件についての活動記録・気づき）
 const MEMO_CATEGORIES_NEW = ['気づき・所感','人との会話','課題・ToDoメモ','判断・思考','その他'];
-// 旧カテゴリ (v2.1以前・後方互換のため残す)
-const MEMO_CATEGORIES_OLD = ['物件探し','現地調査','相場調査','法的確認','交渉・契約','融資','修繕・リフォーム','入居・管理','収支・税務','売却','人脈づくり'];
 
 function renderMemoList() {
-  // 新カテゴリ + 既存データで使われている旧カテゴリのみ表示（徐々にクリーンアップされる）
-  const usedCats = new Set((data.action || []).map(m => m.category).filter(Boolean));
-  const oldUsed = MEMO_CATEGORIES_OLD.filter(c => usedCats.has(c));
-  const CATS = ['すべて', ...MEMO_CATEGORIES_NEW, ...oldUsed];
+  const CATS = ['すべて', ...MEMO_CATEGORIES_NEW];
   const filter = document.querySelector('#memo-filter .filter-chip.active');
   const cat = filter ? filter.dataset.filter : 'すべて';
   document.getElementById('memo-filter').innerHTML = CATS.map(c =>
@@ -4108,7 +4102,7 @@ function renderMemoList() {
     list.map(m =>
       '<div class="card" onclick="openMemoModal(\'' + m.id + '\')" style="cursor:pointer">' +
       '<div class="card-header"><div><div class="card-title">' + esc(m.title) + '</div>' +
-      '<div class="card-sub">' + esc(m.date) + (m.category ? ' · ' + esc(m.category) : '') +
+      '<div class="card-sub">' + esc(fmtDate(m.date)) + (m.category ? ' · ' + esc(m.category) : '') +
       (m.properties && m.properties.length ? ' · 📎' + m.properties.join(', ') : '') + '</div></div></div>' +
       (m.content ? '<div class="card-body" style="white-space:pre-wrap;">' + esc(m.content.substring(0, 100)) + (m.content.length > 100 ? '...' : '') + '</div>' : '') +
       (m.next ? '<div style="margin-top:6px;font-size:12px;color:var(--green);">▶ 次: ' + esc(m.next) + (m.nextDue ? ' (' + m.nextDue + ')' : '') + '</div>' : '') +
@@ -4168,7 +4162,7 @@ function renderLearnList() {
     list.map(l =>
       '<div class="card" onclick="openLearnModal(\'' + l.id + '\')" style="cursor:pointer">' +
       '<div class="card-header"><div><div class="card-title">' + esc(l.title) + '</div>' +
-      '<div class="card-sub">' + esc(l.date) + (l.category ? ' · ' + esc(l.category) : '') + '</div></div></div>' +
+      '<div class="card-sub">' + esc(fmtDate(l.date)) + (l.category ? ' · ' + esc(l.category) : '') + '</div></div></div>' +
       (l.url ? '<div class="card-body"><a href="'+esc(l.url)+'" target="_blank" style="color:var(--green)">🔗 Link</a></div>' : '') +
       '</div>'
     ).join('') :
@@ -4554,7 +4548,7 @@ function renderHome() {
   document.getElementById('home-memo-list').innerHTML =
     data.action.length ?
     data.action.slice(0, 5).map(m =>
-      '<div class="card" onclick="openMemoModal(\'' + m.id + '\')" style="cursor:pointer"><div class="card-header"><div><div class="card-title" style="font-size:13px;">' + esc(m.title) + '</div><div class="card-sub">' + esc(m.date) + (m.category ? ' · '+esc(m.category) : '') + '</div></div></div></div>'
+      '<div class="card" onclick="openMemoModal(\'' + m.id + '\')" style="cursor:pointer"><div class="card-header"><div><div class="card-title" style="font-size:13px;">' + esc(m.title) + '</div><div class="card-sub">' + esc(fmtDate(m.date)) + (m.category ? ' · '+esc(m.category) : '') + '</div></div></div></div>'
     ).join('') :
     '<div class="empty" style="padding:20px;"><div class="icon">📝</div>Memoを追加してみましょう</div>';
 
@@ -4562,7 +4556,7 @@ function renderHome() {
   document.getElementById('home-learn-list').innerHTML =
     data.learns.length ?
     data.learns.slice(0, 5).map(l =>
-      '<div class="card" onclick="openLearnModal(\'' + l.id + '\')" style="cursor:pointer"><div class="card-header"><div><div class="card-title" style="font-size:13px;">' + esc(l.title) + '</div><div class="card-sub">' + esc(l.date) + (l.category ? ' · '+esc(l.category) : '') + '</div></div></div></div>'
+      '<div class="card" onclick="openLearnModal(\'' + l.id + '\')" style="cursor:pointer"><div class="card-header"><div><div class="card-title" style="font-size:13px;">' + esc(l.title) + '</div><div class="card-sub">' + esc(fmtDate(l.date)) + (l.category ? ' · '+esc(l.category) : '') + '</div></div></div></div>'
     ).join('') :
     '<div class="empty" style="padding:20px;"><div class="icon">📚</div>Learnを追加してみましょう</div>';
 

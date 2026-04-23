@@ -933,6 +933,9 @@ select{appearance:auto;}
     </div>
     <div class="form-group"><label>メモ（強み・特徴・やり取り等）</label><textarea id="ct-memo" rows="3" placeholder="例: 戸建て専門・エリア詳しい・反応良い、etc"></textarea></div>
 
+    <div class="form-section">この人との履歴</div>
+    <div id="ct-history" style="max-height:280px;overflow-y:auto;background:var(--white);border:1px solid var(--gray2);border-radius:3px;"></div>
+
     <div style="margin-top:20px;display:flex;gap:8px;">
       <button type="button" class="btn btn-danger" onclick="deleteContact()">🗑 削除</button>
       <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">保存</button>
@@ -1372,23 +1375,6 @@ select{appearance:auto;}
 </div>
 </div>
 
-<!-- Yield Calculator Modal -->
-<div class="modal-overlay" id="modal-calc">
-<div class="modal">
-  <div class="modal-header">
-    <h2>💴 利回り電卓</h2>
-    <button class="modal-close" onclick="closeModal('modal-calc')">&times;</button>
-  </div>
-  <div class="pattern-tabs" id="calc-pattern-tabs"></div>
-  <div style="display:flex;gap:6px;margin-bottom:12px;">
-    <button class="btn btn-secondary btn-sm" onclick="addPattern()">+ パターン</button>
-    <button class="btn btn-secondary btn-sm" onclick="renamePattern()">✏ 名前変更</button>
-    <button class="btn btn-danger btn-sm" onclick="deletePattern()">🗑 削除</button>
-  </div>
-  <div id="calc-body"></div>
-</div>
-</div>
-
 <!-- Loan Modal -->
 <div class="modal-overlay" id="modal-loan">
 <div class="modal">
@@ -1536,7 +1522,7 @@ function lastContactLabel(dateStr) {
 }
 
 let currentPropertyId = null;
-let currentCalcPatternIdx = 0;
+// let currentCalcPatternIdx = 0; // 利回り電卓削除(v3.0後半)
 let currentCalendarDate = new Date();
 
 function genId() { return String(Date.now()) + '-' + Math.random().toString(36).substr(2, 5); }
@@ -2152,7 +2138,73 @@ function openContactModal(id) {
   document.getElementById('ct-favorite').value = c && c.favorite ? 'true' : 'false';
   document.getElementById('ct-memo').value = c ? (c.memo||'') : '';
   renderTypesSelector('ct-types-select', c ? (c.types||[]) : []);
+  renderContactHistory(id);
   document.getElementById('modal-contact').classList.add('show');
+}
+
+function renderContactHistory(contactId) {
+  const el = document.getElementById('ct-history');
+  if (!el) return;
+  if (!contactId) {
+    el.innerHTML = '<div style="padding:10px 12px;color:var(--gray3);font-size:11px;text-align:center;">保存後に履歴が表示されます</div>';
+    return;
+  }
+  const history = [];
+  // ヒアリング
+  data.hearings.forEach(function(h){
+    if (String(h.contactId) === String(contactId)) {
+      const propNames = (h.propertyIds||[]).map(function(pid){
+        const p = data.property.find(x => String(x.id) === String(pid));
+        return p ? p.name : '';
+      }).filter(Boolean);
+      history.push({
+        date: h.date, type: 'hearing', typeLabel: '🎙 ヒアリング', typeCls: 'hi',
+        title: '10項目ヒアリング' + (propNames.length ? ' (' + propNames.join(', ') + ')' : (h.area ? ' (エリア: ' + h.area + ')' : '')),
+        refId: h.id,
+        propId: (h.propertyIds||[])[0] || ''
+      });
+    }
+  });
+  // Memo
+  data.action.forEach(function(m){
+    if ((m.contactIds||[]).indexOf(String(contactId)) >= 0 || (m.contactIds||[]).indexOf(contactId) >= 0) {
+      const props = (m.properties||[]).join(', ');
+      history.push({
+        date: m.date, type: 'memo', typeLabel: '📝 Memo', typeCls: 'me',
+        title: (m.title||'(無題)') + (m.category ? ' [' + m.category + ']' : '') + (props ? ' · ' + props : ''),
+        refId: m.id
+      });
+    }
+  });
+  history.sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+
+  if (!history.length) {
+    el.innerHTML = '<div style="padding:14px;color:var(--gray3);font-size:11.5px;text-align:center;">この人との記録はまだありません<br><span style="font-size:10.5px;">ヒアリングやMemoで紐付けすると表示されます</span></div>';
+    return;
+  }
+  el.innerHTML = history.map(function(h){
+    return '<div style="padding:7px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background .1s;" onmouseover="this.style.background=\'#eef2ed\'" onmouseout="this.style.background=\'\'" onclick="jumpToHistory(\''+h.type+'\', \''+h.refId+'\', \''+(h.propId||'')+'\')">' +
+      '<div style="font-size:10.5px;color:var(--gray3);letter-spacing:.03em;">'+esc(fmtDate(h.date))+' · '+h.typeLabel+'</div>' +
+      '<div style="font-size:12px;color:#1f3d1f;font-weight:500;margin-top:2px;">'+esc(h.title)+'</div>' +
+      '</div>';
+  }).join('');
+}
+
+function jumpToHistory(type, refId, propId) {
+  closeModal('modal-contact');
+  if (type === 'hearing' && propId) {
+    currentPropertyId = propId;
+    showPage('property-detail');
+    setTimeout(function(){
+      const tabs = document.querySelectorAll('.detail-tab');
+      if (tabs[2]) switchDetailTab(tabs[2], 'dtab-2');
+    }, 100);
+  } else if (type === 'memo') {
+    showPage('memo');
+    setTimeout(function(){
+      openMemoModal(refId);
+    }, 150);
+  }
 }
 
 function renderTypesSelector(containerId, selected) {
@@ -4400,118 +4452,6 @@ function deleteJournal(id) {
 function formatText(command, value) {
   document.execCommand(command, false, value);
   document.getElementById('learn-content').focus();
-}
-
-/* ===== YIELD CALCULATOR ===== */
-function openCalcModal() {
-  document.getElementById('modal-calc').classList.add('show');
-  renderCalc();
-}
-
-function renderCalc() {
-  const patterns = data.calcPatterns || [];
-  document.getElementById('calc-pattern-tabs').innerHTML = patterns.map((p, i) =>
-    '<button class="pattern-tab' + (i === currentCalcPatternIdx ? ' active' : '') + '" onclick="currentCalcPatternIdx=' + i + ';renderCalc()">' + esc(p.name) + '</button>'
-  ).join('');
-
-  if (!patterns.length) { document.getElementById('calc-body').innerHTML = '<div class="empty">パターンを追加してください</div>'; return; }
-  const pat = patterns[currentCalcPatternIdx];
-  if (!pat) { currentCalcPatternIdx = 0; renderCalc(); return; }
-
-  let html = '';
-
-  // Income
-  html += '<div class="calc-section"><h3>📈 収入</h3>';
-  (pat.income || []).forEach((item, i) => {
-    html += '<div class="calc-row">' +
-      '<input type="text" value="' + esc(item.name) + '" onchange="pat().income['+i+'].name=this.value;saveData()">' +
-      '<input type="number" value="' + (item.value||0) + '" onchange="pat().income['+i+'].value=num(this.value);saveData();calcResult()">' +
-      '<select class="unit" style="width:60px" onchange="pat().income['+i+'].unit=this.value;saveData();calcResult()">' +
-      ['月','年'].map(u => '<option' + (item.unit===u?' selected':'') + '>' + u + '</option>').join('') +
-      '</select>' +
-      '<button class="del-btn" onclick="pat().income.splice('+i+',1);saveData();renderCalc()">×</button></div>';
-  });
-  html += '<button class="btn btn-secondary btn-sm" onclick="pat().income.push({name:\'\',value:0,unit:\'月\'});saveData();renderCalc()">+ 項目</button></div>';
-
-  // Vacancy
-  html += '<div class="form-group" style="margin:12px 0"><label>空室損失率 (%)</label>' +
-    '<input type="number" value="' + (pat.vacancyRate||0) + '" onchange="pat().vacancyRate=num(this.value);saveData();calcResult()" style="width:100px"></div>';
-
-  // Acquisition cost
-  html += '<div class="calc-section"><h3>🏷 取得費用（一時）</h3>';
-  (pat.acquisition || []).forEach((item, i) => {
-    html += '<div class="calc-row">' +
-      '<input type="text" value="' + esc(item.name) + '" onchange="pat().acquisition['+i+'].name=this.value;saveData()">' +
-      '<input type="number" value="' + (item.value||0) + '" onchange="pat().acquisition['+i+'].value=num(this.value);saveData();calcResult()">' +
-      '<span class="unit">円</span>' +
-      '<button class="del-btn" onclick="pat().acquisition.splice('+i+',1);saveData();renderCalc()">×</button></div>';
-  });
-  html += '<button class="btn btn-secondary btn-sm" onclick="pat().acquisition.push({name:\'\',value:0,unit:\'一時\'});saveData();renderCalc()">+ 項目</button></div>';
-
-  // Running cost
-  html += '<div class="calc-section"><h3>🔄 ランニングコスト</h3>';
-  (pat.running || []).forEach((item, i) => {
-    html += '<div class="calc-row">' +
-      '<input type="text" value="' + esc(item.name) + '" onchange="pat().running['+i+'].name=this.value;saveData()">' +
-      '<input type="number" value="' + (item.value||0) + '" onchange="pat().running['+i+'].value=num(this.value);saveData();calcResult()">' +
-      '<select class="unit" style="width:60px" onchange="pat().running['+i+'].unit=this.value;saveData();calcResult()">' +
-      ['月','年'].map(u => '<option' + (item.unit===u?' selected':'') + '>' + u + '</option>').join('') +
-      '</select>' +
-      '<button class="del-btn" onclick="pat().running.splice('+i+',1);saveData();renderCalc()">×</button></div>';
-  });
-  html += '<button class="btn btn-secondary btn-sm" onclick="pat().running.push({name:\'\',value:0,unit:\'月\'});saveData();renderCalc()">+ 項目</button></div>';
-
-  // Result
-  html += '<div class="calc-result" id="calc-result-area"></div>';
-  document.getElementById('calc-body').innerHTML = html;
-  calcResult();
-}
-
-function pat() { return data.calcPatterns[currentCalcPatternIdx]; }
-
-function calcResult() {
-  const p = pat();
-  if (!p) return;
-  const annualIncome = (p.income||[]).reduce((s, i) => s + (i.unit === '月' ? (i.value||0)*12 : (i.value||0)), 0);
-  const vacancyLoss = annualIncome * ((p.vacancyRate||0) / 100);
-  const effectiveIncome = annualIncome - vacancyLoss;
-  const totalAcquisition = (p.acquisition||[]).reduce((s, i) => s + (i.value||0), 0);
-  const annualRunning = (p.running||[]).reduce((s, i) => s + (i.unit === '月' ? (i.value||0)*12 : (i.value||0)), 0);
-  const noi = effectiveIncome - annualRunning;
-  const grossYield = totalAcquisition ? (annualIncome / totalAcquisition * 100).toFixed(2) : 0;
-  const netYield = totalAcquisition ? (noi / totalAcquisition * 100).toFixed(2) : 0;
-
-  let h = '<div style="margin-bottom:12px;"><div class="sub">表面利回り</div><div class="big">' + grossYield + '%</div></div>';
-  h += '<div style="margin-bottom:12px;"><div class="sub">純利回り (NOI利回り)</div><div class="big" style="color:var(--green);">' + netYield + '%</div></div>';
-  h += '<div><div class="sub">年間NOI</div><div style="font-size:18px;color:var(--green);font-weight:700;">¥' + fmtNum(Math.round(noi)) + '</div></div>';
-  document.getElementById('calc-result-area').innerHTML = h;
-}
-
-function addPattern() {
-  const name = prompt('パターン名:');
-  if (name) {
-    data.calcPatterns.push({ id: genId(), name: name, income: [], acquisition: [], running: [], vacancyRate: 10 });
-    currentCalcPatternIdx = data.calcPatterns.length - 1;
-    saveData();
-    renderCalc();
-  }
-}
-
-function renamePattern() {
-  const p = pat();
-  if (!p) return;
-  const name = prompt('新しい名前:', p.name);
-  if (name) { p.name = name; saveData(); renderCalc(); }
-}
-
-function deletePattern() {
-  if (data.calcPatterns.length <= 1) { toast('最低1つのパターンが必要です', 'error'); return; }
-  if (confirm('削除しますか？')) {
-    data.calcPatterns.splice(currentCalcPatternIdx, 1);
-    currentCalcPatternIdx = 0;
-    saveData();
-    renderCalc();
-  }
 }
 
 /* ===== HOME RENDER ===== */

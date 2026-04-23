@@ -364,6 +364,8 @@ select{appearance:auto;}
 .todo-item{border-left-color:#1f3d1f;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:8px 12px;font-size:12.5px;}
 .todo-item.overdue{border-left-color:var(--red);}
 .todo-item-text{font-size:13px;letter-spacing:.02em;}
+.todo-archive{font-size:12px;color:var(--gray3);padding:3px 8px;background:none;border:1px solid var(--gray2);border-radius:2px;cursor:pointer;margin-left:auto;}
+.todo-archive:hover{color:#1f3d1f;border-color:#4a6a4a;background:#eef2ed;}
 
 /* action-bar */
 .action-bar{gap:6px;margin-bottom:12px;}
@@ -1280,6 +1282,15 @@ select{appearance:auto;}
     <div class="form-group"><label>URL</label><input type="text" id="memo-url" placeholder="参考URL"></div>
     <div class="form-group"><label>紐づけ物件</label>
       <div class="checkbox-list" id="memo-properties-list"></div>
+    </div>
+    <div class="form-group">
+      <label>関連連絡先（銀行・不動産・近隣住民・大家仲間など）</label>
+      <div id="memo-contacts-picker">
+        <input type="text" id="memo-contact-search" placeholder="🔍 名前・会社で検索して追加..." style="padding:6px 10px;" oninput="searchMemoContact(this.value)">
+        <div id="memo-contact-dropdown" class="picker-dropdown" style="display:none;position:relative;margin-top:-1px;"></div>
+      </div>
+      <div id="memo-picked-contacts" style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <div style="font-size:10.5px;color:var(--gray3);margin-top:4px;">💡 近隣住民ヒアリング: 該当住人を連絡先に登録してから紐付け</div>
     </div>
     <div class="form-group"><label>次のアクション</label><input type="text" id="memo-next"></div>
     <div class="form-group"><label>次のアクション予定日</label><input type="text" id="memo-next-due" placeholder="YYYY-MM-DD"></div>
@@ -3935,6 +3946,8 @@ function exportCashflowCSV(propId) {
 }
 
 /* ===== MEMO ===== */
+let currentMemoContactIds = [];
+
 function openMemoModal(id) {
   const m = document.getElementById('modal-memo');
   document.getElementById('memo-modal-title').textContent = id ? 'Memo編集' : 'Memo追加';
@@ -3956,7 +3969,66 @@ function openMemoModal(id) {
   ).join('');
   if (!data.property.length) list.innerHTML = '<span style="font-size:12px;color:var(--gray3);">物件を先に追加してください</span>';
 
+  // 連絡先picker
+  currentMemoContactIds = memo ? (memo.contactIds || []).slice() : [];
+  renderMemoPickedContacts();
+  const srch = document.getElementById('memo-contact-search');
+  if (srch) srch.value = '';
+  const dd = document.getElementById('memo-contact-dropdown');
+  if (dd) dd.style.display = 'none';
+
   m.classList.add('show');
+}
+
+function searchMemoContact(query) {
+  const dd = document.getElementById('memo-contact-dropdown');
+  if (!query.trim()) { dd.style.display = 'none'; return; }
+  const nq = normalizeForSearch(query);
+  const matched = data.contacts.filter(function(c){
+    if (c.archived) return false;
+    if (currentMemoContactIds.indexOf(c.id) >= 0) return false; // 既選択は除外
+    const hay = normalizeForSearch([c.name, c.nameKana, c.company, c.companyKana, c.branch, c.title].join(' '));
+    return hay.indexOf(nq) >= 0;
+  }).slice(0, 10);
+  let h = '';
+  matched.forEach(function(c){
+    const grp = contactGroup(c.types);
+    h += '<div class="picker-item" onclick="pickMemoContact(\''+c.id+'\')">';
+    h += '<div class="picker-avatar t-'+grp+'">'+esc(contactInitial(c.name))+'</div>';
+    h += '<div class="picker-info"><div class="picker-nm">'+esc(c.name)+'</div>';
+    h += '<div class="picker-co">'+esc([c.company, c.branch].filter(Boolean).join(' · '))+'</div></div></div>';
+  });
+  if (!matched.length) h += '<div style="padding:8px 12px;font-size:11px;color:var(--gray3);">該当なし</div>';
+  dd.innerHTML = h;
+  dd.style.display = 'block';
+}
+
+function pickMemoContact(cid) {
+  if (currentMemoContactIds.indexOf(cid) < 0) currentMemoContactIds.push(cid);
+  document.getElementById('memo-contact-search').value = '';
+  document.getElementById('memo-contact-dropdown').style.display = 'none';
+  renderMemoPickedContacts();
+}
+
+function removeMemoContact(cid) {
+  currentMemoContactIds = currentMemoContactIds.filter(id => id !== cid);
+  renderMemoPickedContacts();
+}
+
+function renderMemoPickedContacts() {
+  const wrap = document.getElementById('memo-picked-contacts');
+  if (!wrap) return;
+  if (!currentMemoContactIds.length) { wrap.innerHTML = '<span style="font-size:11px;color:var(--gray3);">選択中の連絡先なし</span>'; return; }
+  wrap.innerHTML = currentMemoContactIds.map(function(cid){
+    const c = data.contacts.find(x => String(x.id) === String(cid));
+    if (!c) return '';
+    const grp = contactGroup(c.types);
+    return '<span class="picked-contact" style="padding:4px 8px;font-size:11px;">' +
+      '<span class="picker-avatar t-'+grp+'" style="width:20px;height:20px;font-size:10px;">'+esc(contactInitial(c.name))+'</span>' +
+      '<span style="margin-left:4px;">'+esc(c.name)+(c.company?'('+esc(c.company)+')':'')+'</span>' +
+      '<button type="button" class="pc-clear" style="padding:1px 6px;margin-left:6px;" onclick="removeMemoContact(\''+c.id+'\')">✕</button>' +
+      '</span>';
+  }).join('');
 }
 
 function getSelectedMemoProperties() {
@@ -3976,8 +4048,15 @@ function saveMemo(e) {
   m.url = document.getElementById('memo-url').value;
   m.properties = getSelectedMemoProperties();
   m.property = m.properties[0] || '';
+  m.contactIds = currentMemoContactIds.slice();
   m.next = document.getElementById('memo-next').value;
   m.nextDue = document.getElementById('memo-next-due').value;
+
+  // 紐付き連絡先の最終接触日を更新
+  m.contactIds.forEach(function(cid){
+    const c = data.contacts.find(x => String(x.id) === String(cid));
+    if (c) c.lastContactDate = m.date;
+  });
 
   if (!isEdit) data.action.unshift(m);
 
@@ -4490,10 +4569,13 @@ function renderHome() {
   // Calendar widget
   document.getElementById('home-calendar-widget').innerHTML = renderCalendar(new Date());
 
-  // Todo list
+  // Todo list (archived以外)
   const allTodos = data.property.flatMap(p => (p.todos||[]).map(t => ({...t, prop: p.name, propId: p.id})));
-  const sortedTodos = allTodos.sort((a,b) => (a.due||'') > (b.due||'') ? 1 : -1);
-  document.getElementById('home-todo-list').innerHTML = sortedTodos.length ?
+  const activeTodos = allTodos.filter(t => !t.archived);
+  const archivedTodos = allTodos.filter(t => t.archived);
+  const sortedTodos = activeTodos.sort((a,b) => (a.due||'') > (b.due||'') ? 1 : -1);
+  const todoEl = document.getElementById('home-todo-list');
+  let todoHtml = sortedTodos.length ?
     sortedTodos.map(t => {
       const isOverdue = t.due && t.due < today() && !t.done;
       return '<div class="todo-item' + (t.done ? ' done' : '') + (isOverdue ? ' overdue' : '') + '">' +
@@ -4501,15 +4583,47 @@ function renderHome() {
         '<div class="todo-item-content">' +
         '<div class="todo-item-text">' + esc(t.text) + '</div>' +
         '<div class="todo-item-meta">' + esc(t.prop) + (t.due ? ' · ' + t.due : '') + '</div>' +
-        '</div></div>';
+        '</div>' +
+        (t.done ? '<button class="todo-archive" onclick="archiveTodo(\'' + t.propId + '\',\'' + t.id + '\')" title="完了済みをアーカイブ">📁</button>' : '') +
+        '</div>';
     }).join('') :
     '<div class="empty" style="padding:20px;"><div class="icon">✅</div>ToDoはありません</div>';
+  // アーカイブ済み折りたたみ
+  if (archivedTodos.length) {
+    todoHtml += '<details style="margin-top:8px;background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:8px 12px;">';
+    todoHtml += '<summary style="cursor:pointer;font-size:11.5px;color:var(--gray3);font-weight:600;">📁 アーカイブ済みToDo ('+archivedTodos.length+'件)</summary>';
+    todoHtml += '<div style="margin-top:6px;">';
+    archivedTodos.sort((a,b) => (b.due||'') > (a.due||'') ? 1 : -1).forEach(function(t){
+      todoHtml += '<div class="todo-item done" style="opacity:.65;">' +
+        '<input type="checkbox" checked disabled>' +
+        '<div class="todo-item-content">' +
+        '<div class="todo-item-text">' + esc(t.text) + '</div>' +
+        '<div class="todo-item-meta">' + esc(t.prop) + (t.due ? ' · ' + t.due : '') + '</div>' +
+        '</div>' +
+        '<button class="todo-archive" onclick="unarchiveTodo(\'' + t.propId + '\',\'' + t.id + '\')" title="アクティブに戻す">↩</button>' +
+        '</div>';
+    });
+    todoHtml += '</div></details>';
+  }
+  todoEl.innerHTML = todoHtml;
 }
 
 function toggleTodo(propId, todoId) {
   const p = data.property.find(x => String(x.id) === String(propId));
   const t = (p.todos||[]).find(x => String(x.id) === String(todoId));
   if (t) { t.done = !t.done; saveData(); renderHome(); }
+}
+
+function archiveTodo(propId, todoId) {
+  const p = data.property.find(x => String(x.id) === String(propId));
+  const t = (p.todos||[]).find(x => String(x.id) === String(todoId));
+  if (t) { t.archived = true; saveData(); renderHome(); toast('アーカイブしました'); }
+}
+
+function unarchiveTodo(propId, todoId) {
+  const p = data.property.find(x => String(x.id) === String(propId));
+  const t = (p.todos||[]).find(x => String(x.id) === String(todoId));
+  if (t) { t.archived = false; t.done = false; saveData(); renderHome(); toast('アクティブに戻しました'); }
 }
 
 /* ===== VOICE INPUT ===== */

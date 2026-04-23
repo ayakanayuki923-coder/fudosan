@@ -3365,8 +3365,59 @@ function renderResearchPane(p) {
   else h += ' <span style="color:#4a6a4a;">✓ 次はヒアリングへ</span>';
   h += '</div>';
 
+  // 📋 現地・近隣ヒアリング (物件紐付き + 連絡先紐付きのMemo自動集約)
+  const neighborMemos = data.action.filter(function(m){
+    const pnames = m.properties || (m.property ? [m.property] : []);
+    return pnames.indexOf(p.name) >= 0 && (m.contactIds||[]).length > 0;
+  }).sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+
+  h += '<div style="margin-top:20px;">';
+  h += '<div style="font-size:13px;font-weight:700;color:#1f3d1f;background:#eef2ed;padding:5px 10px;border-left:3px solid #4a6a4a;letter-spacing:.03em;display:flex;align-items:center;justify-content:space-between;">';
+  h += '<span>📋 現地・近隣ヒアリング</span>';
+  h += '<button type="button" onclick="addNeighborhoodHearing(\''+p.id+'\')" style="font-size:11px;padding:3px 10px;background:var(--white);border:1px solid #4a6a4a;border-radius:2px;color:#1f3d1f;cursor:pointer;font-weight:600;">+ 追加</button>';
+  h += '</div>';
+  h += '<div style="font-size:11px;color:var(--gray4);margin:6px 0 8px;line-height:1.5;">近隣住民・売主・関係者からの現地聞き取り（連絡先と紐付いたMemoが自動集約）</div>';
+  if (neighborMemos.length) {
+    neighborMemos.forEach(function(m){
+      const contacts = (m.contactIds||[]).map(function(cid){
+        const c = data.contacts.find(x => String(x.id) === String(cid));
+        return c ? c.name : '';
+      }).filter(Boolean);
+      h += '<div onclick="openMemoModal(\''+m.id+'\')" style="cursor:pointer;padding:8px 12px;background:var(--white);border:1px solid var(--gray2);border-radius:3px;margin-bottom:6px;transition:border-color .15s;" onmouseover="this.style.borderColor=\'#4a6a4a\'" onmouseout="this.style.borderColor=\'var(--gray2)\'">';
+      h += '<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;">';
+      h += '<div style="font-size:12.5px;font-weight:700;color:#1f3d1f;">'+esc(m.title||'(無題)')+'</div>';
+      h += '<div style="font-size:10.5px;color:var(--gray3);flex-shrink:0;">'+esc(fmtDate(m.date))+'</div>';
+      h += '</div>';
+      if (m.content) h += '<div style="font-size:11.5px;color:var(--gray4);margin-top:3px;line-height:1.5;white-space:pre-wrap;">'+esc(m.content.substring(0,120))+(m.content.length>120?'...':'')+'</div>';
+      if (contacts.length) h += '<div style="font-size:10.5px;color:var(--gray4);margin-top:4px;">👤 '+esc(contacts.join(', '))+'</div>';
+      h += '</div>';
+    });
+  } else {
+    h += '<div style="padding:14px;text-align:center;color:var(--gray3);font-size:11.5px;background:var(--white);border:1px dashed var(--gray2);border-radius:3px;">';
+    h += 'まだ近隣ヒアリングはありません<br><small style="font-size:10px;">「+ 追加」ボタンで新規作成（物件・カテゴリ・連絡先が自動設定されます）</small>';
+    h += '</div>';
+  }
+  h += '</div>';
+
   h += '</div>';
   return h;
+}
+
+function addNeighborhoodHearing(propertyId) {
+  const p = data.property.find(x => String(x.id) === String(propertyId));
+  if (!p) return;
+  openMemoModal();
+  // 初期値セット（開いた後に上書き）
+  setTimeout(function(){
+    document.getElementById('memo-category').value = '人との会話';
+    document.getElementById('memo-title').value = p.name + ' 近隣ヒアリング';
+    // 該当物件のcheckboxを検索してチェック
+    const boxes = document.querySelectorAll('#memo-properties-list input[type=checkbox]');
+    boxes.forEach(function(cb){ if (cb.value === p.name) cb.checked = true; });
+    // 連絡先検索欄にフォーカス
+    const srch = document.getElementById('memo-contact-search');
+    if (srch) srch.focus();
+  }, 50);
 }
 
 function saveResearchField(key, field, value) {

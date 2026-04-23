@@ -329,6 +329,8 @@ select{appearance:auto;}
 .sidebar nav a:hover{background:#0f240f;color:#fff;}
 .sidebar nav a.active{background:#0f240f;color:#fff;border-left-color:#a0c0a0;font-weight:700;}
 .sidebar .ver{color:#7a9a7a;border-top:1px solid #2d4d2d;padding:8px 20px;}
+.sidebar .nav-group{font-size:10px;color:#7a9a7a;padding:12px 20px 4px;letter-spacing:.08em;font-weight:700;text-transform:uppercase;}
+.sidebar .nav-group:first-child{padding-top:6px;}
 
 /* モバイルタブバー */
 .tabbar{background:#1a321a;border-top:none;}
@@ -384,6 +386,18 @@ select{appearance:auto;}
 /* 利回り計算結果 */
 .calc-result{background:#eef2ed;border:1px solid #4a6a4a;border-radius:3px;}
 .calc-result .big{color:#1f3d1f;}
+
+/* ダッシュボード 2カラム */
+.home-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+@media(max-width:899px){.home-2col{grid-template-columns:1fr;gap:0;}}
+
+/* 物件サマリー (フェーズ別件数) */
+.home-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin-bottom:10px;}
+.home-summary-item{background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:8px 10px;text-align:center;}
+.home-summary-item .hs-num{font-size:20px;font-weight:700;color:#1f3d1f;line-height:1.1;font-variant-numeric:tabular-nums;}
+.home-summary-item .hs-lbl{font-size:10.5px;color:var(--gray4);letter-spacing:.03em;margin-top:2px;}
+.home-summary-item.active{border-color:#4a6a4a;background:#eef2ed;}
+.home-summary-item.drop .hs-num{color:var(--gray3);}
 
 /* ===== 調査タブ (Step 2) ===== */
 .rs-intro{background:#f5f7f4;border:1px solid var(--gray2);border-radius:3px;padding:10px 14px;margin-bottom:12px;font-size:12.5px;color:var(--gray4);line-height:1.6;}
@@ -653,13 +667,20 @@ select{appearance:auto;}
 <aside class="sidebar">
   <div class="logo">Property Note</div>
   <nav>
-    <a href="#" data-page="home" class="active"><span>🏠</span> Home</a>
+    <div class="nav-group">作業</div>
+    <a href="#" data-page="home" class="active"><span>🏠</span> ダッシュボード</a>
     <a href="#" data-page="property"><span>🏢</span> 物件</a>
-    <a href="#" data-page="contacts"><span>📇</span> 連絡先</a>
-    <a href="#" data-page="area"><span>🗾</span> エリア情報</a>
-    <a href="#" data-page="memo"><span>📝</span> Memo</a>
+
+    <div class="nav-group">毎日の学び・振り返り</div>
     <a href="#" data-page="learn"><span>📚</span> Learn</a>
     <a href="#" data-page="calendar"><span>📅</span> カレンダー</a>
+
+    <div class="nav-group">記録・人脈</div>
+    <a href="#" data-page="memo"><span>📝</span> Memo</a>
+    <a href="#" data-page="contacts"><span>📇</span> 連絡先</a>
+    <a href="#" data-page="area"><span>🗾</span> エリア</a>
+
+    <div class="nav-group">設定</div>
     <a href="#" data-page="settings"><span>⚙</span> Settings</a>
   </nav>
   <div class="ver">Ver 3.0</div>
@@ -682,35 +703,38 @@ select{appearance:auto;}
 <!-- ===== PAGES ===== -->
 <div class="main">
 
-<!-- HOME -->
+<!-- HOME (ダッシュボード) -->
 <div class="page active" id="page-home">
   <div class="action-bar">
-    <button class="btn btn-primary" onclick="openMemoModal()">+ Memo</button>
-    <button class="btn btn-primary" onclick="openPropertyModal()">+ 物件</button>
-    <button class="btn btn-secondary" onclick="openCalcModal()">💴 利回り電卓</button>
+    <button class="btn btn-primary" onclick="openPropertyModal()">+ 物件追加</button>
   </div>
 
-  <!-- Calendar widget (collapsible on mobile) -->
-  <details id="home-calendar-details" style="margin-bottom:16px;">
-    <summary style="font-size:14px;font-weight:700;color:var(--green);cursor:pointer;padding:8px 0;">📅 カレンダー</summary>
-    <div id="home-calendar-widget" style="margin-top:10px;"></div>
-  </details>
-
-  <!-- ToDo section -->
-  <h3 style="font-size:14px;margin-bottom:10px;">✅ ToDo</h3>
-  <div id="home-todo-list"></div>
-
-  <!-- Properties section -->
-  <h3 style="font-size:14px;margin:16px 0 10px;">🏠 物件</h3>
+  <!-- 物件サマリー (フェーズ別件数) -->
+  <h3>🏢 物件サマリー</h3>
+  <div id="home-property-summary" style="margin-bottom:12px;"></div>
   <div id="home-property-list"></div>
 
-  <!-- Recent Memos section -->
-  <h3 style="font-size:14px;margin:16px 0 10px;">📝 最近のMemo</h3>
-  <div id="home-memo-list"></div>
+  <!-- ToDo section -->
+  <h3>✅ 期限近いToDo</h3>
+  <div id="home-todo-list"></div>
 
-  <!-- Recent Learn section -->
-  <h3 style="font-size:14px;margin:16px 0 10px;">📚 最近のLearn</h3>
-  <div id="home-learn-list"></div>
+  <!-- 2カラム: Learn + Memo (PC) / 縦積み(モバイル) -->
+  <div class="home-2col">
+    <div>
+      <h3>📚 最近のLearn</h3>
+      <div id="home-learn-list"></div>
+    </div>
+    <div>
+      <h3>📝 最近のMemo</h3>
+      <div id="home-memo-list"></div>
+    </div>
+  </div>
+
+  <!-- Calendar widget (折りたたみ) -->
+  <details id="home-calendar-details" style="margin-top:16px;">
+    <summary style="font-size:13px;font-weight:700;color:#1f3d1f;cursor:pointer;padding:6px 10px;background:#eef2ed;border-left:3px solid #4a6a4a;letter-spacing:.03em;">📅 カレンダー</summary>
+    <div id="home-calendar-widget" style="margin-top:8px;"></div>
+  </details>
 </div>
 
 <!-- PROPERTY LIST -->
@@ -736,9 +760,14 @@ select{appearance:auto;}
   <div class="action-bar">
     <button class="btn btn-primary" onclick="openMemoModal()">+ Memo追加</button>
   </div>
-  <div style="font-size:11.5px;color:var(--gray4);margin-bottom:10px;padding:8px 10px;background:#f5f7f4;border-left:3px solid #4a6a4a;line-height:1.6;">
-    <b>Memo</b>: 物件についての<b>気づき・所感・自由メモ</b>（構造化できない記録）。<br>
-    構造化機能（ヒアリング・調査・リフォーム等）は各物件詳細の専用タブから記録してください。
+  <div style="font-size:11.5px;color:var(--gray4);margin-bottom:10px;padding:10px 12px;background:#f5f7f4;border-left:3px solid #4a6a4a;line-height:1.7;">
+    <b>Memo</b>: <b>構造化できない自由メモ</b>置き場。物件に紐付けOK・紐付けなしOK。<br>
+    <b>📌 こんな時に使う:</b><br>
+    ・ 💡 内見で「外観は古いけど立地がいい」と感じた (気づき・所感)<br>
+    ・ 🤝 銀行の山田さんと雑談「融資方針前向き」(人との会話)<br>
+    ・ ⚠「来週までに○○の確認」(課題・ToDo)<br>
+    ・ 💭「この物件を見送るか悩んでる、理由は…」(判断・思考)<br>
+    <span style="color:var(--gray3);">※ ヒアリング10項目・調査5項目・リフォームプラン等は各物件詳細の専用タブから記録</span>
   </div>
   <div class="filter-bar" id="memo-filter"></div>
   <div id="memo-list"></div>
@@ -749,9 +778,15 @@ select{appearance:auto;}
   <div class="action-bar">
     <button class="btn btn-primary" onclick="openLearnModal()">+ Learn追加</button>
   </div>
-  <div style="font-size:11.5px;color:var(--gray4);margin-bottom:10px;padding:8px 10px;background:#f5f7f4;border-left:3px solid #4a6a4a;line-height:1.6;">
-    <b>Learn</b>: 投資家としての<b>知識ストック</b>（書籍・セミナー・YouTube・ネット記事・現場での学び等）。<br>
-    物件に紐づかない汎用的な学習ログ。
+  <div style="font-size:11.5px;color:var(--gray4);margin-bottom:10px;padding:10px 12px;background:#f5f7f4;border-left:3px solid #4a6a4a;line-height:1.7;">
+    <b>Learn</b>: 投資家としての<b>知識ストック</b>。物件に紐づかない汎用的な学習ログ。<br>
+    <b>📚 毎日の学び記録に:</b><br>
+    ・ 📖 書籍・Audible で読んだこと<br>
+    ・ 🎥 YouTubeで学んだノウハウ（リフォーム動画・成功事例等）<br>
+    ・ 🎓 セミナー・懇親会で聞いた話<br>
+    ・ 🌐 ネット記事・ブログから<br>
+    ・ 🏗 現場で学んだこと（業者から・内見で・他大家から）<br>
+    <span style="color:var(--gray3);">物件購入前の情報収集フェーズでは一番よく使う画面</span>
   </div>
   <div class="filter-bar" id="learn-filter"></div>
   <div id="learn-list"></div>
@@ -787,9 +822,11 @@ select{appearance:auto;}
 <!-- AREA -->
 <div class="page" id="page-area">
   <h2 style="font-size:18px;margin-bottom:6px;">🗾 エリア情報（横断閲覧）</h2>
-  <div style="font-size:12px;color:var(--gray4);margin-bottom:12px;line-height:1.6;">
-    エリアを選ぶと、そのエリアに紐づく<b>物件・連絡先・ヒアリング記録・Memo</b>を一覧表示します。
-    「このエリア、過去にヒアリング済みじゃん！」と気づけます。
+  <div style="font-size:12px;color:var(--gray4);margin-bottom:12px;line-height:1.6;padding:10px 12px;background:#f5f7f4;border-left:3px solid #4a6a4a;">
+    <b>使い方:</b> 新しい物件候補を見つけた時、そのエリアを選ぶと<br>
+    → 過去に<b>同エリアでヒアリングした連絡先・Memo・関連物件</b>が一覧表示。<br>
+    「この前○○不動産にこのエリアのヒアリング済みじゃん！」と気づけます。<br>
+    <span style="color:var(--gray3);">※ 物件の住所 / 連絡先の担当エリア / ヒアリングのエリア欄 から自動抽出</span>
   </div>
   <div class="area-select">
     <div class="area-select-row">
@@ -837,9 +874,9 @@ select{appearance:auto;}
 <nav class="tabbar">
   <a href="#" data-page="home" class="active"><span class="icon">🏠</span>Home</a>
   <a href="#" data-page="property"><span class="icon">🏢</span>物件</a>
-  <a href="#" data-page="memo"><span class="icon">📝</span>Memo</a>
   <a href="#" data-page="learn"><span class="icon">📚</span>Learn</a>
   <a href="#" data-page="calendar"><span class="icon">📅</span>カレンダー</a>
+  <a href="#" data-page="memo"><span class="icon">📝</span>Memo</a>
 </nav>
 
 <!-- ===== MODALS ===== -->
@@ -4406,7 +4443,29 @@ function deletePattern() {
 
 /* ===== HOME RENDER ===== */
 function renderHome() {
-  // Properties
+  // 物件サマリー（フェーズ別件数）
+  const phaseGroups = [
+    { label: '候補発見', keys: ['候補発見'] },
+    { label: '調査中', keys: ['調査中'] },
+    { label: '内見', keys: ['内覧予定', '内覧済'] },
+    { label: '交渉・買付', keys: ['交渉中', '買付済', '契約済'] },
+    { label: '運用中', keys: ['修繕中', '募集中', '運用中'] },
+    { label: '見送り', keys: ['見送り'] }
+  ];
+  const activeProps = data.property.filter(p => p.status !== '売却済');
+  let summaryHtml = '<div class="home-summary">';
+  phaseGroups.forEach(function(g){
+    const count = activeProps.filter(p => g.keys.indexOf(p.status) >= 0).length;
+    const isActive = count > 0;
+    const isDrop = g.label === '見送り';
+    summaryHtml += '<div class="home-summary-item' + (isActive && !isDrop ? ' active' : '') + (isDrop ? ' drop' : '') + '">';
+    summaryHtml += '<div class="hs-num">' + count + '</div><div class="hs-lbl">' + g.label + '</div>';
+    summaryHtml += '</div>';
+  });
+  summaryHtml += '</div>';
+  document.getElementById('home-property-summary').innerHTML = summaryHtml;
+
+  // Properties (直近5件)
   document.getElementById('home-property-list').innerHTML =
     data.property.length ?
     data.property.slice(0, 5).map(p => renderPropertyCard(p, true)).join('') :

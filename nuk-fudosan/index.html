@@ -29,7 +29,11 @@ select{appearance:auto;}
 #toast.error{background:var(--red);}
 
 /* Sidebar - PC */
-.sidebar{display:none;position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--white);border-right:1px solid var(--gray2);padding:20px 0;z-index:100;flex-direction:column;}
+.sidebar{display:none;position:fixed;left:0;top:0;width:var(--sidebar-w);height:100vh;background:var(--white);border-right:1px solid var(--gray2);padding:20px 0;z-index:300;flex-direction:column;transition:transform .25s;}
+/* モバイル時のサイドバードロワー */
+.sidebar.mobile-open{display:flex;box-shadow:4px 0 16px rgba(0,0,0,.3);}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:299;}
+.sidebar-backdrop.show{display:block;}
 .sidebar .logo{font-size:18px;font-weight:700;color:var(--green);padding:0 20px 20px;border-bottom:1px solid var(--gray2);}
 .sidebar nav{flex:1;padding:10px 0;}
 .sidebar nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--gray4);text-decoration:none;font-size:14px;font-weight:500;transition:background .2s;}
@@ -691,14 +695,17 @@ select{appearance:auto;}
 
 <!-- Top bar (Mobile) -->
 <header class="topbar">
+  <span class="icon-btn menu-btn" onclick="toggleMobileSidebar()" title="メニュー" style="font-size:22px;">☰</span>
   <h1 id="topbar-title">Property Note</h1>
   <div class="actions">
     <span class="icon-btn" onclick="openVoiceInput()" title="音声入力">🎤</span>
     <span class="icon-btn" onclick="refreshCurrentPage()" title="更新">🔄</span>
-    <span class="icon-btn" onclick="showPage('settings')" title="設定">⚙</span>
   </div>
   <span class="ver">Ver 3.0</span>
 </header>
+
+<!-- モバイル用サイドバーバックドロップ -->
+<div class="sidebar-backdrop" onclick="toggleMobileSidebar()"></div>
 
 <!-- Toast -->
 <div id="toast"></div>
@@ -1596,12 +1603,26 @@ function showPage(name, skipScrollReset) {
     }
   } catch(e){}
   if (!skipScrollReset) window.scrollTo(0, 0);
+  // モバイル: サイドバードロワーを閉じる
+  const sb = document.querySelector('.sidebar');
+  const bd = document.querySelector('.sidebar-backdrop');
+  if (sb) sb.classList.remove('mobile-open');
+  if (bd) bd.classList.remove('show');
   renderCurrentPage();
 }
 
 document.querySelectorAll('[data-page]').forEach(a => {
   a.addEventListener('click', e => { e.preventDefault(); showPage(a.dataset.page); });
 });
+
+function toggleMobileSidebar() {
+  const sb = document.querySelector('.sidebar');
+  const bd = document.querySelector('.sidebar-backdrop');
+  if (!sb || !bd) return;
+  const isOpen = sb.classList.contains('mobile-open');
+  sb.classList.toggle('mobile-open', !isOpen);
+  bd.classList.toggle('show', !isOpen);
+}
 
 /* ===== STATUS HELPERS ===== */
 const STATUS_PHASE = {

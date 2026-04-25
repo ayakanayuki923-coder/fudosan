@@ -1289,11 +1289,12 @@ select{appearance:auto;}
     <div class="form-group">
       <label>関連連絡先（銀行・不動産・近隣住民・大家仲間など）</label>
       <div id="memo-contacts-picker">
-        <input type="text" id="memo-contact-search" placeholder="🔍 名前・会社で検索して追加..." style="padding:6px 10px;" oninput="searchMemoContact(this.value)">
+        <input type="text" id="memo-contact-search" placeholder="🔍 名前・会社で検索。なければ「+ 新規追加」" style="padding:6px 10px;" oninput="searchMemoContact(this.value)">
         <div id="memo-contact-dropdown" class="picker-dropdown" style="display:none;position:relative;margin-top:-1px;"></div>
       </div>
+      <div id="memo-inline-form-wrap"></div>
       <div id="memo-picked-contacts" style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;"></div>
-      <div style="font-size:10.5px;color:var(--gray3);margin-top:4px;">💡 近隣住民ヒアリング: 該当住人を連絡先に登録してから紐付け</div>
+      <div style="font-size:10.5px;color:var(--gray3);margin-top:4px;">💡 検索該当者がいなければ「+ 新規追加」でその場で連絡先を登録できます</div>
     </div>
     <div class="form-group"><label>次のアクション</label><input type="text" id="memo-next"></div>
     <div class="form-group"><label>次のアクション予定日</label><input type="text" id="memo-next-due" placeholder="YYYY-MM-DD"></div>
@@ -4122,9 +4123,57 @@ function searchMemoContact(query) {
     h += '<div class="picker-info"><div class="picker-nm">'+esc(c.name)+'</div>';
     h += '<div class="picker-co">'+esc([c.company, c.branch].filter(Boolean).join(' · '))+'</div></div></div>';
   });
-  if (!matched.length) h += '<div style="padding:8px 12px;font-size:11px;color:var(--gray3);">該当なし</div>';
+  // 新規追加オプション（常に出す）
+  const q = query.replace(/'/g, '&#39;');
+  h += '<div class="picker-add" onclick="showMemoInlineForm(\''+q+'\')"><span style="font-size:15px;font-weight:700;">+</span> "' + esc(query) + '" で新規追加 <span style="color:var(--gray4);font-weight:400;font-size:10.5px;">該当者がいなければクリック</span></div>';
   dd.innerHTML = h;
   dd.style.display = 'block';
+}
+
+function showMemoInlineForm(name) {
+  const wrap = document.getElementById('memo-inline-form-wrap');
+  wrap.innerHTML = '<div style="background:#fafdf9;border:2px solid #4a6a4a;border-radius:3px;padding:10px 12px;margin-top:6px;">' +
+    '<div style="font-size:12px;color:#1f3d1f;font-weight:700;margin-bottom:6px;">+ 新規連絡先を登録（後で編集可）</div>' +
+    '<div class="form-row"><div class="form-group"><label>名前 *</label><input type="text" id="memo-ic-name" value="'+esc(name)+'"></div><div class="form-group"><label>ふりがな（音検索用）</label><input type="text" id="memo-ic-name-kana" placeholder="例: さとう"></div></div>' +
+    '<div class="form-row"><div class="form-group"><label>会社</label><input type="text" id="memo-ic-company"></div><div class="form-group"><label>会社のふりがな</label><input type="text" id="memo-ic-company-kana"></div></div>' +
+    '<div class="form-group"><label>業種タグ（複数可）</label><div id="memo-ic-types" class="prop-select-chips"></div></div>' +
+    '<div class="form-group"><label>電話 or メール（任意）</label><input type="text" id="memo-ic-contact"></div>' +
+    '<div style="display:flex;gap:6px;margin-top:6px;">' +
+    '<button type="button" class="btn btn-primary btn-sm" onclick="saveMemoInlineContact()">✓ 登録して紐付け</button>' +
+    '<button type="button" class="btn btn-secondary btn-sm" onclick="cancelMemoInlineForm()">キャンセル</button>' +
+    '</div></div>';
+  renderTypesSelector('memo-ic-types', []);
+  // dropdown は閉じる
+  document.getElementById('memo-contact-dropdown').style.display = 'none';
+  // 検索欄クリア
+  document.getElementById('memo-contact-search').value = '';
+  // 名前欄フォーカス
+  setTimeout(function(){ document.getElementById('memo-ic-name').focus(); }, 0);
+}
+
+function saveMemoInlineContact() {
+  const name = (document.getElementById('memo-ic-name').value || '').trim();
+  if (!name) { toast('名前を入力してください', 'error'); return; }
+  const nameKana = (document.getElementById('memo-ic-name-kana').value || '').trim();
+  const company = (document.getElementById('memo-ic-company').value || '').trim();
+  const companyKana = (document.getElementById('memo-ic-company-kana').value || '').trim();
+  const contact = (document.getElementById('memo-ic-contact').value || '').trim();
+  const types = collectSelectedTypes('memo-ic-types');
+  const c = { id: genId(), name: name, nameKana: nameKana, company: company, companyKana: companyKana, types: types, archived: false, firstContactDate: today() };
+  if (contact.indexOf('@') >= 0) c.email = contact;
+  else if (contact) c.phone = contact;
+  data.contacts.unshift(c);
+  saveData();
+  // Memoの連絡先リストに自動追加
+  currentMemoContactIds.push(c.id);
+  renderMemoPickedContacts();
+  // フォーム閉じる
+  document.getElementById('memo-inline-form-wrap').innerHTML = '';
+  toast('連絡先「' + name + '」を登録＆紐付け');
+}
+
+function cancelMemoInlineForm() {
+  document.getElementById('memo-inline-form-wrap').innerHTML = '';
 }
 
 function pickMemoContact(cid) {

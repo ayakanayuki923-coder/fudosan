@@ -155,6 +155,12 @@ select{appearance:auto;}
 .calendar-day.other-month{color:var(--gray3);}
 .calendar-day.today{background:var(--green-light);color:var(--green);font-weight:700;}
 .calendar-day.has-events::after{content:'·';position:absolute;bottom:2px;color:var(--green);font-size:16px;}
+/* カレンダー色分けドット */
+.calendar-day .cal-dots{position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center;gap:2px;pointer-events:none;}
+.calendar-day .cal-dot{width:5px;height:5px;border-radius:50%;}
+.calendar-day .cal-dot.past{background:#1f3d1f;}
+.calendar-day .cal-dot.future{background:#c77800;}
+.calendar-day .cal-dot.overdue{background:var(--red);}
 
 /* Todo item */
 .todo-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--white);border-radius:6px;margin-bottom:8px;border-left:4px solid var(--green);}
@@ -1296,8 +1302,23 @@ select{appearance:auto;}
       <div id="memo-picked-contacts" style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;"></div>
       <div style="font-size:10.5px;color:var(--gray3);margin-top:4px;">💡 検索該当者がいなければ「+ 新規追加」でその場で連絡先を登録できます</div>
     </div>
-    <div class="form-group"><label>次のアクション</label><input type="text" id="memo-next"></div>
-    <div class="form-group"><label>次のアクション予定日</label><input type="text" id="memo-next-due" placeholder="YYYY-MM-DD"></div>
+    <div style="border:1px solid #c77800;border-radius:3px;padding:8px 10px;margin-top:10px;background:#fff8ed;">
+      <div style="font-size:11.5px;color:#c77800;font-weight:700;margin-bottom:6px;">✅ 次のアクション → ToDoに追加</div>
+      <div class="form-group" style="margin-bottom:6px;"><label>内容（例: 役所に接道確認）</label><input type="text" id="memo-next-todo"></div>
+      <div class="form-group"><label>期限日</label><input type="text" id="memo-next-todo-due" placeholder="YYYY-MM-DD"></div>
+      <div style="font-size:10.5px;color:var(--gray3);">※ 紐付け物件のToDoリストに追加されます（物件紐付け必須）</div>
+    </div>
+    <div style="border:1px solid #1a3a6a;border-radius:3px;padding:8px 10px;margin-top:10px;background:#f0f4fa;">
+      <div style="font-size:11.5px;color:#1a3a6a;font-weight:700;margin-bottom:6px;">📅 次のアポ → カレンダーに予定追加</div>
+      <div class="form-group" style="margin-bottom:6px;"><label>予定タイトル（例: 銀行打ち合わせ）</label><input type="text" id="memo-next-appt"></div>
+      <div class="form-row">
+        <div class="form-group"><label>日付</label><input type="text" id="memo-next-appt-date" placeholder="YYYY-MM-DD"></div>
+        <div class="form-group"><label>時間</label><input type="text" id="memo-next-appt-time" placeholder="HH:MM or 終日"></div>
+      </div>
+    </div>
+    <!-- 旧フィールド（後方互換・通常は非表示でOK・開発用に残す） -->
+    <input type="hidden" id="memo-next">
+    <input type="hidden" id="memo-next-due">
     <div style="margin-top:20px;">
       <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">保存</button>
     </div>
@@ -4085,6 +4106,12 @@ function openMemoModal(id) {
   document.getElementById('memo-url').value = memo ? (memo.url||'') : '';
   document.getElementById('memo-next').value = memo ? (memo.next||'') : '';
   document.getElementById('memo-next-due').value = memo ? (memo.nextDue||'') : '';
+  // 新規作成 or 編集ごとに次アクション/アポ欄はクリア（毎回新規追加用）
+  document.getElementById('memo-next-todo').value = '';
+  document.getElementById('memo-next-todo-due').value = '';
+  document.getElementById('memo-next-appt').value = '';
+  document.getElementById('memo-next-appt-date').value = '';
+  document.getElementById('memo-next-appt-time').value = '';
 
   // Property checkboxes
   const list = document.getElementById('memo-properties-list');
@@ -4224,6 +4251,39 @@ function saveMemo(e) {
   m.contactIds = currentMemoContactIds.slice();
   m.next = document.getElementById('memo-next').value;
   m.nextDue = document.getElementById('memo-next-due').value;
+
+  // 次のアクション → ToDoに追加（紐付き物件ごとに）
+  const todoText = document.getElementById('memo-next-todo').value.trim();
+  const todoDue = document.getElementById('memo-next-todo-due').value.trim();
+  if (todoText) {
+    if (m.properties && m.properties.length) {
+      m.properties.forEach(function(pname){
+        const p = data.property.find(x => x.name === pname);
+        if (p) {
+          if (!p.todos) p.todos = [];
+          p.todos.push({ id: genId(), text: todoText, due: todoDue, done: false, archived: false });
+        }
+      });
+      toast('ToDoに追加しました');
+    } else {
+      toast('ToDo追加には物件紐付けが必要（Memoは保存されました）', 'error');
+    }
+  }
+
+  // 次のアポ → カレンダー予定に追加
+  const apptTitle = document.getElementById('memo-next-appt').value.trim();
+  const apptDate = document.getElementById('memo-next-appt-date').value.trim();
+  const apptTime = document.getElementById('memo-next-appt-time').value.trim();
+  if (apptTitle && apptDate) {
+    data.schedules.push({
+      id: genId(),
+      date: apptDate,
+      time: apptTime,
+      title: apptTitle,
+      memo: 'Memo「' + (m.title||'') + '」より作成'
+    });
+    toast('カレンダーに予定追加');
+  }
 
   // 紐付き連絡先の最終接触日を更新
   m.contactIds.forEach(function(cid){
@@ -4379,13 +4439,27 @@ function renderCalendar(date) {
   // Current month dates
   for (let d = 1; d <= lastDate; d++) {
     const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-    const hasEvents = data.schedules.some(s => s.date === dateStr) ||
-                     data.journals.some(j => j.date === dateStr) ||
-                     data.action.some(a => a.date === dateStr) ||
-                     data.learns.some(l => l.date === dateStr) ||
-                     data.property.some(p => (p.timeline||[]).some(t => t.date === dateStr));
     const isToday = dateStr === today_;
-    html += '<div class="calendar-day' + (isToday ? ' today' : '') + (hasEvents ? ' has-events' : '') + '" onclick="showCalendarDate(\'' + dateStr + '\')">' + d + '</div>';
+    const isPast = dateStr < today_;
+    // 実行済み（過去の活動記録）
+    const hasPast = (
+      data.action.some(a => fmtDate(a.date) === dateStr) ||
+      data.journals.some(j => fmtDate(j.date) === dateStr) ||
+      data.learns.some(l => fmtDate(l.date) === dateStr) ||
+      data.property.some(p => (p.timeline||[]).some(t => fmtDate(t.date) === dateStr))
+    );
+    // 予定
+    const hasSchedule = data.schedules.some(s => fmtDate(s.date) === dateStr);
+    // 未完了ToDo
+    const hasActiveTodo = data.property.some(p => (p.todos||[]).some(t => fmtDate(t.due) === dateStr && !t.done && !t.archived));
+    const hasOverdue = isPast && hasActiveTodo;
+
+    let dots = '';
+    if (hasPast) dots += '<span class="cal-dot past" title="実行済み"></span>';
+    if (hasOverdue) dots += '<span class="cal-dot overdue" title="期限切れToDo"></span>';
+    else if (hasSchedule || hasActiveTodo) dots += '<span class="cal-dot future" title="予定/ToDo"></span>';
+
+    html += '<div class="calendar-day' + (isToday ? ' today' : '') + '" onclick="showCalendarDate(\'' + dateStr + '\')">' + d + (dots ? '<div class="cal-dots">' + dots + '</div>' : '') + '</div>';
   }
 
   // Next month dates
@@ -4422,18 +4496,27 @@ function renderCalendarPage() {
   const dateStr = today_format(currentCalendarDate);
   document.getElementById('calendar-widget').innerHTML = renderCalendar(currentCalendarDate);
 
-  let html = '<h3 style="font-size:14px;margin-bottom:10px;">' + dateStr + ' の記録</h3>';
+  const today_ = today();
+  const isPast = dateStr < today_;
+  const isToday = dateStr === today_;
 
-  const schedules = data.schedules.filter(s => s.date === dateStr).sort((a,b) => a.time > b.time ? 1 : -1);
-  const memos = data.action.filter(m => m.date === dateStr);
-  const learns = data.learns.filter(l => l.date === dateStr);
-  const logs = data.property.flatMap(p => (p.timeline||[]).filter(t => t.date === dateStr).map(t => ({...t, prop: p.name})));
-  const journal = data.journals.find(j => j.date === dateStr);
+  let html = '<div style="font-size:10.5px;color:var(--gray4);margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap;"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1f3d1f;vertical-align:middle;margin-right:3px;"></span>実行済み</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#c77800;vertical-align:middle;margin-right:3px;"></span>予定・ToDo</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);vertical-align:middle;margin-right:3px;"></span>期限切れ</span></div>';
+  html += '<h3 style="font-size:14px;margin-bottom:10px;">' + dateStr + ' の記録</h3>';
 
-  if (schedules.length) {
-    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">📅 予定</h4>';
+  const schedules = data.schedules.filter(s => fmtDate(s.date) === dateStr).sort((a,b) => a.time > b.time ? 1 : -1);
+  const memos = data.action.filter(m => fmtDate(m.date) === dateStr);
+  const learns = data.learns.filter(l => fmtDate(l.date) === dateStr);
+  const logs = data.property.flatMap(p => (p.timeline||[]).filter(t => fmtDate(t.date) === dateStr).map(t => ({...t, prop: p.name})));
+  const journal = data.journals.find(j => fmtDate(j.date) === dateStr);
+  // ToDo (期限がこの日)
+  const todos = data.property.flatMap(p => (p.todos||[]).filter(t => fmtDate(t.due) === dateStr && !t.archived).map(t => ({...t, prop: p.name, propId: p.id})));
+
+  // 予定・ToDoは未来寄り、実行済みは過去寄り
+  // 予定セクション（未完了 or 未来）
+  if (schedules.length || todos.length) {
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:#c77800;border-left:3px solid #c77800;padding-left:8px;">📅 予定・ToDo</h4>';
     schedules.forEach(s => {
-      html += '<div class="card">';
+      html += '<div class="card" style="border-left:3px solid #c77800;">';
       html += '<div style="font-weight:700;">' + (s.time||'終日') + ' · ' + esc(s.title) + '</div>';
       if(s.memo) html += '<div style="font-size:12px;color:var(--gray3);margin-top:4px;">'+esc(s.memo)+'</div>';
       html += '<div style="margin-top:6px;display:flex;gap:4px;">';
@@ -4441,39 +4524,55 @@ function renderCalendarPage() {
       html += '<button class="btn btn-danger btn-sm" onclick="deleteSchedule(\''+s.id+'\')">削除</button>';
       html += '</div></div>';
     });
+    todos.forEach(t => {
+      const overdue = isPast && !t.done;
+      const color = t.done ? 'var(--gray3)' : (overdue ? 'var(--red)' : '#c77800');
+      html += '<div class="card" style="border-left:3px solid '+color+';opacity:'+(t.done?0.6:1)+';">';
+      html += '<div style="font-weight:700;'+(t.done?'text-decoration:line-through;':'')+'">' + (t.done ? '✓ ' : '') + (overdue ? '⚠ ' : '') + '[ToDo] ' + esc(t.text) + '</div>';
+      html += '<div style="font-size:11px;color:var(--gray3);margin-top:2px;">'+esc(t.prop)+'</div>';
+      html += '<div style="margin-top:4px;"><label style="font-size:11px;cursor:pointer;"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo(\''+t.propId+'\',\''+t.id+'\')" style="margin-right:4px;">完了</label></div>';
+      html += '</div>';
+    });
+  }
+
+  // 実行済みセクション
+  const pastItems = memos.length + learns.length + logs.length + (journal ? 1 : 0);
+  if (pastItems > 0) {
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:#1f3d1f;border-left:3px solid #1f3d1f;padding-left:8px;">✓ 実行済み・記録</h4>';
   }
 
   if (memos.length) {
-    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">📝 Memo</h4>';
     memos.forEach(m => {
-      html += '<div class="card" style="cursor:pointer;" onclick="openMemoModal(\''+m.id+'\')">';
-      html += '<div style="font-weight:700;">'+esc(m.title)+'</div>';
-      if(m.content) html += '<div style="font-size:12px;color:var(--gray3);margin-top:4px;">'+esc(m.content.substring(0,80))+(m.content.length>80?'...':'')+'</div>';
+      html += '<div class="card" style="cursor:pointer;border-left:3px solid #1f3d1f;" onclick="openMemoModal(\''+m.id+'\')">';
+      html += '<div style="font-size:10.5px;color:var(--gray3);">📝 Memo'+(m.category?' · '+esc(m.category):'')+'</div>';
+      html += '<div style="font-weight:700;margin-top:2px;">'+esc(m.title)+'</div>';
+      if(m.content) html += '<div style="font-size:12px;color:var(--gray4);margin-top:4px;">'+esc(m.content.substring(0,80))+(m.content.length>80?'...':'')+'</div>';
       html += '</div>';
     });
   }
 
   if (learns.length) {
-    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">📚 Learn</h4>';
     learns.forEach(l => {
-      html += '<div class="card" style="cursor:pointer;" onclick="openLearnModal(\''+l.id+'\')">';
-      html += '<div style="font-weight:700;">'+esc(l.title)+'</div>';
-      if(l.category) html += '<div style="font-size:12px;color:var(--gray3);">'+esc(l.category)+'</div>';
+      html += '<div class="card" style="cursor:pointer;border-left:3px solid #1f3d1f;" onclick="openLearnModal(\''+l.id+'\')">';
+      html += '<div style="font-size:10.5px;color:var(--gray3);">📚 Learn'+(l.category?' · '+esc(l.category):'')+'</div>';
+      html += '<div style="font-weight:700;margin-top:2px;">'+esc(l.title)+'</div>';
       html += '</div>';
     });
   }
 
   if (logs.length) {
-    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">🏢 物件Log</h4>';
     logs.forEach(l => {
-      html += '<div class="card"><div style="font-weight:700;">'+esc(l.prop)+'</div><div style="font-size:12px;color:var(--gray3);">'+esc(l.text)+'</div></div>';
+      html += '<div class="card" style="border-left:3px solid #1f3d1f;">';
+      html += '<div style="font-size:10.5px;color:var(--gray3);">🏢 物件Log · '+esc(l.prop)+'</div>';
+      html += '<div style="font-size:12px;color:var(--gray4);margin-top:4px;">'+esc(l.text)+'</div>';
+      html += '</div>';
     });
   }
 
   if (journal) {
-    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);">✍ 日記</h4>';
-    html += '<div class="card">';
-    html += '<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;">'+esc(journal.content)+'</div>';
+    html += '<div class="card" style="border-left:3px solid #1f3d1f;">';
+    html += '<div style="font-size:10.5px;color:var(--gray3);">✍ 日記</div>';
+    html += '<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;margin-top:4px;">'+esc(journal.content)+'</div>';
     html += '<div style="margin-top:8px;display:flex;gap:4px;">';
     html += '<button class="btn btn-secondary btn-sm" onclick="editJournal(\''+journal.id+'\')">編集</button>';
     html += '<button class="btn btn-danger btn-sm" onclick="deleteJournal(\''+journal.id+'\')">削除</button>';

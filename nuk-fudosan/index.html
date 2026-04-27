@@ -158,8 +158,8 @@ select{appearance:auto;}
 /* カレンダー色分けドット */
 .calendar-day .cal-dots{position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center;gap:2px;pointer-events:none;}
 .calendar-day .cal-dot{width:5px;height:5px;border-radius:50%;}
-.calendar-day .cal-dot.past{background:#1f3d1f;}
-.calendar-day .cal-dot.future{background:#c77800;}
+.calendar-day .cal-dot.past{background:var(--gray3);}
+.calendar-day .cal-dot.future{background:var(--green);}
 .calendar-day .cal-dot.overdue{background:var(--red);}
 
 /* Todo item */
@@ -969,7 +969,7 @@ select{appearance:auto;}
     <input type="hidden" id="hr-id">
     <input type="hidden" id="hr-prop-context">
     <div class="form-row">
-      <div class="form-group"><label>日付</label><input type="text" id="hr-date" placeholder="YYYY-MM-DD"></div>
+      <div class="form-group"><label>日付</label><input type="date" id="hr-date"></div>
       <div class="form-group"><label>対象エリア（任意）</label><input type="text" id="hr-area" placeholder="例: 仙台市青葉区"></div>
     </div>
     <div class="form-group">
@@ -1077,7 +1077,7 @@ select{appearance:auto;}
     <input type="hidden" id="prop-id">
 
     <div class="form-section">基本情報</div>
-    <div class="form-group"><label>物件登録日</label><input type="text" id="prop-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-group"><label>物件登録日</label><input type="date" id="prop-date"></div>
     <div class="form-group"><label>物件名 *</label><input type="text" id="prop-name" required></div>
     <div class="form-group"><label>住所</label><input type="text" id="prop-location"></div>
     <div class="form-group"><label>Google Maps URL</label><input type="text" id="prop-mapurl"></div>
@@ -1154,7 +1154,7 @@ select{appearance:auto;}
     <div id="prop-rebuild-judge" class="auto-judge unknown">自動判定: 接道3項目を入力すると判定されます</div>
     <div class="verify-row">
       <label><input type="checkbox" id="prop-road-verified"> 役所確認済</label>
-      <input type="text" id="prop-road-verify-date" placeholder="確認日 YYYY-MM-DD" style="max-width:160px;">
+      <input type="date" id="prop-road-verify-date" style="max-width:160px;">
       <input type="text" id="prop-road-verify-by" placeholder="確認先 例: 建築指導課">
     </div>
     <div class="form-group"><label>接道メモ（補足・自由記述）</label><input type="text" id="prop-road" placeholder="例: セットバック0.5m必要、等"></div>
@@ -1170,7 +1170,7 @@ select{appearance:auto;}
     </div>
     <div class="verify-row">
       <label><input type="checkbox" id="prop-zoning-verified"> 役所確認済</label>
-      <input type="text" id="prop-zoning-verify-date" placeholder="確認日 YYYY-MM-DD" style="max-width:160px;">
+      <input type="date" id="prop-zoning-verify-date" style="max-width:160px;">
       <input type="text" id="prop-zoning-verify-by" placeholder="確認先 例: 都市計画課">
     </div>
 
@@ -1179,7 +1179,7 @@ select{appearance:auto;}
     <div class="form-group"><label>登記・権利関係メモ（自由記述）</label><textarea id="prop-legal-memo" rows="1" placeholder="任意"></textarea></div>
     <div class="verify-row">
       <label><input type="checkbox" id="prop-registry-verified"> 法務局確認済</label>
-      <input type="text" id="prop-registry-verify-date" placeholder="確認日 YYYY-MM-DD" style="max-width:160px;">
+      <input type="date" id="prop-registry-verify-date" style="max-width:160px;">
       <input type="text" id="prop-registry-verify-by" placeholder="確認先 例: 法務局">
     </div>
 
@@ -1224,7 +1224,7 @@ select{appearance:auto;}
     <div id="drop-section" style="display:none;">
       <div class="form-section" style="color:var(--red);">見送り情報（次回に活かすためのノウハウ蓄積）</div>
       <div class="form-row">
-        <div class="form-group"><label>見送り日</label><input type="text" id="prop-drop-date" placeholder="YYYY-MM-DD"></div>
+        <div class="form-group"><label>見送り日</label><input type="date" id="prop-drop-date"></div>
         <div class="form-group"><label>見送りフェーズ</label>
           <select id="prop-drop-phase"><option value="">--</option><option>候補発見時</option><option>デスクトップ調査後</option><option>ヒアリング後</option><option>内見前準備で</option><option>内見後</option><option>交渉中</option><option>融資否決</option></select>
         </div>
@@ -1248,7 +1248,7 @@ select{appearance:auto;}
       </div>
       <div class="sub-section">📊 追跡情報（見送り後の動向）</div>
       <div class="form-row">
-        <div class="form-group"><label>掲載終了日</label><input type="text" id="prop-drop-end" placeholder="YYYY-MM-DD"></div>
+        <div class="form-group"><label>掲載終了日</label><input type="date" id="prop-drop-end"></div>
         <div class="form-group"><label>最終販売価格 (万円)</label><input type="number" id="prop-drop-final-price" placeholder="値下げ幅を追う"></div>
       </div>
       <div class="form-group"><label>追跡状態</label>
@@ -1275,7 +1275,7 @@ select{appearance:auto;}
   </div>
   <form onsubmit="saveMemo(event)">
     <input type="hidden" id="memo-id">
-    <div class="form-group"><label>日付</label><input type="text" id="memo-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-group"><label>日付</label><input type="date" id="memo-date"></div>
     <div class="form-group"><label>タイトル *</label><input type="text" id="memo-title" required></div>
     <div class="form-group"><label>カテゴリ</label>
       <select id="memo-category">
@@ -1305,15 +1305,15 @@ select{appearance:auto;}
     <div style="border:1px solid #c77800;border-radius:3px;padding:8px 10px;margin-top:10px;background:#fff8ed;">
       <div style="font-size:11.5px;color:#c77800;font-weight:700;margin-bottom:6px;">✅ 次のアクション → ToDoに追加</div>
       <div class="form-group" style="margin-bottom:6px;"><label>内容（例: 役所に接道確認）</label><input type="text" id="memo-next-todo"></div>
-      <div class="form-group"><label>期限日</label><input type="text" id="memo-next-todo-due" placeholder="YYYY-MM-DD"></div>
+      <div class="form-group"><label>期限日</label><input type="date" id="memo-next-todo-due"></div>
       <div style="font-size:10.5px;color:var(--gray3);">※ 紐付け物件のToDoリストに追加されます（物件紐付け必須）</div>
     </div>
     <div style="border:1px solid #1a3a6a;border-radius:3px;padding:8px 10px;margin-top:10px;background:#f0f4fa;">
       <div style="font-size:11.5px;color:#1a3a6a;font-weight:700;margin-bottom:6px;">📅 次のアポ → カレンダーに予定追加</div>
       <div class="form-group" style="margin-bottom:6px;"><label>予定タイトル（例: 銀行打ち合わせ）</label><input type="text" id="memo-next-appt"></div>
       <div class="form-row">
-        <div class="form-group"><label>日付</label><input type="text" id="memo-next-appt-date" placeholder="YYYY-MM-DD"></div>
-        <div class="form-group"><label>時間</label><input type="text" id="memo-next-appt-time" placeholder="HH:MM or 終日"></div>
+        <div class="form-group"><label>日付</label><input type="date" id="memo-next-appt-date"></div>
+        <div class="form-group"><label>時間</label><input type="time" id="memo-next-appt-time"></div>
       </div>
     </div>
     <!-- 旧フィールド（後方互換・通常は非表示でOK・開発用に残す） -->
@@ -1335,7 +1335,7 @@ select{appearance:auto;}
   </div>
   <form onsubmit="saveLearn(event)">
     <input type="hidden" id="learn-id">
-    <div class="form-group"><label>日付</label><input type="text" id="learn-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-group"><label>日付</label><input type="date" id="learn-date"></div>
     <div class="form-group"><label>タイトル *</label><input type="text" id="learn-title" required></div>
     <div class="form-group"><label>カテゴリ</label>
       <select id="learn-category">
@@ -1376,7 +1376,7 @@ select{appearance:auto;}
   </div>
   <form onsubmit="saveSchedule(event)">
     <input type="hidden" id="schedule-id">
-    <div class="form-group"><label>日付</label><input type="text" id="schedule-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-group"><label>日付</label><input type="date" id="schedule-date"></div>
     <div class="form-group"><label>時間</label><input type="text" id="schedule-time" placeholder="HH:MM"></div>
     <div class="form-group"><label>タイトル *</label><input type="text" id="schedule-title" required></div>
     <div class="form-group"><label>メモ</label><textarea id="schedule-memo" rows="2"></textarea></div>
@@ -1451,7 +1451,7 @@ select{appearance:auto;}
   <form onsubmit="saveCashflow(event)">
     <input type="hidden" id="cashflow-id">
     <input type="hidden" id="cashflow-prop-id">
-    <div class="form-group"><label>日付</label><input type="text" id="cashflow-date" placeholder="YYYY-MM-DD"></div>
+    <div class="form-group"><label>日付</label><input type="date" id="cashflow-date"></div>
     <div class="form-group"><label>タイプ</label>
       <select id="cashflow-type" onchange="updateCashflowCategories()">
         <option value="income">収入</option>
@@ -4474,7 +4474,14 @@ function renderCalendar(date) {
 
 function showCalendarDate(dateStr) {
   currentCalendarDate = new Date(dateStr);
-  renderCalendarPage();
+  // どのページからクリックしてもカレンダーページに遷移
+  const activePage = document.querySelector('.page.active');
+  if (!activePage || activePage.id !== 'page-calendar') {
+    showPage('calendar');
+    setTimeout(function(){ renderCalendarPage(); }, 50);
+  } else {
+    renderCalendarPage();
+  }
 }
 
 function prevMonth() {
@@ -4500,7 +4507,7 @@ function renderCalendarPage() {
   const isPast = dateStr < today_;
   const isToday = dateStr === today_;
 
-  let html = '<div style="font-size:10.5px;color:var(--gray4);margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap;"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1f3d1f;vertical-align:middle;margin-right:3px;"></span>実行済み</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#c77800;vertical-align:middle;margin-right:3px;"></span>予定・ToDo</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);vertical-align:middle;margin-right:3px;"></span>期限切れ</span></div>';
+  let html = '<div style="font-size:10.5px;color:var(--gray4);margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap;"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gray3);vertical-align:middle;margin-right:3px;"></span>実行済み</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);vertical-align:middle;margin-right:3px;"></span>予定・ToDo</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);vertical-align:middle;margin-right:3px;"></span>期限切れ</span></div>';
   html += '<h3 style="font-size:14px;margin-bottom:10px;">' + dateStr + ' の記録</h3>';
 
   const schedules = data.schedules.filter(s => fmtDate(s.date) === dateStr).sort((a,b) => a.time > b.time ? 1 : -1);
@@ -4514,9 +4521,9 @@ function renderCalendarPage() {
   // 予定・ToDoは未来寄り、実行済みは過去寄り
   // 予定セクション（未完了 or 未来）
   if (schedules.length || todos.length) {
-    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:#c77800;border-left:3px solid #c77800;padding-left:8px;">📅 予定・ToDo</h4>';
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);border-left:3px solid var(--green);padding-left:8px;">📅 予定・ToDo</h4>';
     schedules.forEach(s => {
-      html += '<div class="card" style="border-left:3px solid #c77800;">';
+      html += '<div class="card" style="border-left:3px solid var(--green);">';
       html += '<div style="font-weight:700;">' + (s.time||'終日') + ' · ' + esc(s.title) + '</div>';
       if(s.memo) html += '<div style="font-size:12px;color:var(--gray3);margin-top:4px;">'+esc(s.memo)+'</div>';
       html += '<div style="margin-top:6px;display:flex;gap:4px;">';
@@ -4538,12 +4545,12 @@ function renderCalendarPage() {
   // 実行済みセクション
   const pastItems = memos.length + learns.length + logs.length + (journal ? 1 : 0);
   if (pastItems > 0) {
-    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:#1f3d1f;border-left:3px solid #1f3d1f;padding-left:8px;">✓ 実行済み・記録</h4>';
+    html += '<h4 style="font-size:13px;margin:12px 0 8px;color:#1f3d1f;border-left:3px solid var(--gray3);padding-left:8px;">✓ 実行済み・記録</h4>';
   }
 
   if (memos.length) {
     memos.forEach(m => {
-      html += '<div class="card" style="cursor:pointer;border-left:3px solid #1f3d1f;" onclick="openMemoModal(\''+m.id+'\')">';
+      html += '<div class="card" style="cursor:pointer;border-left:3px solid var(--gray3);" onclick="openMemoModal(\''+m.id+'\')">';
       html += '<div style="font-size:10.5px;color:var(--gray3);">📝 Memo'+(m.category?' · '+esc(m.category):'')+'</div>';
       html += '<div style="font-weight:700;margin-top:2px;">'+esc(m.title)+'</div>';
       if(m.content) html += '<div style="font-size:12px;color:var(--gray4);margin-top:4px;">'+esc(m.content.substring(0,80))+(m.content.length>80?'...':'')+'</div>';
@@ -4553,7 +4560,7 @@ function renderCalendarPage() {
 
   if (learns.length) {
     learns.forEach(l => {
-      html += '<div class="card" style="cursor:pointer;border-left:3px solid #1f3d1f;" onclick="openLearnModal(\''+l.id+'\')">';
+      html += '<div class="card" style="cursor:pointer;border-left:3px solid var(--gray3);" onclick="openLearnModal(\''+l.id+'\')">';
       html += '<div style="font-size:10.5px;color:var(--gray3);">📚 Learn'+(l.category?' · '+esc(l.category):'')+'</div>';
       html += '<div style="font-weight:700;margin-top:2px;">'+esc(l.title)+'</div>';
       html += '</div>';
@@ -4562,7 +4569,7 @@ function renderCalendarPage() {
 
   if (logs.length) {
     logs.forEach(l => {
-      html += '<div class="card" style="border-left:3px solid #1f3d1f;">';
+      html += '<div class="card" style="border-left:3px solid var(--gray3);">';
       html += '<div style="font-size:10.5px;color:var(--gray3);">🏢 物件Log · '+esc(l.prop)+'</div>';
       html += '<div style="font-size:12px;color:var(--gray4);margin-top:4px;">'+esc(l.text)+'</div>';
       html += '</div>';
@@ -4570,7 +4577,7 @@ function renderCalendarPage() {
   }
 
   if (journal) {
-    html += '<div class="card" style="border-left:3px solid #1f3d1f;">';
+    html += '<div class="card" style="border-left:3px solid var(--gray3);">';
     html += '<div style="font-size:10.5px;color:var(--gray3);">✍ 日記</div>';
     html += '<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;margin-top:4px;">'+esc(journal.content)+'</div>';
     html += '<div style="margin-top:8px;display:flex;gap:4px;">';

@@ -4921,9 +4921,18 @@ function renderCurrentPage() {
   else if (id === 'calendar') renderCalendarPage();
 }
 
-// Close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(ov => {
-  ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('show'); });
+// モーダル背景クリックでは閉じない（誤タップで入力消失防止）
+// 閉じるには ✕ボタン または 保存/キャンセルボタンのみ
+// Esc キーで閉じたい場合のみ:
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.show').forEach(function(ov){
+      // Esc でも確認ダイアログ
+      if (confirm('入力中の内容は破棄されます。閉じますか？')) {
+        ov.classList.remove('show');
+      }
+    });
+  }
 });
 
 /* ===== INIT ===== */

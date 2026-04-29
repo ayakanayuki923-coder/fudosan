@@ -154,13 +154,19 @@ select{appearance:auto;}
 .calendar-day:hover{background:var(--gray);}
 .calendar-day.other-month{color:var(--gray3);}
 .calendar-day.today{background:var(--green-light);color:var(--green);font-weight:700;}
-.calendar-day.has-events::after{content:'·';position:absolute;bottom:2px;color:var(--green);font-size:16px;}
-/* カレンダー色分けドット */
-.calendar-day .cal-dots{position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center;gap:2px;pointer-events:none;}
-.calendar-day .cal-dot{width:5px;height:5px;border-radius:50%;}
-.calendar-day .cal-dot.past{background:var(--gray3);}
-.calendar-day .cal-dot.future{background:var(--green);}
-.calendar-day .cal-dot.overdue{background:var(--red);}
+.calendar-day.has-events::after{content:'';}
+/* カレンダー: Googleカレンダー風 バー表示 */
+.calendar-day{padding-top:2px;padding-bottom:14px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;}
+.calendar-day .cal-bars{position:absolute;bottom:2px;left:0;right:0;display:flex;flex-direction:column;gap:1px;pointer-events:none;}
+.calendar-day .cal-bar{height:3px;font-size:0;}
+.calendar-day .cal-bar.b-past{background:var(--gray3);}
+.calendar-day .cal-bar.b-future{background:var(--green);}
+.calendar-day .cal-bar.b-overdue{background:var(--red);}
+/* 単日 / 開始 / 終了 / 中日 でバーの伸び方を変えて連続感 */
+.calendar-day .cal-bar.b-single{margin:0 3px;border-radius:2px;}
+.calendar-day .cal-bar.b-start{margin-left:3px;margin-right:-4px;border-radius:2px 0 0 2px;}
+.calendar-day .cal-bar.b-end{margin-left:-4px;margin-right:3px;border-radius:0 2px 2px 0;}
+.calendar-day .cal-bar.b-mid{margin-left:-4px;margin-right:-4px;}
 
 /* Todo item */
 .todo-item{display:flex;align-items:center;gap:10px;padding:10px;background:var(--white);border-radius:6px;margin-bottom:8px;border-left:4px solid var(--green);}
@@ -811,8 +817,9 @@ select{appearance:auto;}
 <!-- CALENDAR -->
 <div class="page" id="page-calendar">
   <div class="action-bar">
-    <button class="btn btn-secondary" onclick="addJournal()">+ 日記</button>
-    <button class="btn btn-secondary" onclick="openScheduleModal()">+ 予定</button>
+    <button class="btn btn-primary" onclick="openScheduleModal(null, today())">+ 予定</button>
+    <button class="btn btn-primary" onclick="addCalendarTodo(today())">+ ToDo</button>
+    <button class="btn btn-secondary" onclick="addJournal(today())">+ 日記</button>
   </div>
   <div id="calendar-widget" style="margin-bottom:20px;"></div>
   <div id="calendar-records" style="margin-top:20px;"></div>
@@ -4470,6 +4477,17 @@ function renderCalendar(date) {
     const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
     const isToday = dateStr === today_;
     const isPast = dateStr < today_;
+
+    // 該当日に絡む予定（複数日対応）
+    const dayScheds = data.schedules.filter(s => {
+      const start = fmtDate(s.date);
+      const end = fmtDate(s.endDate || s.date);
+      return start <= dateStr && dateStr <= end;
+    });
+    // 未完了ToDo
+    const dayTodos = data.property.flatMap(p => (p.todos||[]).filter(t => fmtDate(t.due) === dateStr && !t.archived));
+    const hasActiveTodo = dayTodos.some(t => !t.done);
+    const hasOverdueTodo = isPast && hasActiveTodo;
     // 実行済み（過去の活動記録）
     const hasPast = (
       data.action.some(a => fmtDate(a.date) === dateStr) ||
@@ -4477,22 +4495,30 @@ function renderCalendar(date) {
       data.learns.some(l => fmtDate(l.date) === dateStr) ||
       data.property.some(p => (p.timeline||[]).some(t => fmtDate(t.date) === dateStr))
     );
-    // 予定（複数日対応: 開始〜終了の範囲内に含まれる日）
-    const hasSchedule = data.schedules.some(s => {
+
+    // バー生成
+    let bars = '';
+    // 予定バー（複数日対応で position class 付与）
+    dayScheds.slice(0, 3).forEach(function(s){
       const start = fmtDate(s.date);
       const end = fmtDate(s.endDate || s.date);
-      return start <= dateStr && dateStr <= end;
+      let posCls = ' b-single';
+      if (start !== end) {
+        if (dateStr === start) posCls = ' b-start';
+        else if (dateStr === end) posCls = ' b-end';
+        else posCls = ' b-mid';
+      }
+      bars += '<span class="cal-bar b-future' + posCls + '" title="' + esc(s.title||'') + '"></span>';
     });
-    // 未完了ToDo
-    const hasActiveTodo = data.property.some(p => (p.todos||[]).some(t => fmtDate(t.due) === dateStr && !t.done && !t.archived));
-    const hasOverdue = isPast && hasActiveTodo;
+    // ToDo (期限切れは赤、それ以外は緑)
+    if (hasActiveTodo) {
+      const cls = hasOverdueTodo ? 'b-overdue' : 'b-future';
+      bars += '<span class="cal-bar ' + cls + ' b-single" title="ToDo"></span>';
+    }
+    // 実行済み
+    if (hasPast) bars += '<span class="cal-bar b-past b-single" title="実行済み"></span>';
 
-    let dots = '';
-    if (hasPast) dots += '<span class="cal-dot past" title="実行済み"></span>';
-    if (hasOverdue) dots += '<span class="cal-dot overdue" title="期限切れToDo"></span>';
-    else if (hasSchedule || hasActiveTodo) dots += '<span class="cal-dot future" title="予定/ToDo"></span>';
-
-    html += '<div class="calendar-day' + (isToday ? ' today' : '') + '" onclick="showCalendarDate(\'' + dateStr + '\')">' + d + (dots ? '<div class="cal-dots">' + dots + '</div>' : '') + '</div>';
+    html += '<div class="calendar-day' + (isToday ? ' today' : '') + '" onclick="showCalendarDate(\'' + dateStr + '\')">' + d + (bars ? '<div class="cal-bars">' + bars + '</div>' : '') + '</div>';
   }
 
   // Next month dates
@@ -4540,14 +4566,8 @@ function renderCalendarPage() {
   const isPast = dateStr < today_;
   const isToday = dateStr === today_;
 
-  let html = '<div style="font-size:10.5px;color:var(--gray4);margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap;"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gray3);vertical-align:middle;margin-right:3px;"></span>実行済み</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);vertical-align:middle;margin-right:3px;"></span>予定・ToDo</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);vertical-align:middle;margin-right:3px;"></span>期限切れ</span></div>';
-  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">';
-  html += '<h3 style="font-size:14px;margin:0;">' + dateStr + ' の記録</h3>';
-  html += '<div style="display:flex;gap:6px;">';
-  html += '<button class="btn btn-secondary btn-sm" onclick="openScheduleModal(null, \''+dateStr+'\')">+ 予定</button>';
-  html += '<button class="btn btn-secondary btn-sm" onclick="addCalendarTodo(\''+dateStr+'\')">+ ToDo</button>';
-  html += '<button class="btn btn-secondary btn-sm" onclick="addJournal(\''+dateStr+'\')">+ 日記</button>';
-  html += '</div></div>';
+  let html = '<div style="font-size:10.5px;color:var(--gray4);margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap;"><span><span style="display:inline-block;width:14px;height:3px;background:var(--gray3);vertical-align:middle;margin-right:3px;border-radius:1px;"></span>実行済み</span><span><span style="display:inline-block;width:14px;height:3px;background:var(--green);vertical-align:middle;margin-right:3px;border-radius:1px;"></span>予定・ToDo</span><span><span style="display:inline-block;width:14px;height:3px;background:var(--red);vertical-align:middle;margin-right:3px;border-radius:1px;"></span>期限切れ</span></div>';
+  html += '<h3 style="font-size:14px;margin-bottom:10px;">' + dateStr + ' の記録</h3>';
 
   const schedules = data.schedules.filter(s => {
     const start = fmtDate(s.date);
@@ -4569,17 +4589,14 @@ function renderCalendarPage() {
       const start = fmtDate(s.date);
       const end = fmtDate(s.endDate || s.date);
       const isMultiDay = start !== end;
-      let position = '';
-      if (isMultiDay) {
-        if (dateStr === start) position = '開始';
-        else if (dateStr === end) position = '終了';
-        else position = '継続中';
-      }
       html += '<div class="card" style="border-left:3px solid var(--green);">';
-      const positionTag = position ? '<span style="display:inline-block;font-size:10px;background:var(--green);color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px;font-weight:700;">'+position+'</span>' : '';
-      const timeStr = (dateStr === start ? (s.time||'終日') : (dateStr === end && s.endTime ? '〜'+s.endTime : '終日'));
-      html += '<div style="font-weight:700;">' + positionTag + timeStr + ' · ' + esc(s.title) + '</div>';
-      if (isMultiDay) html += '<div style="font-size:11px;color:var(--gray4);margin-top:2px;">📅 '+start+(s.time?' '+s.time:'')+' 〜 '+end+(s.endTime?' '+s.endTime:'')+'</div>';
+      html += '<div style="font-weight:700;">' + esc(s.title) + '</div>';
+      if (isMultiDay) {
+        html += '<div style="font-size:11.5px;color:var(--gray4);margin-top:2px;">📅 '+start+(s.time?' '+s.time:'')+' 〜 '+end+(s.endTime?' '+s.endTime:'')+'</div>';
+      } else {
+        const timeStr = s.time ? s.time + (s.endTime ? '〜'+s.endTime : '') : '終日';
+        html += '<div style="font-size:11.5px;color:var(--gray4);margin-top:2px;">'+timeStr+'</div>';
+      }
       if(s.memo) html += '<div style="font-size:12px;color:var(--gray3);margin-top:4px;">'+esc(s.memo)+'</div>';
       html += '<div style="margin-top:6px;display:flex;gap:4px;">';
       html += '<button class="btn btn-secondary btn-sm" onclick="editSchedule(\''+s.id+'\')">編集</button>';

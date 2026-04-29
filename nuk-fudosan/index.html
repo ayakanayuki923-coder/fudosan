@@ -383,6 +383,14 @@ select{appearance:auto;}
 .todo-item-text{font-size:13px;letter-spacing:.02em;}
 .todo-archive{font-size:12px;color:var(--gray3);padding:3px 8px;background:none;border:1px solid var(--gray2);border-radius:2px;cursor:pointer;margin-left:auto;}
 .todo-archive:hover{color:#1f3d1f;border-color:#4a6a4a;background:#eef2ed;}
+/* Home: コンパクトToDo */
+.home-todo-compact{background:var(--white);border:1px solid var(--gray2);border-radius:3px;}
+.home-todo-compact .todo-row{display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:1px solid #f0f0f0;font-size:12.5px;}
+.home-todo-compact .todo-row:last-child{border-bottom:none;}
+.home-todo-compact .todo-row.overdue{background:#fff5f5;}
+.home-todo-compact .todo-row input[type=checkbox]{width:auto;margin:0;cursor:pointer;flex-shrink:0;}
+.home-todo-compact .todo-text{flex:1;line-height:1.4;min-width:0;word-break:break-word;}
+.home-todo-compact .todo-meta{font-size:10.5px;color:var(--gray3);white-space:nowrap;}
 
 /* action-bar */
 .action-bar{gap:6px;margin-bottom:12px;}
@@ -731,14 +739,14 @@ select{appearance:auto;}
     <button class="btn btn-primary" onclick="openPropertyModal()">+ 物件追加</button>
   </div>
 
+  <!-- ToDo (TOP) -->
+  <h3>✅ ToDo</h3>
+  <div id="home-todo-list" style="margin-bottom:12px;"></div>
+
   <!-- 物件サマリー (フェーズ別件数) -->
   <h3>🏢 物件サマリー</h3>
   <div id="home-property-summary" style="margin-bottom:12px;"></div>
   <div id="home-property-list"></div>
-
-  <!-- ToDo section -->
-  <h3>✅ 期限近いToDo</h3>
-  <div id="home-todo-list"></div>
 
   <!-- 2カラム: Learn + Memo (PC) / 縦積み(モバイル) -->
   <div class="home-2col">
@@ -4861,38 +4869,47 @@ function renderHome() {
   // Calendar widget
   document.getElementById('home-calendar-widget').innerHTML = renderCalendar(new Date());
 
-  // Todo list (archived以外)
+  // Todo list (完了orアーカイブは非表示)
   const allTodos = data.property.flatMap(p => (p.todos||[]).map(t => ({...t, prop: p.name, propId: p.id})));
-  const activeTodos = allTodos.filter(t => !t.archived);
-  const archivedTodos = allTodos.filter(t => t.archived);
-  const sortedTodos = activeTodos.sort((a,b) => (a.due||'') > (b.due||'') ? 1 : -1);
+  // 表示対象: 未完了 かつ 未アーカイブ
+  const activeTodos = allTodos.filter(t => !t.done && !t.archived);
+  // 完了済み or アーカイブ済み
+  const doneTodos = allTodos.filter(t => t.done || t.archived);
+  // 並び順: 期限日近い順 → 期限日未設定が最後
+  const todayStr = today();
+  const sortedTodos = activeTodos.sort(function(a,b){
+    const dueA = fmtDate(a.due || '');
+    const dueB = fmtDate(b.due || '');
+    if (!dueA && !dueB) return 0;
+    if (!dueA) return 1;   // a 期限なし → 後
+    if (!dueB) return -1;  // b 期限なし → 前
+    return dueA > dueB ? 1 : -1;
+  });
   const todoEl = document.getElementById('home-todo-list');
   let todoHtml = sortedTodos.length ?
-    sortedTodos.map(t => {
-      const isOverdue = t.due && t.due < today() && !t.done;
-      return '<div class="todo-item' + (t.done ? ' done' : '') + (isOverdue ? ' overdue' : '') + '">' +
-        '<input type="checkbox" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(\'' + t.propId + '\',\'' + t.id + '\')">' +
-        '<div class="todo-item-content">' +
-        '<div class="todo-item-text">' + esc(t.text) + '</div>' +
-        '<div class="todo-item-meta">' + esc(t.prop) + (t.due ? ' · ' + t.due : '') + '</div>' +
-        '</div>' +
-        (t.done ? '<button class="todo-archive" onclick="archiveTodo(\'' + t.propId + '\',\'' + t.id + '\')" title="完了済みをアーカイブ">📁</button>' : '') +
+    '<div class="home-todo-compact">' + sortedTodos.map(t => {
+      const dueDate = fmtDate(t.due || '');
+      const isOverdue = dueDate && dueDate < todayStr;
+      const isToday = dueDate === todayStr;
+      const dueLabel = !dueDate ? '期限なし' : (isOverdue ? '⚠ '+dueDate : (isToday ? '今日' : dueDate));
+      const dueColor = isOverdue ? 'var(--red)' : (isToday ? 'var(--green)' : 'var(--gray3)');
+      return '<div class="todo-row' + (isOverdue ? ' overdue' : '') + '">' +
+        '<input type="checkbox" onchange="toggleTodo(\'' + t.propId + '\',\'' + t.id + '\')">' +
+        '<div class="todo-text">' + esc(t.text) + '</div>' +
+        '<div class="todo-meta"><span style="color:'+dueColor+';">'+dueLabel+'</span> · '+esc(t.prop)+'</div>' +
         '</div>';
-    }).join('') :
-    '<div class="empty" style="padding:20px;"><div class="icon">✅</div>ToDoはありません</div>';
-  // アーカイブ済み折りたたみ
-  if (archivedTodos.length) {
-    todoHtml += '<details style="margin-top:8px;background:var(--white);border:1px solid var(--gray2);border-radius:3px;padding:8px 12px;">';
-    todoHtml += '<summary style="cursor:pointer;font-size:11.5px;color:var(--gray3);font-weight:600;">📁 アーカイブ済みToDo ('+archivedTodos.length+'件)</summary>';
-    todoHtml += '<div style="margin-top:6px;">';
-    archivedTodos.sort((a,b) => (b.due||'') > (a.due||'') ? 1 : -1).forEach(function(t){
-      todoHtml += '<div class="todo-item done" style="opacity:.65;">' +
-        '<input type="checkbox" checked disabled>' +
-        '<div class="todo-item-content">' +
-        '<div class="todo-item-text">' + esc(t.text) + '</div>' +
-        '<div class="todo-item-meta">' + esc(t.prop) + (t.due ? ' · ' + t.due : '') + '</div>' +
-        '</div>' +
-        '<button class="todo-archive" onclick="unarchiveTodo(\'' + t.propId + '\',\'' + t.id + '\')" title="アクティブに戻す">↩</button>' +
+    }).join('') + '</div>' :
+    '<div style="padding:8px 12px;color:var(--gray3);font-size:12px;">ToDoはありません</div>';
+  // 完了済み（アーカイブ済み含む）折りたたみ
+  if (doneTodos.length) {
+    todoHtml += '<details style="margin-top:6px;font-size:11px;">';
+    todoHtml += '<summary style="cursor:pointer;color:var(--gray3);padding:4px 0;">完了済み ('+doneTodos.length+'件)</summary>';
+    todoHtml += '<div class="home-todo-compact" style="margin-top:4px;">';
+    doneTodos.sort((a,b) => (b.due||'') > (a.due||'') ? 1 : -1).forEach(function(t){
+      todoHtml += '<div class="todo-row" style="opacity:.55;">' +
+        '<input type="checkbox" checked onchange="unarchiveTodo(\'' + t.propId + '\',\'' + t.id + '\')">' +
+        '<div class="todo-text" style="text-decoration:line-through;">' + esc(t.text) + '</div>' +
+        '<div class="todo-meta">'+esc(t.prop)+'</div>' +
         '</div>';
     });
     todoHtml += '</div></details>';

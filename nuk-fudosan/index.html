@@ -1376,12 +1376,41 @@ select{appearance:auto;}
   </div>
   <form onsubmit="saveSchedule(event)">
     <input type="hidden" id="schedule-id">
-    <div class="form-group"><label>日付</label><input type="date" id="schedule-date"></div>
-    <div class="form-group"><label>時間</label><input type="text" id="schedule-time" placeholder="HH:MM"></div>
+    <div class="form-row">
+      <div class="form-group"><label>開始日 *</label><input type="date" id="schedule-date" required></div>
+      <div class="form-group"><label>開始時間</label><input type="time" id="schedule-time"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>終了日</label><input type="date" id="schedule-end-date"></div>
+      <div class="form-group"><label>終了時間</label><input type="time" id="schedule-end-time"></div>
+    </div>
+    <div style="font-size:10.5px;color:var(--gray3);margin:-6px 0 8px;">※ 終了日は省略可（単日予定）。複数日にまたがる予定はカレンダー上で全期間ハイライト</div>
     <div class="form-group"><label>タイトル *</label><input type="text" id="schedule-title" required></div>
     <div class="form-group"><label>メモ</label><textarea id="schedule-memo" rows="2"></textarea></div>
-    <div style="margin-top:20px;">
-      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">保存</button>
+    <div style="margin-top:20px;display:flex;gap:8px;">
+      <button type="button" class="btn btn-danger" onclick="deleteScheduleFromModal()">🗑 削除</button>
+      <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">保存</button>
+    </div>
+  </form>
+</div>
+</div>
+
+<!-- Calendar ToDo Modal -->
+<div class="modal-overlay" id="modal-cal-todo">
+<div class="modal">
+  <div class="modal-header">
+    <h2>ToDo追加</h2>
+    <button class="modal-close" onclick="closeModal('modal-cal-todo')">&times;</button>
+  </div>
+  <form onsubmit="saveCalendarTodo(event)">
+    <div class="form-group"><label>対象物件 *</label>
+      <select id="cal-todo-prop" required></select>
+    </div>
+    <div class="form-group"><label>内容 *</label><input type="text" id="cal-todo-text" placeholder="例: 役所に接道確認" required></div>
+    <div class="form-group"><label>期限</label><input type="date" id="cal-todo-due"></div>
+    <div style="margin-top:20px;display:flex;gap:8px;">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('modal-cal-todo')">キャンセル</button>
+      <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;">追加</button>
     </div>
   </form>
 </div>
@@ -4448,8 +4477,12 @@ function renderCalendar(date) {
       data.learns.some(l => fmtDate(l.date) === dateStr) ||
       data.property.some(p => (p.timeline||[]).some(t => fmtDate(t.date) === dateStr))
     );
-    // 予定
-    const hasSchedule = data.schedules.some(s => fmtDate(s.date) === dateStr);
+    // 予定（複数日対応: 開始〜終了の範囲内に含まれる日）
+    const hasSchedule = data.schedules.some(s => {
+      const start = fmtDate(s.date);
+      const end = fmtDate(s.endDate || s.date);
+      return start <= dateStr && dateStr <= end;
+    });
     // 未完了ToDo
     const hasActiveTodo = data.property.some(p => (p.todos||[]).some(t => fmtDate(t.due) === dateStr && !t.done && !t.archived));
     const hasOverdue = isPast && hasActiveTodo;
@@ -4508,9 +4541,19 @@ function renderCalendarPage() {
   const isToday = dateStr === today_;
 
   let html = '<div style="font-size:10.5px;color:var(--gray4);margin-bottom:8px;display:flex;gap:10px;flex-wrap:wrap;"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gray3);vertical-align:middle;margin-right:3px;"></span>実行済み</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);vertical-align:middle;margin-right:3px;"></span>予定・ToDo</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);vertical-align:middle;margin-right:3px;"></span>期限切れ</span></div>';
-  html += '<h3 style="font-size:14px;margin-bottom:10px;">' + dateStr + ' の記録</h3>';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">';
+  html += '<h3 style="font-size:14px;margin:0;">' + dateStr + ' の記録</h3>';
+  html += '<div style="display:flex;gap:6px;">';
+  html += '<button class="btn btn-secondary btn-sm" onclick="openScheduleModal(null, \''+dateStr+'\')">+ 予定</button>';
+  html += '<button class="btn btn-secondary btn-sm" onclick="addCalendarTodo(\''+dateStr+'\')">+ ToDo</button>';
+  html += '<button class="btn btn-secondary btn-sm" onclick="addJournal(\''+dateStr+'\')">+ 日記</button>';
+  html += '</div></div>';
 
-  const schedules = data.schedules.filter(s => fmtDate(s.date) === dateStr).sort((a,b) => a.time > b.time ? 1 : -1);
+  const schedules = data.schedules.filter(s => {
+    const start = fmtDate(s.date);
+    const end = fmtDate(s.endDate || s.date);
+    return start <= dateStr && dateStr <= end;
+  }).sort((a,b) => (a.time||'') > (b.time||'') ? 1 : -1);
   const memos = data.action.filter(m => fmtDate(m.date) === dateStr);
   const learns = data.learns.filter(l => fmtDate(l.date) === dateStr);
   const logs = data.property.flatMap(p => (p.timeline||[]).filter(t => fmtDate(t.date) === dateStr).map(t => ({...t, prop: p.name})));
@@ -4523,8 +4566,20 @@ function renderCalendarPage() {
   if (schedules.length || todos.length) {
     html += '<h4 style="font-size:13px;margin:12px 0 8px;color:var(--green);border-left:3px solid var(--green);padding-left:8px;">📅 予定・ToDo</h4>';
     schedules.forEach(s => {
+      const start = fmtDate(s.date);
+      const end = fmtDate(s.endDate || s.date);
+      const isMultiDay = start !== end;
+      let position = '';
+      if (isMultiDay) {
+        if (dateStr === start) position = '開始';
+        else if (dateStr === end) position = '終了';
+        else position = '継続中';
+      }
       html += '<div class="card" style="border-left:3px solid var(--green);">';
-      html += '<div style="font-weight:700;">' + (s.time||'終日') + ' · ' + esc(s.title) + '</div>';
+      const positionTag = position ? '<span style="display:inline-block;font-size:10px;background:var(--green);color:#fff;padding:1px 6px;border-radius:2px;margin-right:6px;font-weight:700;">'+position+'</span>' : '';
+      const timeStr = (dateStr === start ? (s.time||'終日') : (dateStr === end && s.endTime ? '〜'+s.endTime : '終日'));
+      html += '<div style="font-weight:700;">' + positionTag + timeStr + ' · ' + esc(s.title) + '</div>';
+      if (isMultiDay) html += '<div style="font-size:11px;color:var(--gray4);margin-top:2px;">📅 '+start+(s.time?' '+s.time:'')+' 〜 '+end+(s.endTime?' '+s.endTime:'')+'</div>';
       if(s.memo) html += '<div style="font-size:12px;color:var(--gray3);margin-top:4px;">'+esc(s.memo)+'</div>';
       html += '<div style="margin-top:6px;display:flex;gap:4px;">';
       html += '<button class="btn btn-secondary btn-sm" onclick="editSchedule(\''+s.id+'\')">編集</button>';
@@ -4603,8 +4658,10 @@ function openScheduleModal(id, dateStr) {
   document.getElementById('schedule-modal-title').textContent = id ? '予定編集' : '予定追加';
   const s = id ? data.schedules.find(x => String(x.id) === String(id)) : null;
   document.getElementById('schedule-id').value = id || '';
-  document.getElementById('schedule-date').value = s ? s.date : (dateStr || today());
+  document.getElementById('schedule-date').value = s ? fmtDate(s.date) : (dateStr || today());
   document.getElementById('schedule-time').value = s ? (s.time||'') : '';
+  document.getElementById('schedule-end-date').value = s ? fmtDate(s.endDate||'') : '';
+  document.getElementById('schedule-end-time').value = s ? (s.endTime||'') : '';
   document.getElementById('schedule-title').value = s ? s.title : '';
   document.getElementById('schedule-memo').value = s ? (s.memo||'') : '';
   m.classList.add('show');
@@ -4617,8 +4674,16 @@ function saveSchedule(e) {
   const s = isEdit ? data.schedules.find(x => String(x.id) === String(id)) : { id: genId() };
   s.date = document.getElementById('schedule-date').value;
   s.time = document.getElementById('schedule-time').value;
+  s.endDate = document.getElementById('schedule-end-date').value;
+  s.endTime = document.getElementById('schedule-end-time').value;
   s.title = document.getElementById('schedule-title').value;
   s.memo = document.getElementById('schedule-memo').value;
+  // 終了日が開始日より前なら入れ替え or クリア
+  if (s.endDate && s.endDate < s.date) {
+    toast('終了日が開始日より前です。終了日をクリアします', 'error');
+    s.endDate = '';
+    s.endTime = '';
+  }
   if (!isEdit) data.schedules.push(s);
   saveData();
   closeModal('modal-schedule');
@@ -4627,6 +4692,54 @@ function saveSchedule(e) {
 }
 
 function editSchedule(id) { openScheduleModal(id); }
+
+function addCalendarTodo(dateStr) {
+  if (!data.property.length) {
+    toast('物件を先に追加してください', 'error');
+    return;
+  }
+  openCalendarTodoModal(dateStr);
+}
+
+function openCalendarTodoModal(dateStr) {
+  document.getElementById('cal-todo-due').value = dateStr;
+  // 物件selectを更新
+  const sel = document.getElementById('cal-todo-prop');
+  sel.innerHTML = data.property
+    .filter(p => p.status !== '売却済')
+    .map(p => '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>')
+    .join('');
+  document.getElementById('cal-todo-text').value = '';
+  document.getElementById('modal-cal-todo').classList.add('show');
+  setTimeout(function(){ document.getElementById('cal-todo-text').focus(); }, 50);
+}
+
+function saveCalendarTodo(e) {
+  e.preventDefault();
+  const propId = document.getElementById('cal-todo-prop').value;
+  const text = document.getElementById('cal-todo-text').value.trim();
+  const due = document.getElementById('cal-todo-due').value;
+  if (!text) { toast('内容を入力してください', 'error'); return; }
+  const p = data.property.find(x => String(x.id) === String(propId));
+  if (!p) { toast('物件が見つかりません', 'error'); return; }
+  if (!p.todos) p.todos = [];
+  p.todos.push({ id: genId(), text: text, due: due, done: false, archived: false });
+  saveData();
+  closeModal('modal-cal-todo');
+  toast('ToDo追加: ' + p.name);
+  renderCurrentPage();
+}
+
+function deleteScheduleFromModal() {
+  const id = document.getElementById('schedule-id').value;
+  if (!id) { closeModal('modal-schedule'); return; }
+  if (!confirm('この予定を削除しますか？')) return;
+  data.schedules = data.schedules.filter(x => String(x.id) !== String(id));
+  saveData();
+  closeModal('modal-schedule');
+  toast('削除しました');
+  renderCurrentPage();
+}
 
 function deleteSchedule(id) {
   const idx = data.schedules.findIndex(x => String(x.id) === String(id));
